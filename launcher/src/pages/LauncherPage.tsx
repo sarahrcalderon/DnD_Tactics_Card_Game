@@ -1,27 +1,23 @@
-// launcher/src/pages/LauncherPage.tsx
 import { useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import toast from 'react-hot-toast';
-
-// ============================================================
-// TIPOS PYWEBVIEW
-// ============================================================
 
 declare global {
   interface Window {
     pywebview?: {
       api: {
-        startGame: () => Promise<{ success: boolean; message: string }>;
-        loadGame: () => Promise<{ success: boolean; message: string }>;
-        saveGame: () => Promise<{ success: boolean; message: string }>;
-        quit: () => Promise<void>;
+        start_game: () => Promise<{ success: boolean; message: string }>;
+        load_game: () => Promise<{ success: boolean; message: string }>;
+        save_game: () => Promise<{ success: boolean; message: string }>;
+        quit_app: () => Promise<void>;
       };
     };
   }
 }
 
 // ============================================================
-// STYLED COMPONENTS - COM WALLPAPER
+// STYLED COMPONENTS
 // ============================================================
 
 const Container = styled.div`
@@ -154,10 +150,6 @@ const Footer = styled.div`
 const Version = styled.span``;
 const Credits = styled.span``;
 
-// ============================================================
-// STATUS PYWEBVIEW
-// ============================================================
-
 const StatusBadge = styled.div`
   display: inline-block;
   background: rgba(76, 175, 80, 0.15);
@@ -180,15 +172,16 @@ interface LauncherOption {
 }
 
 export const LauncherPage = () => {
+  const navigate = useNavigate();
   const [selectedIndex, setSelectedIndex] = useState<number>(0);
   const [isPywebview, setIsPywebview] = useState<boolean>(false);
 
   const options: LauncherOption[] = [
-    { id: 'iniciar', label: 'Iniciar Jogo', icon: '⚔️' },
-    { id: 'continuar', label: 'Continuar Jogo', icon: '📂' },
-    { id: 'carregar', label: 'Carregar Jogo', icon: '📥' },
-    { id: 'opcoes', label: 'Opções', icon: '⚙️' },
-    { id: 'sair', label: 'Sair', icon: '🚪' },
+    { id: 'iniciar', label: 'Iniciar Jogo', icon: '' },
+    { id: 'continuar', label: 'Continuar Jogo', icon: '' },
+    { id: 'carregar', label: 'Carregar Jogo', icon: '' },
+    { id: 'opcoes', label: 'Opções', icon: '' },
+    { id: 'sair', label: 'Sair', icon: '' },
   ];
 
   // ============================================================
@@ -198,13 +191,12 @@ export const LauncherPage = () => {
   useEffect(() => {
     if (window.pywebview) {
       setIsPywebview(true);
-      console.log('✅ Pywebview detectado!');
+      console.log(' Pywebview detectado!');
+      console.log(' API disponível:', Object.keys(window.pywebview.api || {}));
+    } else {
+      console.log('ℹ Modo navegador (sem pywebview)');
     }
   }, []);
-
-  // ============================================================
-  // TECLADO
-  // ============================================================
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -224,7 +216,7 @@ export const LauncherPage = () => {
   }, [selectedIndex]);
 
   // ============================================================
-  // AÇÕES
+  // AÇÕES - USANDO OS NOMES CORRETOS DA API
   // ============================================================
 
   const handleSelect = async (id: string) => {
@@ -232,40 +224,53 @@ export const LauncherPage = () => {
       switch (id) {
         case 'iniciar':
           toast.loading('Iniciando jogo...');
-          if (window.pywebview) {
-            const result = await window.pywebview.api.startGame();
-            toast.success(result.message);
+
+          if (window.pywebview && window.pywebview.api) {
+            try {
+              const result = await window.pywebview.api.start_game();
+              if (result.success) {
+                toast.success(result.message);
+              } else {
+                toast.error(result.message);
+              }
+            } catch (err) {
+              console.error('Erro ao chamar start_game:', err);
+              toast.error('Erro ao iniciar jogo via pywebview');
+            }
           } else {
-            toast.success('🎮 Jogo iniciado!');
+            toast.success('🎮 Modo navegador - Jogo iniciado!');
           }
+
+          // Navega para a seleção de classe
+          setTimeout(() => navigate('/class-select'), 500);
           break;
 
         case 'continuar':
-          if (window.pywebview) {
-            const result = await window.pywebview.api.loadGame();
+          if (window.pywebview && window.pywebview.api) {
+            const result = await window.pywebview.api.load_game();
             toast.success(result.message);
           } else {
-            toast.success('📂 Jogo continuado!');
+            toast.success(' Jogo continuado!');
           }
           break;
 
         case 'carregar':
-          if (window.pywebview) {
-            const result = await window.pywebview.api.saveGame();
+          if (window.pywebview && window.pywebview.api) {
+            const result = await window.pywebview.api.save_game();
             toast.success(result.message);
           } else {
-            toast.success('📥 Jogo carregado!');
+            toast.success(' Jogo carregado!');
           }
           break;
 
         case 'opcoes':
-          toast('⚙️ Abrindo opções...');
+          toast('Abrindo opções...');
           break;
 
         case 'sair':
-          toast('👋 Saindo...');
-          if (window.pywebview) {
-            await window.pywebview.api.quit();
+          toast(' Saindo...');
+          if (window.pywebview && window.pywebview.api) {
+            await window.pywebview.api.quit_app();
           } else {
             setTimeout(() => window.close(), 500);
           }
@@ -275,22 +280,18 @@ export const LauncherPage = () => {
           break;
       }
     } catch (error) {
+      console.error('Erro:', error);
       toast.error('Erro ao executar ação');
-      console.error(error);
     }
   };
-
-  // ============================================================
-  // RENDER
-  // ============================================================
 
   return (
     <Container>
       <Content>
         {isPywebview && <StatusBadge>🔗 Pywebview Conectado</StatusBadge>}
 
-        <Title>D&D TACTICS</Title>
-        <Subtitle>⚔️ Card Game ⚔️</Subtitle>
+        <Title>DUNGEON TACTICS</Title>
+        <Subtitle> Card Game </Subtitle>
 
         <MenuContainer>
           {options.map((option, index) => (
