@@ -1,0 +1,23 @@
+# backend/core/state.py
+from enum import Enum
+
+class GameState(Enum):
+    MENU = 'MENU'
+    CLASS_SELECT = 'CLASS_SELECT'
+    RACE_SELECT = 'RACE_SELECT'
+    BUILD_SELECT = 'BUILD_SELECT'
+    ATTRIBUTE_DIST = 'ATTRIBUTE_DIST'
+    DECK_BUILDER = 'DECK_BUILDER'
+    MAP = 'MAP'
+    BATTLE = 'BATTLE'
+    OPTIONS = 'OPTIONS'
+    CHARACTER = 'CHARACTER'
+    GAME_OVER = 'GAME_OVER'
+    PAUSED = 'PAUSED'
+
+class BattleState(Enum):
+    WAITING = 'WAITING'
+    PLAYER_TURN = 'PLAYER_TURN'
+    ENEMY_TURN = 'ENEMY_TURN'
+    ANIMATION = 'ANIMATION'
+    END = 'END'
