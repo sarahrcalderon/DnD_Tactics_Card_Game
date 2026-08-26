@@ -68,3 +68,4 @@ htmlcov/
 *.whl
 *.tar.gz
 *.zip
+node_modules
