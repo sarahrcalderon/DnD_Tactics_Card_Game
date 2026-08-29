@@ -1,456 +1,198 @@
-import os
 import sys
-import time
-import shutil
+import os
 import subprocess
+import time
 import threading
-
 import requests
+import signal
+from pathlib import Path
 import webview
+import logging
+
+logging.basicConfig(
+    level=logging.INFO,
+    format='[%(levelname)s] %(message)s'
+)
+logger = logging.getLogger(__name__)
 
 
 class Launcher:
     def __init__(self):
-        self.window = None
-
-        # --------------------------------------------------------
-        # Caminhos
-        # --------------------------------------------------------
-
-        self.project_root = os.path.dirname(
-            os.path.dirname(
-                os.path.dirname(
-                    os.path.abspath(__file__)
-                )
-            )
-        )
-
-        self.launcher_dir = os.path.join(
-            self.project_root,
-            "launcher"
-        )
-
-        self.react_port = 5173
-        self.react_url = f"http://127.0.0.1:{self.react_port}"
-
         self.react_process = None
-
-        # --------------------------------------------------------
-        # Node / npm
-        # --------------------------------------------------------
-
-        self.npm_command = self.find_npm()
-
-    # ============================================================
-    # LOCALIZAR NPM
-    # ============================================================
+        self.window = None
+        self.react_ready = False
+        self.shutting_down = False
+        self.port = 5173
+        self.host = "127.0.0.1"
+        self.react_url = f"http://{self.host}:{self.port}"
+        # Caminho para o frontend (pasta launcher na raiz)
+        self.react_dir = Path(__file__).parent.parent.parent / "launcher"
 
     def find_npm(self):
-        """
-        Localiza o npm no Windows sem depender de PATH perfeito.
-        """
-
-        possible_commands = [
-            "npm.cmd",
+        """Encontra o executável do npm"""
+        npm_paths = [
+            r"C:\Program Files\nodejs\npm.cmd",
+            r"C:\Program Files (x86)\nodejs\npm.cmd",
             "npm",
+            "npm.cmd"
         ]
-
-        for command in possible_commands:
-            path = shutil.which(command)
-
-            if path:
-                print(f"[launcher] npm encontrado: {path}")
-                return path
-
-        # Caminhos comuns do Node.js no Windows
-        possible_paths = [
-            os.path.join(
-                os.environ.get("ProgramFiles", ""),
-                "nodejs",
-                "npm.cmd",
-            ),
-
-            os.path.join(
-                os.environ.get("ProgramFiles(x86)", ""),
-                "nodejs",
-                "npm.cmd",
-            ),
-
-            os.path.join(
-                os.environ.get("APPDATA", ""),
-                "npm",
-                "npm.cmd",
-            ),
-        ]
-
-        for path in possible_paths:
-            if path and os.path.exists(path):
-                print(f"[launcher] npm encontrado: {path}")
-                return path
-
+        
+        for npm in npm_paths:
+            try:
+                result = subprocess.run(
+                    [npm, "--version"],
+                    capture_output=True,
+                    text=True,
+                    shell=True,
+                    timeout=5
+                )
+                if result.returncode == 0:
+                    logger.info(f"npm encontrado: {npm}")
+                    return npm
+            except:
+                continue
+        
+        logger.error("npm não encontrado")
         return None
 
-    # ============================================================
-    # VERIFICAR NODE
-    # ============================================================
-
-    def check_node(self):
-        if not self.npm_command:
-            raise RuntimeError(
-                "npm não foi encontrado no sistema. "
-                "Instale o Node.js ou adicione o Node/npm ao PATH."
-            )
-
-        try:
-            result = subprocess.run(
-                [self.npm_command, "--version"],
-                cwd=self.launcher_dir,
-                capture_output=True,
-                text=True,
-                timeout=10,
-                shell=False,
-            )
-
-            if result.returncode != 0:
-                raise RuntimeError(
-                    f"npm não pôde ser executado:\n"
-                    f"{result.stderr}"
-                )
-
-            print(
-                f"[launcher] npm versão: "
-                f"{result.stdout.strip()}"
-            )
-
-        except FileNotFoundError:
-            raise RuntimeError(
-                "O executável npm não foi encontrado."
-            )
-
-    # ============================================================
-    # INICIAR REACT
-    # ============================================================
-
     def start_react(self):
-        print("[launcher] Iniciando servidor React...")
-
+        """Inicia o servidor React"""
         try:
-            if not os.path.isdir(self.launcher_dir):
-                raise RuntimeError(
-                    f"Diretório do React não encontrado:\n"
-                    f"{self.launcher_dir}"
-                )
+            npm = self.find_npm()
+            if not npm:
+                return False
 
-            package_json = os.path.join(
-                self.launcher_dir,
-                "package.json"
-            )
+            if not self.react_dir.exists():
+                logger.error(f"Diretório React não encontrado: {self.react_dir}")
+                return False
 
-            if not os.path.isfile(package_json):
-                raise RuntimeError(
-                    f"package.json não encontrado em:\n"
-                    f"{self.launcher_dir}"
-                )
-
-            print(
-                f"[launcher] Diretório React: "
-                f"{self.launcher_dir}"
-            )
-
-            # ----------------------------------------------------
-            # Verifica npm
-            # ----------------------------------------------------
-
-            self.check_node()
-
-            # ----------------------------------------------------
-            # Instala dependências somente se necessário
-            # ----------------------------------------------------
-
-            node_modules = os.path.join(
-                self.launcher_dir,
-                "node_modules"
-            )
-
-            if not os.path.isdir(node_modules):
-                print(
-                    "[launcher] node_modules não encontrado."
-                )
-
-                print(
-                    "[launcher] Instalando dependências..."
-                )
-
-                result = subprocess.run(
-                    [self.npm_command, "install"],
-                    cwd=self.launcher_dir,
-                    shell=False,
-                    check=False,
-                )
-
-                if result.returncode != 0:
-                    raise RuntimeError(
-                        "npm install falhou."
-                    )
-
-            # ----------------------------------------------------
-            # Inicia Vite
-            # ----------------------------------------------------
-
-            print(
-                "[launcher] Iniciando Vite..."
-            )
-
-            creationflags = 0
-
-            if sys.platform == "win32":
-                creationflags = (
-                    subprocess.CREATE_NEW_PROCESS_GROUP
-                )
-
+            logger.info(f"Iniciando servidor React em: {self.react_dir}")
+            
             self.react_process = subprocess.Popen(
-                [
-                    self.npm_command,
-                    "run",
-                    "dev",
-                    "--",
-                    "--host",
-                    "127.0.0.1",
-                    "--port",
-                    str(self.react_port),
-                ],
-                cwd=self.launcher_dir,
+                [npm, "run", "dev"],
+                cwd=self.react_dir,
                 stdout=subprocess.PIPE,
-                stderr=subprocess.STDOUT,
+                stderr=subprocess.PIPE,
                 text=True,
-                shell=False,
-                creationflags=creationflags,
+                shell=True,
+                creationflags=subprocess.CREATE_NO_WINDOW if sys.platform == "win32" else 0
             )
 
-            # ----------------------------------------------------
-            # Thread para mostrar logs do Vite
-            # ----------------------------------------------------
-
-            threading.Thread(
-                target=self.read_react_output,
-                daemon=True,
-            ).start()
-
-            # ----------------------------------------------------
-            # Espera o React responder
-            # ----------------------------------------------------
-
-            print(
-                f"[launcher] Aguardando React em "
-                f"{self.react_url}..."
-            )
-
-            for _ in range(60):
-                if self.react_process.poll() is not None:
-                    raise RuntimeError(
-                        "O processo do React encerrou antes "
-                        "de ficar disponível."
-                    )
-
-                try:
-                    response = requests.get(
-                        self.react_url,
-                        timeout=1,
-                    )
-
-                    if response.status_code == 200:
-                        print(
-                            f"[launcher] React disponível em "
-                            f"{self.react_url}"
-                        )
-                        return True
-
-                except requests.RequestException:
-                    pass
-
-                time.sleep(0.5)
-
-            raise RuntimeError(
-                "React não respondeu dentro do tempo esperado."
-            )
-
+            return True
+            
         except Exception as e:
-            print(
-                f"[launcher] Erro ao iniciar React: {e}"
-            )
+            logger.error(f"Erro ao iniciar React: {e}")
+            return False
 
-            self.stop_react()
-
-            raise
-
-    # ============================================================
-    # LOG DO REACT
-    # ============================================================
-
-    def read_react_output(self):
-        """
-        Mostra o output do Vite sem bloquear a interface.
-        """
-
-        if not self.react_process:
-            return
-
-        stdout = self.react_process.stdout
-
-        if stdout is None:
-            return
-
-        try:
-            for line in iter(stdout.readline, ""):
-                line = line.rstrip()
-
-                if line:
-                    print(f"[vite] {line}")
-
-        except Exception:
-            pass
-
-    # ============================================================
-    # PARAR REACT
-    # ============================================================
+    def wait_for_react(self, timeout=30):
+        """Aguarda o servidor React ficar disponível"""
+        start_time = time.time()
+        
+        while time.time() - start_time < timeout:
+            try:
+                if self.react_process and self.react_process.poll() is not None:
+                    logger.error("Servidor React parou")
+                    return False
+                
+                response = requests.get(self.react_url, timeout=2)
+                if response.status_code == 200:
+                    logger.info(f"React disponível em {self.react_url}")
+                    return True
+                    
+            except requests.exceptions.RequestException:
+                pass
+            
+            time.sleep(1)
+        
+        logger.error(f"Timeout aguardando React")
+        return False
 
     def stop_react(self):
-        if not self.react_process:
-            return
-
-        try:
-            if self.react_process.poll() is None:
-                print(
-                    "[launcher] Encerrando servidor React..."
-                )
-
+        """Para o servidor React"""
+        if self.react_process:
+            try:
+                logger.info("Parando servidor React...")
                 self.react_process.terminate()
-
+                self.react_process.wait(timeout=5)
+            except:
                 try:
-                    self.react_process.wait(
-                        timeout=5
-                    )
-                except subprocess.TimeoutExpired:
                     self.react_process.kill()
-
-        except Exception as e:
-            print(
-                f"[launcher] Erro ao encerrar React: {e}"
-            )
-
-        finally:
+                except:
+                    pass
             self.react_process = None
 
-    # ============================================================
-    # API
-    # ============================================================
-
-    def start_game(self):
-        print("[launcher] Iniciando jogo...")
-
-        return {
-            "success": True,
-            "message": "Jogo iniciado!",
-        }
-
-    def load_game(self):
-        print("[launcher] Carregando jogo...")
-
-        return {
-            "success": True,
-            "message": "Jogo carregado!",
-        }
-
-    def save_game(self):
-        print("[launcher] Salvando jogo...")
-
-        return {
-            "success": True,
-            "message": "Jogo salvo!",
-        }
-
-    def quit_app(self):
-        print("[launcher] Fechando launcher...")
-
+    def on_window_closed(self):
+        """Callback quando a janela é fechada"""
+        logger.info("Janela fechada")
+        self.shutting_down = True
         self.stop_react()
 
-        if self.window:
-            try:
-                self.window.destroy()
-            except Exception:
-                pass
-
-    # ============================================================
-    # RUN
-    # ============================================================
+    def create_window(self):
+        """Cria a janela do pywebview"""
+        try:
+            logger.info("Criando janela...")
+            
+            self.window = webview.create_window(
+                title="Dungeons & Tactics - Launcher",
+                url=self.react_url,
+                width=1280,
+                height=800,
+                resizable=True,
+                fullscreen=False,
+                min_size=(800, 600),
+                confirm_close=True,
+                background_color="#0a0810"
+            )
+            
+            logger.info("Iniciando WebView...")
+            
+            webview.start(
+                debug=False,
+                http_server=True,
+                http_port=0,
+                private_mode=False
+            )
+            
+        except Exception as e:
+            logger.error(f"Erro ao criar janela: {e}")
+            return False
+        return True
 
     def run(self):
-        print("[launcher] Iniciando launcher...")
-
-        # --------------------------------------------------------
-        # React é iniciado ANTES da janela
-        # --------------------------------------------------------
-
-        self.start_react()
-
-        # --------------------------------------------------------
-        # Cria a janela somente quando o React estiver disponível
-        # --------------------------------------------------------
-
-        print("[launcher] Criando janela...")
-
-        self.window = webview.create_window(
-            title="D&D Tactics - Launcher",
-            url=self.react_url,
-
-            # Tamanho inicial.
-            # NÃO limita o usuário a esse tamanho.
-            width=1024,
-            height=768,
-
-            resizable=True,
-            fullscreen=False,
-
-            # Permite reduzir, mas não impede maximização.
-            min_size=(800, 600),
-
-            confirm_close=True,
-
-            js_api=self,
-        )
-
+        """Executa o launcher"""
         try:
-            print("[launcher] Iniciando WebView...")
+            logger.info("=" * 50)
+            logger.info("Iniciando Dungeons & Tactics - Launcher")
+            logger.info("=" * 50)
+            
+            if not self.start_react():
+                logger.error("Falha ao iniciar React")
+                return 1
 
-            webview.start(
-                debug=True,
-                http_server=False,
-            )
+            if not self.wait_for_react():
+                logger.error("Falha ao iniciar React")
+                self.stop_react()
+                return 1
 
-        finally:
+            if not self.create_window():
+                self.stop_react()
+                return 1
+
             self.stop_react()
+            logger.info("Launcher finalizado")
+            return 0
 
-
-# ================================================================
-# MAIN
-# ================================================================
-
-def main():
-    try:
-        launcher = Launcher()
-        launcher.run()
-
-    except Exception as e:
-        import traceback
-
-        print(
-            f"❌ Erro fatal: {e}"
-        )
-
-        traceback.print_exc()
-
-        sys.exit(1)
+        except KeyboardInterrupt:
+            logger.info("\nInterrompido pelo usuário")
+            self.stop_react()
+            return 0
+            
+        except Exception as e:
+            logger.error(f"Erro inesperado: {e}")
+            self.stop_react()
+            return 1
 
 
 if __name__ == "__main__":
-    main()
+    launcher = Launcher()
+    sys.exit(launcher.run())
