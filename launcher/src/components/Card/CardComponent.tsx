@@ -1,395 +1,283 @@
 // launcher/src/components/Card/CardComponent.tsx
-import styled from 'styled-components';
+import React from 'react';
+import { CardData } from '../../types/card.types';
+import {
+  CardContainer,
+  CardHeader,
+  CardIcon,
+  CardName,
+  CardManaCost,
+  CardImageWrapper,
+  CardImage,
+  CardContent,
+  CardType,
+  CardRarity,
+  CardStats,
+  CardStat,
+  CardEffect,
+  CardDescription,
+  CardFooter,
+} from './../../styles/cardComponentStyles';
 
-// ============================================================
-// TIPOS
-// ============================================================
-
-export interface CardData {
-  id: string;
-  name: string;
-  level: number;
-  image: string;
-  description: string;
-  attack: number;
-  manaCost: number;
-  type: 'Ataque' | 'Defesa' | 'Habilidade' | 'Buff' | 'Debuff';
-  rarity: 'Comum' | 'Incomum' | 'Rara' | 'Épica';
-  color: string;
-}
-
-// ============================================================
-// ESTILOS DA CARTA
-// ============================================================
-
-const CardContainer = styled.div<{ rarity: string; color: string }>`
-  width: 100%;
-  max-width: 280px;
-  min-width: 200px;
-  background: linear-gradient(145deg, #1a1530 0%, #0d0a16 100%);
-  border-radius: 16px;
-  border: 2px solid
-    ${({ rarity, color }) => {
-      switch (rarity) {
-        case 'Épica':
-          return '#ffd700';
-        case 'Rara':
-          return '#9b59b6';
-        case 'Incomum':
-          return '#4a9eff';
-        default:
-          return color;
-      }
-    }};
-  box-shadow: ${({ rarity }) =>
-    rarity === 'Épica'
-      ? '0 0 30px rgba(255, 215, 0, 0.2), inset 0 0 20px rgba(255, 215, 0, 0.05)'
-      : '0 8px 24px rgba(0, 0, 0, 0.4)'};
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  transition:
-    transform 0.3s ease,
-    box-shadow 0.3s ease;
-  cursor: pointer;
-  position: relative;
-
-  &:hover {
-    transform: translateY(-6px) scale(1.02);
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
-  }
-
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 3px;
-    background: linear-gradient(
-      90deg,
-      transparent,
-      ${({ color }) => color},
-      transparent
-    );
-    opacity: 0.6;
-  }
-`;
-
-// ============================================================
-// TOPO DA CARTA
-// ============================================================
-
-const CardHeader = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px 14px 6px;
-  background: rgba(0, 0, 0, 0.3);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-`;
-
-const CardName = styled.h3<{ color: string }>`
-  margin: 0;
-  color: #ffffff;
-  font-size: 0.95rem;
-  font-weight: 700;
-  letter-spacing: 0.3px;
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
-  flex: 1;
-  padding-right: 8px;
-  font-family: 'Cinzel', serif;
-`;
-
-const CardLevel = styled.div<{ color: string }>`
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  background: radial-gradient(
-    circle at 30% 30%,
-    ${({ color }) => color}88,
-    ${({ color }) => color}
-  );
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.7rem;
-  font-weight: 800;
-  color: #ffffff;
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
-  flex-shrink: 0;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
-`;
-
-// ============================================================
-// TIPO DA CARTA (BADGE)
-// ============================================================
-
-const CardTypeBadge = styled.div<{ type: string }>`
-  position: absolute;
-  top: 42px;
-  left: 14px;
-  padding: 2px 12px;
-  border-radius: 10px;
-  font-size: 0.55rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  background: ${({ type }) => {
-    switch (type) {
-      case 'Ataque':
-        return 'rgba(255, 107, 107, 0.85)';
-      case 'Defesa':
-        return 'rgba(74, 158, 255, 0.85)';
-      case 'Habilidade':
-        return 'rgba(155, 89, 182, 0.85)';
-      case 'Buff':
-        return 'rgba(46, 204, 113, 0.85)';
-      case 'Debuff':
-        return 'rgba(44, 62, 80, 0.85)';
-      default:
-        return 'rgba(255, 255, 255, 0.3)';
-    }
-  }};
-  color: #ffffff;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-  z-index: 2;
-`;
-
-// ============================================================
-// IMAGEM DA CARTA
-// ============================================================
-
-const CardImageWrapper = styled.div`
-  width: 100%;
-  padding-top: 75%; /* Proporção 4:3 */
-  position: relative;
-  background: linear-gradient(135deg, #0a0810 0%, #1a1530 100%);
-  overflow: hidden;
-`;
-
-const CardImage = styled.img`
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center;
-  filter: brightness(0.9) contrast(1.1);
-  transition: filter 0.3s ease;
-
-  ${CardContainer}:hover & {
-    filter: brightness(1) contrast(1.2);
-  }
-`;
-
-const CardImageFallback = styled.div`
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 4rem;
-  background: radial-gradient(circle at center, #1a1530 0%, #0a0810 100%);
-  color: rgba(255, 255, 255, 0.1);
-`;
-
-// ============================================================
-// CONTEÚDO DA CARTA
-// ============================================================
-
-const CardContent = styled.div`
-  padding: 10px 14px 8px;
-  flex: 1;
-  background: rgba(0, 0, 0, 0.4);
-  backdrop-filter: blur(4px);
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
-`;
-
-const CardDescription = styled.p`
-  margin: 0;
-  color: #dcdce5;
-  font-size: 0.7rem;
-  line-height: 1.4;
-  opacity: 0.9;
-  font-style: italic;
-  min-height: 32px;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-`;
-
-// ============================================================
-// RODAPÉ DA CARTA (ATK + MANA)
-// ============================================================
-
-const CardFooter = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 6px 14px 10px;
-  background: rgba(0, 0, 0, 0.5);
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
-`;
-
-const CardStatCircle = styled.div<{ color: string; size?: string }>`
-  width: ${({ size }) => size || '36px'};
-  height: ${({ size }) => size || '36px'};
-  border-radius: 50%;
-  background: radial-gradient(
-    circle at 35% 35%,
-    ${({ color }) => color}aa,
-    ${({ color }) => color}
-  );
-  border: 2px solid rgba(255, 255, 255, 0.25);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: ${({ size }) => (size === '40px' ? '1rem' : '0.85rem')};
-  font-weight: 800;
-  color: #ffffff;
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
-  position: relative;
-
-  &::after {
-    content: '';
-    position: absolute;
-    inset: -3px;
-    border-radius: 50%;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-  }
-`;
-
-const CardStatsGroup = styled.div`
-  display: flex;
-  gap: 8px;
-  align-items: center;
-`;
-
-const StatLabel = styled.span`
-  color: rgba(255, 255, 255, 0.4);
-  font-size: 0.5rem;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-right: 2px;
-`;
-
-// ============================================================
-// RARIDADE BADGE
-// ============================================================
-
-const RarityBadge = styled.div<{ rarity: string }>`
-  position: absolute;
-  top: 42px;
-  right: 14px;
-  padding: 2px 10px;
-  border-radius: 10px;
-  font-size: 0.5rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  background: ${({ rarity }) => {
-    switch (rarity) {
-      case 'Épica':
-        return 'rgba(255, 215, 0, 0.85)';
-      case 'Rara':
-        return 'rgba(155, 89, 182, 0.85)';
-      case 'Incomum':
-        return 'rgba(74, 158, 255, 0.85)';
-      default:
-        return 'rgba(138, 138, 138, 0.7)';
-    }
-  }};
-  color: ${({ rarity }) => {
-    switch (rarity) {
-      case 'Épica':
-        return '#000';
-      default:
-        return '#fff';
-    }
-  }};
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-  z-index: 2;
-`;
-
-// ============================================================
-// COMPONENTE PRINCIPAL
-// ============================================================
-
-interface CardComponentProps {
+export interface CardComponentProps {
   card: CardData;
-  onClick?: (card: CardData) => void;
+  onClick?: () => void;
   className?: string;
+  size?: 'small' | 'medium' | 'large';
+  showRarity?: boolean;
+  showStats?: boolean;
 }
 
-export const CardComponent = ({
+const getRarityColor = (rarity: CardData['rarity']): string => {
+  const colors: Record<CardData['rarity'], string> = {
+    Comum: '#8a8a8a',
+    Incomum: '#4caf50',
+    Rara: '#2196f3',
+    Epica: '#9c27b0',
+  };
+  return colors[rarity] || '#8a8a8a';
+};
+
+const getTypeColor = (type: CardData['type']): string => {
+  const colors: Record<CardData['type'], string> = {
+    Ataque: '#ff6b6b',
+    Defesa: '#4a9eff',
+    Habilidade: '#9b59b6',
+    Buff: '#2ecc71',
+    Debuff: '#e74c3c',
+  };
+  return colors[type] || '#ffffff';
+};
+
+const getRarityLabel = (rarity: CardData['rarity']): string => {
+  const labels: Record<CardData['rarity'], string> = {
+    Comum: 'Comum',
+    Incomum: 'Incomum',
+    Rara: 'Rara',
+    Epica: 'Épica',
+  };
+  return labels[rarity] || rarity;
+};
+
+const getTypeLabel = (type: CardData['type']): string => {
+  const labels: Record<CardData['type'], string> = {
+    Ataque: 'Ataque',
+    Defesa: 'Defesa',
+    Habilidade: 'Habilidade',
+    Buff: 'Buff',
+    Debuff: 'Debuff',
+  };
+  return labels[type] || type;
+};
+
+export const CardComponent: React.FC<CardComponentProps> = ({
   card,
   onClick,
   className,
-}: CardComponentProps) => {
+  size = 'medium',
+  showRarity = true,
+  showStats = true,
+}) => {
+  const rarityColor = getRarityColor(card.rarity);
+  const typeColor = getTypeColor(card.type);
+  const rarityLabel = getRarityLabel(card.rarity);
+  const typeLabel = getTypeLabel(card.type);
+
   const handleClick = () => {
     if (onClick) {
-      onClick(card);
+      onClick();
     }
+  };
+
+  const renderIcon = () => {
+    if (!card.icon) return null;
+
+    return (
+      <CardIcon>
+        <img
+          src={card.icon}
+          alt={card.name}
+          width="24"
+          height="24"
+          style={{ objectFit: 'contain' }}
+          onError={(e) => {
+            (e.target as HTMLImageElement).style.display = 'none';
+          }}
+        />
+      </CardIcon>
+    );
+  };
+
+  const renderManaCost = () => {
+    if (card.manaCost === undefined || card.manaCost === null) return null;
+
+    return (
+      <CardManaCost>
+        <svg
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="#ffd700"
+          strokeWidth="2"
+        >
+          <circle cx="12" cy="12" r="10" />
+          <path d="M12 6v12" />
+          <path d="M8 10l4-4 4 4" />
+        </svg>
+        <span>{card.manaCost}</span>
+      </CardManaCost>
+    );
+  };
+
+  const renderStats = () => {
+    if (!showStats) return null;
+
+    return (
+      <CardStats>
+        {card.attack !== undefined && card.attack > 0 && (
+          <CardStat color="#ff6b6b">
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#ff6b6b"
+              strokeWidth="2"
+            >
+              <path d="M14.5 9.5L20 4" />
+              <path d="M4 20l6-6" />
+              <path d="M9.5 14.5L4 20" />
+              <path d="M20 4l-5.5 5.5" />
+              <circle cx="12" cy="12" r="2" />
+            </svg>
+            {card.attack}
+          </CardStat>
+        )}
+        {card.defense !== undefined && card.defense > 0 && (
+          <CardStat color="#4a9eff">
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#4a9eff"
+              strokeWidth="2"
+            >
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+            </svg>
+            {card.defense}
+          </CardStat>
+        )}
+        {card.level !== undefined && card.level > 0 && (
+          <CardStat color="#ffd700">
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#ffd700"
+              strokeWidth="2"
+            >
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+            </svg>
+            Nv.{card.level}
+          </CardStat>
+        )}
+      </CardStats>
+    );
+  };
+
+  const renderRarity = () => {
+    if (!showRarity) return null;
+
+    return <CardRarity color={rarityColor}>{rarityLabel}</CardRarity>;
   };
 
   return (
     <CardContainer
-      rarity={card.rarity}
-      color={card.color}
-      onClick={handleClick}
       className={className}
+      onClick={handleClick}
+      size={size}
+      color={card.color || '#ffd700'}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          handleClick();
+        }
+      }}
     >
-      {/* TOPO: Nome + Nível */}
       <CardHeader>
-        <CardName color={card.color}>{card.name}</CardName>
-        <CardLevel color={card.color}>{card.level}</CardLevel>
+        {renderIcon()}
+        <CardName>{card.name}</CardName>
+        {renderManaCost()}
       </CardHeader>
 
-      {/* Badge de Tipo */}
-      <CardTypeBadge type={card.type}>{card.type}</CardTypeBadge>
-
-      {/* Badge de Raridade */}
-      <RarityBadge rarity={card.rarity}>{card.rarity}</RarityBadge>
-
-      {/* IMAGEM */}
       <CardImageWrapper>
         {card.image ? (
-          <CardImage src={card.image} alt={card.name} loading="lazy" />
+          <CardImage
+            src={card.image}
+            alt={card.name}
+            onError={(e) => {
+              (e.target as HTMLImageElement).style.display = 'none';
+            }}
+          />
         ) : (
-          <CardImageFallback>🎴</CardImageFallback>
+          <div
+            style={{
+              width: '100%',
+              height: '100%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '2rem',
+              opacity: 0.3,
+            }}
+          >
+            {card.icon ? (
+              <img
+                src={card.icon}
+                alt={card.name}
+                width="48"
+                height="48"
+                style={{ objectFit: 'contain', opacity: 0.5 }}
+                onError={(e) => {
+                  (e.target as HTMLImageElement).style.display = 'none';
+                }}
+              />
+            ) : (
+              '🃏'
+            )}
+          </div>
         )}
       </CardImageWrapper>
 
-      {/* DESCRIÇÃO */}
       <CardContent>
-        <CardDescription>"{card.description}"</CardDescription>
+        <div
+          style={{
+            display: 'flex',
+            gap: '6px',
+            flexWrap: 'wrap',
+            justifyContent: 'center',
+            marginBottom: '4px',
+          }}
+        >
+          <CardType color={typeColor}>{typeLabel}</CardType>
+          {renderRarity()}
+        </div>
+
+        {renderStats()}
+
+        <CardEffect>{card.effect}</CardEffect>
+        <CardDescription>{card.description}</CardDescription>
       </CardContent>
 
-      {/* RODAPÉ: ATK + MANA */}
       <CardFooter>
-        <CardStatsGroup>
-          <StatLabel>ATK</StatLabel>
-          <CardStatCircle color="#e74c3c" size="36px">
-            {card.attack}
-          </CardStatCircle>
-        </CardStatsGroup>
-
-        <CardStatsGroup>
-          <StatLabel>MANA</StatLabel>
-          <CardStatCircle color="#3498db" size="36px">
-            {card.manaCost}
-          </CardStatCircle>
-        </CardStatsGroup>
+        <span style={{ fontSize: '0.55rem', color: '#666', opacity: 0.5 }}>
+          ID: {card.id.slice(0, 6)}
+        </span>
       </CardFooter>
     </CardContainer>
   );

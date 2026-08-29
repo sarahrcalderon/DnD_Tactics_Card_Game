@@ -11,6 +11,8 @@ import { DeckSelectPage } from './pages/DeckSelectPage';
 import { DeckViewPage } from './pages/DeckViewPage';
 import { NameSelectPage } from './pages/NameSelectPage';
 import { AttributeDistPage } from './pages/AttributeDistPage';
+import { EquipmentPage } from './pages/EquipamentPage';
+import { BagPage } from './pages/BagPage';
 
 function App() {
   return (
@@ -38,6 +40,8 @@ function App() {
           <Route path="/deck-view" element={<DeckViewPage />} />
           <Route path="/name-select" element={<NameSelectPage />} />
           <Route path="/attribute-dist" element={<AttributeDistPage />} />
+          <Route path="/equipment" element={<EquipmentPage />} />
+          <Route path="/bag" element={<BagPage />} />
         </Routes>
       </AudioProvider>
     </BrowserRouter>

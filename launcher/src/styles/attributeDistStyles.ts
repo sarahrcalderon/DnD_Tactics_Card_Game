@@ -493,4 +493,326 @@ export const ScrollHint = styled.div`
       transform: translateY(-2px);
     }
   }
+    
+`;
+
+
+export const Divider = styled.hr`
+  width: 100%;
+  border: none;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  margin: 16px 0;
+`;
+
+export const StatsGrid = styled.div`
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  margin-top: 8px;
+
+  @media (max-width: 480px) {
+    grid-template-columns: 1fr;
+  }
+`;
+
+export const StatItem = styled.div`
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 8px;
+  padding: 8px 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+`;
+
+export const StatLabel = styled.span`
+  color: #858594;
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+`;
+
+export const StatValue = styled.span`
+  color: #ffd700;
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin: 2px 0;
+`;
+
+export const StatModifier = styled.span`
+  color: #666;
+  font-size: 0.5rem;
+  opacity: 0.6;
+`;
+// Adicione no attributeDistStyles.ts:
+
+export const EquipmentButton = styled.button`
+  width: 100%;
+  padding: 12px 16px;
+  margin-top: 16px;
+  border: 1.5px solid rgba(255, 215, 0, 0.25);
+  border-radius: 10px;
+  background: rgba(255, 215, 0, 0.06);
+  color: #ffd700;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  &:hover {
+    background: rgba(255, 215, 0, 0.12);
+    border-color: #ffd700;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px rgba(255, 215, 0, 0.1);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+`;
+// Adicione no final do arquivo attributeDistStyles.ts
+
+export const DeckInfoButton = styled.button`
+  background: transparent;
+  border: none;
+  color: #ffd700;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+  font-family: 'Cinzel', serif;
+
+  &:hover {
+    background: rgba(255, 215, 0, 0.1);
+    transform: scale(1.02);
+  }
+
+  small {
+    font-weight: 400;
+    color: #858594;
+    font-size: 0.75rem;
+  }
+`;
+
+export const BottomActions = styled.div`
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 10px;
+  margin-top: 16px;
+
+  @media (max-width: 600px) {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+`;
+
+export const BottomActionButton = styled.button<{ variant?: 'gold' | 'blue' | 'green' }>`
+  padding: 12px 16px;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  ${({ variant }) => {
+    switch (variant) {
+      case 'gold':
+        return `
+          background: rgba(255, 215, 0, 0.12);
+          color: #ffd700;
+          border: 1px solid rgba(255, 215, 0, 0.25);
+          &:hover {
+            background: rgba(255, 215, 0, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(255, 215, 0, 0.15);
+          }
+        `;
+      case 'blue':
+        return `
+          background: rgba(74, 158, 255, 0.12);
+          color: #4a9eff;
+          border: 1px solid rgba(74, 158, 255, 0.25);
+          &:hover {
+            background: rgba(74, 158, 255, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(74, 158, 255, 0.15);
+          }
+        `;
+      case 'green':
+        return `
+          background: rgba(46, 204, 113, 0.12);
+          color: #2ecc71;
+          border: 1px solid rgba(46, 204, 113, 0.25);
+          &:hover {
+            background: rgba(46, 204, 113, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(46, 204, 113, 0.15);
+          }
+        `;
+      default:
+        return `
+          background: rgba(255, 255, 255, 0.06);
+          color: #dcdce5;
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          &:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+          }
+        `;
+    }
+  }}
+
+  &:active {
+    transform: translateY(0) scale(0.97);
+  }
+`;
+
+export const TutorialModal = styled.div`
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  padding: 20px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(10px);
+  animation: fadeIn 0.3s ease;
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+`;
+
+export const TutorialContent = styled.div`
+  width: 100%;
+  max-width: 800px;
+  max-height: 85vh;
+  overflow-y: auto;
+  background: linear-gradient(145deg, #1a1530 0%, #0d0a16 100%);
+  border-radius: 20px;
+  padding: 32px;
+  border: 1px solid rgba(255, 215, 0, 0.15);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.8);
+
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 215, 0, 0.3) transparent;
+
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: rgba(255, 215, 0, 0.3);
+    border-radius: 10px;
+  }
+`;
+
+export const TutorialTitle = styled.h2`
+  margin: 0 0 8px;
+  color: #ffd700;
+  font-family: 'Cinzel', serif;
+  font-size: 1.8rem;
+  text-align: center;
+`;
+
+export const TutorialSubtitle = styled.p`
+  margin: 0 0 24px;
+  color: #9999aa;
+  text-align: center;
+  font-size: 0.9rem;
+`;
+
+export const TutorialGrid = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+
+  @media (max-width: 600px) {
+    grid-template-columns: 1fr;
+  }
+`;
+
+export const TutorialItem = styled.div`
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 12px;
+  padding: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+`;
+
+export const TutorialItemTitle = styled.h4`
+  margin: 0 0 4px;
+  color: #ffd700;
+  font-size: 0.9rem;
+`;
+
+export const TutorialItemDesc = styled.p`
+  margin: 0;
+  color: #9999aa;
+  font-size: 0.8rem;
+  line-height: 1.4;
+`;
+
+export const TutorialItemFormula = styled.div`
+  margin-top: 4px;
+  padding: 4px 8px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 4px;
+  color: #666;
+  font-size: 0.65rem;
+  font-family: monospace;
+`;
+
+export const TutorialCloseButton = styled.button`
+  display: block;
+  margin: 20px auto 0;
+  padding: 12px 40px;
+  background: #ffd700;
+  color: #0a0810;
+  border: none;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: scale(1.02);
+    box-shadow: 0 4px 20px rgba(255, 215, 0, 0.3);
+  }
+`;
+
+
+export const DeckFooter = styled.div`
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
 `;
