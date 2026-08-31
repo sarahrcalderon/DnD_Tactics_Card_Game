@@ -1,12 +1,9 @@
-// launcher/src/pages/LauncherPage.tsx
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import toast from 'react-hot-toast';
-
-// ============================================================
-// TIPOS PYWEBVIEW
-// ============================================================
+import { saveService } from '../services/saveService';
+import { SavedGame } from '../types/save.types';
 
 declare global {
   interface Window {
@@ -20,10 +17,6 @@ declare global {
     };
   }
 }
-
-// ============================================================
-// STYLED COMPONENTS - OTIMIZADOS
-// ============================================================
 
 const Container = styled.div`
   min-height: 100vh;
@@ -179,6 +172,201 @@ const StatusBadge = styled.div`
 `;
 
 // ============================================================
+// MODAL DE CARREGAR JOGO
+// ============================================================
+
+const ModalOverlay = styled.div`
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  padding: 20px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(10px);
+  animation: fadeIn 0.3s ease;
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+`;
+
+const ModalContent = styled.div`
+  width: 100%;
+  max-width: 800px;
+  max-height: 85vh;
+  overflow-y: auto;
+  background: linear-gradient(145deg, #1a1530 0%, #0d0a16 100%);
+  border-radius: 20px;
+  padding: 32px;
+  border: 1px solid rgba(255, 215, 0, 0.15);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.8);
+
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 215, 0, 0.3) transparent;
+
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: rgba(255, 215, 0, 0.3);
+    border-radius: 10px;
+  }
+`;
+
+const ModalTitle = styled.h2`
+  margin: 0 0 8px;
+  color: #ffd700;
+  font-family: 'Cinzel', serif;
+  font-size: 1.8rem;
+  text-align: center;
+`;
+
+const ModalSubtitle = styled.p`
+  margin: 0 0 24px;
+  color: #9999aa;
+  text-align: center;
+  font-size: 0.9rem;
+`;
+
+const SaveGrid = styled.div`
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+`;
+
+const SaveCard = styled.div`
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 12px;
+  padding: 16px 20px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background: rgba(255, 215, 0, 0.08);
+    border-color: rgba(255, 215, 0, 0.2);
+    transform: translateX(4px);
+  }
+`;
+
+const SaveInfo = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+`;
+
+const SaveName = styled.span`
+  color: #ffffff;
+  font-size: 1rem;
+  font-weight: 600;
+`;
+
+const SaveDetails = styled.span`
+  color: #858594;
+  font-size: 0.8rem;
+`;
+
+const SaveMeta = styled.span`
+  color: #666677;
+  font-size: 0.75rem;
+`;
+
+const SaveActions = styled.div`
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+`;
+
+const SaveButton = styled.button<{ variant?: 'primary' | 'danger' }>`
+  padding: 6px 14px;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  ${({ variant }) => {
+    switch (variant) {
+      case 'primary':
+        return `
+          background: rgba(255, 215, 0, 0.15);
+          color: #ffd700;
+          &:hover {
+            background: rgba(255, 215, 0, 0.25);
+          }
+        `;
+      case 'danger':
+        return `
+          background: rgba(255, 68, 68, 0.15);
+          color: #ff4444;
+          &:hover {
+            background: rgba(255, 68, 68, 0.25);
+          }
+        `;
+      default:
+        return `
+          background: rgba(255, 255, 255, 0.08);
+          color: #dcdce5;
+          &:hover {
+            background: rgba(255, 255, 255, 0.15);
+          }
+        `;
+    }
+  }}
+`;
+
+const EmptySaves = styled.div`
+  text-align: center;
+  padding: 40px 0;
+  color: #666677;
+
+  span {
+    font-size: 3rem;
+    display: block;
+    margin-bottom: 12px;
+    opacity: 0.3;
+  }
+`;
+
+const CloseButton = styled.button`
+  position: absolute;
+  top: 16px;
+  right: 20px;
+  background: transparent;
+  border: none;
+  color: #666677;
+  font-size: 1.5rem;
+  cursor: pointer;
+  transition: color 0.3s ease;
+
+  &:hover {
+    color: #ffd700;
+  }
+`;
+
+const ModalWrapper = styled.div`
+  position: relative;
+`;
+
+// ============================================================
 // COMPONENTE
 // ============================================================
 
@@ -193,8 +381,9 @@ export const LauncherPage = () => {
   const [selectedIndex, setSelectedIndex] = useState<number>(0);
   const [isPywebview, setIsPywebview] = useState<boolean>(false);
   const [isMusicPlaying, setIsMusicPlaying] = useState<boolean>(false);
+  const [showLoadModal, setShowLoadModal] = useState<boolean>(false);
+  const [saves, setSaves] = useState<SavedGame[]>([]);
 
-  // REFS
   const musicRef = useRef<HTMLAudioElement | null>(null);
   const hoverSoundRef = useRef<HTMLAudioElement | null>(null);
   const musicLoadedRef = useRef<boolean>(false);
@@ -208,10 +397,6 @@ export const LauncherPage = () => {
     { id: 'sair', label: 'Sair', icon: '' },
   ];
 
-  // ============================================================
-  // CARREGAR ÁUDIO - OTIMIZADO
-  // ============================================================
-
   useEffect(() => {
     if (!musicLoadedRef.current) {
       try {
@@ -223,7 +408,6 @@ export const LauncherPage = () => {
       } catch (e) {}
     }
 
-    // CARREGA O SOM DO HOVER APENAS UMA VEZ
     if (!hoverSoundLoadedRef.current) {
       try {
         hoverSoundRef.current = new Audio('/assets/sounds/som_botao.mp3');
@@ -233,7 +417,6 @@ export const LauncherPage = () => {
       } catch (e) {}
     }
 
-    // TOCA A MÚSICA APÓS 1 SEGUNDO (MAIS SUAVE)
     const playMusicTimer = setTimeout(() => {
       if (musicRef.current && !isMusicPlaying) {
         musicRef.current
@@ -296,56 +479,88 @@ export const LauncherPage = () => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [selectedIndex, options, playHoverSound]);
 
+  const handleOpenLoadModal = useCallback(() => {
+    const savesList = saveService.getAllSaves();
+    setSaves(savesList);
+    setShowLoadModal(true);
+  }, []);
+
+  const handleCloseLoadModal = useCallback(() => {
+    setShowLoadModal(false);
+  }, []);
+
+  const handleLoadSave = useCallback(
+    (save: SavedGame) => {
+      setShowLoadModal(false);
+      toast.loading('Carregando jogo...', { duration: 800 });
+      setTimeout(() => {
+        navigate('/attribute-dist', {
+          state: {
+            classId: save.className.toLowerCase(),
+            raceName: save.raceName || '',
+            characterName: save.characterName,
+            attributes: save.attributes,
+            derivedStats: save.derivedStats,
+            deckId: save.deckId,
+            deckName: save.deckName,
+            saveId: save.id,
+            isSaved: true,
+          },
+        });
+      }, 600);
+    },
+    [navigate],
+  );
+
+  const handleDeleteSave = useCallback((id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (window.confirm('Deseja realmente deletar este save?')) {
+      saveService.deleteSave(id);
+      setSaves(saveService.getAllSaves());
+      toast.success('Save deletado!');
+    }
+  }, []);
+
   const handleSelect = async (id: string) => {
     try {
       switch (id) {
         case 'iniciar':
-          toast.loading('Iniciando jogo...', { duration: 2000 });
-
-          if (window.pywebview && window.pywebview.api) {
-            try {
-              const result = await window.pywebview.api.start_game();
-              toast.dismiss();
-              if (result.success) {
-                toast.success(result.message);
-              } else {
-                toast.error(result.message);
-              }
-            } catch (err) {
-              toast.dismiss();
-              console.error('Erro ao chamar start_game:', err);
-              toast.error('Erro ao iniciar jogo');
-            }
-          } else {
-            toast.dismiss();
-            toast.success('Jogo iniciado!');
-          }
-
+          toast.loading('Iniciando novo jogo...', { duration: 2000 });
           setTimeout(() => {
             navigate('/class-select');
           }, 600);
           break;
 
-        case 'continuar':
-          if (window.pywebview && window.pywebview.api) {
-            const result = await window.pywebview.api.load_game();
-            toast.success(result.message);
+        case 'continuar': {
+          const latestSave = saveService.getLatestSave();
+          if (latestSave) {
+            toast.loading('Carregando jogo...', { duration: 1000 });
+            setTimeout(() => {
+              navigate('/attribute-dist', {
+                state: {
+                  classId: latestSave.className.toLowerCase(),
+                  raceName: latestSave.raceName || '',
+                  characterName: latestSave.characterName,
+                  attributes: latestSave.attributes,
+                  derivedStats: latestSave.derivedStats,
+                  deckId: latestSave.deckId,
+                  deckName: latestSave.deckName,
+                  saveId: latestSave.id,
+                  isSaved: true,
+                },
+              });
+            }, 600);
           } else {
-            toast.success('Jogo continuado!');
+            toast.error('Nenhum jogo salvo encontrado!');
           }
           break;
+        }
 
         case 'carregar':
-          if (window.pywebview && window.pywebview.api) {
-            const result = await window.pywebview.api.save_game();
-            toast.success(result.message);
-          } else {
-            toast.success('Jogo carregado!');
-          }
+          handleOpenLoadModal();
           break;
 
         case 'opcoes':
-          // CORRIGIDO: Navega para a página de opções
           toast('Abrindo opções...');
           setTimeout(() => {
             navigate('/options');
@@ -379,40 +594,96 @@ export const LauncherPage = () => {
   };
 
   return (
-    <Container>
-      <BackgroundImage />
+    <>
+      <Container>
+        <BackgroundImage />
 
-      <Content>
-        {isPywebview && <StatusBadge>🔗 Pywebview Conectado</StatusBadge>}
+        <Content>
+          {isPywebview && <StatusBadge>Pywebview Conectado</StatusBadge>}
 
-        <Title>DUNGEONS TACTICS</Title>
-        <Subtitle>Card Game</Subtitle>
+          <Title>DUNGEONS TACTICS</Title>
+          <Subtitle>Card Game</Subtitle>
 
-        <MenuContainer>
-          {options.map((option, index) => (
-            <MenuItem
-              key={option.id}
-              selected={selectedIndex === index}
-              onClick={() => {
-                setSelectedIndex(index);
-                handleSelect(option.id);
-              }}
-              onMouseEnter={() => handleMouseEnter(index)}
-            >
-              <IconText>{option.icon}</IconText>
-              <LabelText selected={selectedIndex === index}>
-                {option.label}
-              </LabelText>
-              <ArrowIcon selected={selectedIndex === index}>▶</ArrowIcon>
-            </MenuItem>
-          ))}
-        </MenuContainer>
+          <MenuContainer>
+            {options.map((option, index) => (
+              <MenuItem
+                key={option.id}
+                selected={selectedIndex === index}
+                onClick={() => {
+                  setSelectedIndex(index);
+                  handleSelect(option.id);
+                }}
+                onMouseEnter={() => handleMouseEnter(index)}
+              >
+                <IconText>{option.icon}</IconText>
+                <LabelText selected={selectedIndex === index}>
+                  {option.label}
+                </LabelText>
+                <ArrowIcon selected={selectedIndex === index}>▶</ArrowIcon>
+              </MenuItem>
+            ))}
+          </MenuContainer>
 
-        <Footer>
-          <Version>v1.0.0</Version>
-          <Credits>Dungeonborn Tactics</Credits>
-        </Footer>
-      </Content>
-    </Container>
+          <Footer>
+            <Version>v1.0.0</Version>
+            <Credits>Dungeonborn Tactics</Credits>
+          </Footer>
+        </Content>
+      </Container>
+
+      {showLoadModal && (
+        <ModalOverlay onClick={handleCloseLoadModal}>
+          <ModalContent onClick={(e) => e.stopPropagation()}>
+            <ModalWrapper>
+              <CloseButton onClick={handleCloseLoadModal}>✕</CloseButton>
+              <ModalTitle>Carregar Jogo</ModalTitle>
+              <ModalSubtitle>
+                Selecione um jogo salvo para continuar
+              </ModalSubtitle>
+
+              {saves.length === 0 ? (
+                <EmptySaves>
+                  <span>📭</span>
+                  <p>Nenhum jogo salvo encontrado.</p>
+                  <p style={{ fontSize: '0.8rem', marginTop: '8px' }}>
+                    Inicie uma nova aventura para criar seu primeiro save.
+                  </p>
+                </EmptySaves>
+              ) : (
+                <SaveGrid>
+                  {saves.map((save) => (
+                    <SaveCard
+                      key={save.id}
+                      onClick={() => handleLoadSave(save)}
+                    >
+                      <SaveInfo>
+                        <SaveName>{save.characterName}</SaveName>
+                        <SaveDetails>
+                          {save.className} • {save.raceName || 'Raça'} • Nv.{' '}
+                          {save.level}
+                        </SaveDetails>
+                        <SaveMeta>
+                          {save.date} às {save.time} •{' '}
+                          {save.location || 'Acampamento'}
+                        </SaveMeta>
+                      </SaveInfo>
+                      <SaveActions>
+                        <SaveButton variant="primary">Carregar</SaveButton>
+                        <SaveButton
+                          variant="danger"
+                          onClick={(e) => handleDeleteSave(save.id, e)}
+                        >
+                          Deletar
+                        </SaveButton>
+                      </SaveActions>
+                    </SaveCard>
+                  ))}
+                </SaveGrid>
+              )}
+            </ModalWrapper>
+          </ModalContent>
+        </ModalOverlay>
+      )}
+    </>
   );
 };

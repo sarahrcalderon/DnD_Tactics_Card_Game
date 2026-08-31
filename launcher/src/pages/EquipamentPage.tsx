@@ -1,6 +1,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
+import { CharacterData } from '../types/characterData.types';
 import {
   Container,
   BackgroundImage,
@@ -32,15 +33,28 @@ import {
   ActionButton,
   Actions,
   BackButton,
+  CharacterStatsPanel,
+  StatsTitle,
+  StatBarContainer,
+  StatBarRow,
+  StatBarLabel,
+  StatBarValue,
+  StatBarTrack,
+  StatBarFill,
+  EquipmentGridWrapper,
+  EquipmentSectionTitle,
 } from '../styles/equipmentStyles';
 import {
   Equipment,
   EquipmentSlot,
   EQUIPMENT_SLOTS,
-  EquipmentData,
+  EquipmentData as EquipmentDataType,
 } from '../types/equipment.types';
 import { equipmentLoader } from '../services/equipamentLoader';
 import { getStartingEquipment } from '../data/startingEquipment';
+import { EquipmentPreview } from '../components/Equipment/EquipmentPreview';
+import { calculateCharacter } from '../utils/characterCalculator';
+import { DerivedStats, Attributes } from '../types/character.types';
 
 const GOLD_AMOUNT = 1250;
 
@@ -80,17 +94,31 @@ const getIconForSlot = (slot: EquipmentSlot): string => {
   return icons[slot] || '/assets/images/icons/star.svg';
 };
 
-interface CharacterData {
-  characterName?: string;
-  className?: string;
-  raceName?: string;
-  raceImage?: string;
-  raceIcon?: string;
-  attributes?: any;
-  derivedStats?: any;
-  classId?: string;
-  build?: string;
-}
+// Atributos padrão para fallback
+const defaultAttributes: Attributes = {
+  str: 8,
+  dex: 8,
+  con: 8,
+  int: 8,
+  wis: 8,
+  cha: 8,
+};
+
+const defaultDerivedStats: DerivedStats = {
+  defense: 0,
+  awareness: 0,
+  critical: 0,
+  avoidance: 0,
+  deflect: 0,
+  actionPoints: 0,
+  criticalSeverity: 0,
+  initiative: 0,
+  maxHP: 0,
+  speed: 0,
+  maxMana: 0,
+  manaRegen: 0,
+  manaPower: 0,
+};
 
 export const EquipmentPage = () => {
   const navigate = useNavigate();
@@ -100,17 +128,29 @@ export const EquipmentPage = () => {
     Record<EquipmentSlot, Equipment | null>
   >({} as Record<EquipmentSlot, Equipment | null>);
   const [loading, setLoading] = useState<boolean>(true);
-  const [equipmentData, setEquipmentData] = useState<EquipmentData[]>([]);
-  const [characterData, setCharacterData] = useState<CharacterData>({});
+  const [equipmentData, setEquipmentData] = useState<EquipmentDataType[]>([]);
+  const [characterData, setCharacterData] = useState<CharacterData | null>(
+    null,
+  );
+  const [previewEquipment, setPreviewEquipment] = useState<Equipment | null>(
+    null,
+  );
+  const [characterDerivedStats, setCharacterDerivedStats] =
+    useState<DerivedStats | null>(null);
+  const [hoverStats, setHoverStats] = useState<DerivedStats | null>(null);
 
   useEffect(() => {
     const loadEquipmentData = async (): Promise<void> => {
       try {
         setLoading(true);
-        const state = location.state as CharacterData | null;
+        const state = location.state as Partial<CharacterData> | null;
 
         let classId: string = state?.classId || '';
         let build: string = state?.build || '';
+        let isSaved: boolean = state?.isSaved || false;
+        let saveId: string = state?.saveId || '';
+        let deckId: string = state?.deckId || '';
+        let deckName: string = state?.deckName || '';
 
         if (!classId) {
           const savedData = localStorage.getItem('characterData');
@@ -118,6 +158,10 @@ export const EquipmentPage = () => {
             try {
               const parsed = JSON.parse(savedData);
               classId = parsed.classId || parsed.className?.toLowerCase() || '';
+              isSaved = parsed.isSaved || parsed.isFinalized || false;
+              saveId = parsed.saveId || '';
+              deckId = parsed.deckId || '';
+              deckName = parsed.deckName || '';
               if (classId === 'paladino') build = 'tank';
               else if (classId === 'clerigo') build = 'cura';
               else if (classId === 'barbaro') build = 'tank';
@@ -130,9 +174,42 @@ export const EquipmentPage = () => {
           }
         }
 
-        if (state) {
-          setCharacterData(state);
-        }
+        const name = state?.name || state?.characterName || '';
+        const className = state?.className || '';
+        const raceName = state?.raceName || '';
+        const raceImage = state?.raceImage || '';
+        const raceIcon = state?.raceIcon || '';
+        const attributes = state?.attributes || defaultAttributes;
+        const derivedStats = state?.derivedStats || defaultDerivedStats;
+        const deityId = state?.deityId || '';
+        const deityName = state?.deityName || '';
+
+        setCharacterData({
+          name,
+          classId,
+          className,
+          raceName,
+          raceImage,
+          raceIcon,
+          deityId,
+          deityName,
+          deckId,
+          deckName,
+          level: state?.level || 1,
+          attributes,
+          derivedStats,
+          pointsRemaining: state?.pointsRemaining || 0,
+          totalPoints: state?.totalPoints || 5,
+          isSaved,
+          isFinalized: state?.isFinalized || false,
+          saveId: saveId || null,
+          progress: state?.progress || 0,
+          location: state?.location || 'Acampamento Inicial',
+          equipment: state?.equipment || {},
+          createdAt: state?.createdAt || new Date().toISOString(),
+          build,
+          characterName: name,
+        });
 
         const finalClassId = classId || 'paladino';
         const startingEquip = getStartingEquipment(finalClassId);
@@ -165,11 +242,12 @@ export const EquipmentPage = () => {
 
           slots.forEach((slot) => {
             const slotItems = items.filter(
-              (item: EquipmentData) => item.slot === slot,
+              (item: EquipmentDataType) => item.slot === slot,
             );
             if (slotItems.length > 0) {
-              const bestItem: EquipmentData = slotItems.sort(
-                (a: EquipmentData, b: EquipmentData) => b.level - a.level,
+              const bestItem: EquipmentDataType = slotItems.sort(
+                (a: EquipmentDataType, b: EquipmentDataType) =>
+                  b.level - a.level,
               )[0];
               if (
                 bestItem &&
@@ -216,8 +294,49 @@ export const EquipmentPage = () => {
     loadEquipmentData();
   }, [location]);
 
+  const calculateStats = useCallback(
+    (equip: Record<EquipmentSlot, Equipment | null>) => {
+      if (characterData?.classId) {
+        const stats = calculateCharacter(characterData.classId, equip);
+        return stats.derivedStats.total;
+      }
+      return null;
+    },
+    [characterData?.classId],
+  );
+
+  useEffect(() => {
+    const stats = calculateStats(equipment);
+    setCharacterDerivedStats(stats);
+  }, [equipment, calculateStats]);
+
+  useEffect(() => {
+    if (previewEquipment) {
+      const tempEquipment = { ...equipment };
+      const slot = previewEquipment.slot as EquipmentSlot;
+      tempEquipment[slot] = previewEquipment;
+      const stats = calculateStats(tempEquipment);
+      setHoverStats(stats);
+    } else {
+      setHoverStats(null);
+    }
+  }, [previewEquipment, equipment, calculateStats]);
+
   const handleSlotClick = (slotId: EquipmentSlot): void => {
     setSelectedSlot(slotId);
+  };
+
+  const handleSlotHover = (slotId: EquipmentSlot): void => {
+    const item = getSlotEquipment(slotId);
+    if (item) {
+      setPreviewEquipment(item);
+    } else {
+      setPreviewEquipment(null);
+    }
+  };
+
+  const handleSlotLeave = (): void => {
+    setPreviewEquipment(null);
   };
 
   const handleUnequip = (slotId: EquipmentSlot): void => {
@@ -234,15 +353,29 @@ export const EquipmentPage = () => {
   };
 
   const handleBack = (): void => {
+    const state = location.state as Partial<CharacterData> | null;
+
     navigate('/attribute-dist', {
       state: {
-        classId: characterData.className?.toLowerCase() || '',
-        raceName: characterData.raceName || '',
-        raceImage: characterData.raceImage || '',
-        raceIcon: characterData.raceIcon || '',
-        characterName: characterData.characterName || '',
-        attributes: characterData.attributes,
-        derivedStats: characterData.derivedStats,
+        classId: characterData?.classId || state?.classId || '',
+        raceId: characterData?.raceId || state?.raceId || '',
+        raceName: characterData?.raceName || state?.raceName || '',
+        raceImage: characterData?.raceImage || state?.raceImage || '',
+        raceIcon: characterData?.raceIcon || state?.raceIcon || '',
+        characterName:
+          characterData?.name || state?.name || state?.characterName || '',
+        attributes:
+          characterData?.attributes || state?.attributes || defaultAttributes,
+        derivedStats:
+          characterData?.derivedStats ||
+          state?.derivedStats ||
+          defaultDerivedStats,
+        deckId: characterData?.deckId || state?.deckId || '',
+        deckName: characterData?.deckName || state?.deckName || '',
+        deityId: characterData?.deityId || state?.deityId || '',
+        deityName: characterData?.deityName || state?.deityName || '',
+        isSaved: characterData?.isSaved || state?.isSaved || false,
+        saveId: characterData?.saveId || state?.saveId || null,
       },
     });
   };
@@ -253,6 +386,7 @@ export const EquipmentPage = () => {
         ...location.state,
         equipment,
         gold: GOLD_AMOUNT,
+        isSaved: characterData?.isSaved || false,
       },
     });
   };
@@ -264,6 +398,8 @@ export const EquipmentPage = () => {
   const selectedEquipment: Equipment | null = selectedSlot
     ? equipment[selectedSlot]
     : null;
+
+  const displayStats = hoverStats || characterDerivedStats;
 
   if (loading) {
     return (
@@ -299,36 +435,222 @@ export const EquipmentPage = () => {
         </Header>
 
         <MainContent>
-          <EquipmentGrid>
-            {EQUIPMENT_SLOTS.map((slot) => {
-              const item: Equipment | null = getSlotEquipment(slot.id);
-              const isEmpty: boolean = !item;
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '16px',
+              flex: 1,
+            }}
+          >
+            <CharacterStatsPanel>
+              <StatsTitle>Atributos do Personagem</StatsTitle>
+              <StatBarContainer>
+                <StatBarRow>
+                  <StatBarLabel>HP</StatBarLabel>
+                  <StatBarTrack>
+                    <StatBarFill
+                      $value={displayStats?.maxHP || 0}
+                      $max={Math.max(displayStats?.maxHP || 100, 100)}
+                      $color="#e74c3c"
+                    />
+                  </StatBarTrack>
+                  <StatBarValue>{displayStats?.maxHP || 0}</StatBarValue>
+                </StatBarRow>
 
-              return (
-                <SlotItem
-                  key={slot.id}
-                  isEmpty={isEmpty}
-                  rarity={item?.rarity}
-                  onClick={() => handleSlotClick(slot.id)}
-                  title={
-                    item ? `${item.name} (${item.rarity})` : slot.description
-                  }
+                <StatBarRow>
+                  <StatBarLabel>MANA</StatBarLabel>
+                  <StatBarTrack>
+                    <StatBarFill
+                      $value={displayStats?.maxMana || 0}
+                      $max={Math.max(displayStats?.maxMana || 50, 50)}
+                      $color="#3498db"
+                    />
+                  </StatBarTrack>
+                  <StatBarValue>{displayStats?.maxMana || 0}</StatBarValue>
+                </StatBarRow>
+
+                <StatBarRow>
+                  <StatBarLabel>AP</StatBarLabel>
+                  <StatBarTrack>
+                    <StatBarFill
+                      $value={displayStats?.actionPoints || 0}
+                      $max={15}
+                      $color="#9b59b6"
+                    />
+                  </StatBarTrack>
+                  <StatBarValue>{displayStats?.actionPoints || 0}</StatBarValue>
+                </StatBarRow>
+
+                <StatBarRow>
+                  <StatBarLabel>REG. MANA</StatBarLabel>
+                  <StatBarTrack>
+                    <StatBarFill
+                      $value={displayStats?.manaRegen || 0}
+                      $max={10}
+                      $color="#2ecc71"
+                    />
+                  </StatBarTrack>
+                  <StatBarValue>{displayStats?.manaRegen || 0}</StatBarValue>
+                </StatBarRow>
+              </StatBarContainer>
+
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: '1fr 1fr',
+                  gap: '4px 12px',
+                  marginTop: '12px',
+                }}
+              >
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    color: '#858594',
+                    fontSize: '0.7rem',
+                  }}
                 >
-                  {item ? (
-                    <>
-                      <SlotEquipmentImage src={item.image} alt={item.name} />
-                      <SlotRarityBadge rarity={item.rarity} />
-                    </>
-                  ) : (
-                    <>
-                      <SlotIcon>{slot.icon}</SlotIcon>
-                      <SlotLabel>{slot.label}</SlotLabel>
-                    </>
-                  )}
-                </SlotItem>
-              );
-            })}
-          </EquipmentGrid>
+                  <span>Defesa</span>
+                  <span style={{ color: '#ffd700' }}>
+                    {displayStats?.defense || 0}
+                  </span>
+                </div>
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    color: '#858594',
+                    fontSize: '0.7rem',
+                  }}
+                >
+                  <span>Awareness</span>
+                  <span style={{ color: '#ffd700' }}>
+                    {displayStats?.awareness || 0}
+                  </span>
+                </div>
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    color: '#858594',
+                    fontSize: '0.7rem',
+                  }}
+                >
+                  <span>Crítico</span>
+                  <span style={{ color: '#ffd700' }}>
+                    {displayStats?.critical || 0}%
+                  </span>
+                </div>
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    color: '#858594',
+                    fontSize: '0.7rem',
+                  }}
+                >
+                  <span>Avoidance</span>
+                  <span style={{ color: '#ffd700' }}>
+                    {displayStats?.avoidance || 0}%
+                  </span>
+                </div>
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    color: '#858594',
+                    fontSize: '0.7rem',
+                  }}
+                >
+                  <span>Deflect</span>
+                  <span style={{ color: '#ffd700' }}>
+                    {displayStats?.deflect || 0}%
+                  </span>
+                </div>
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    color: '#858594',
+                    fontSize: '0.7rem',
+                  }}
+                >
+                  <span>Potência Mágica</span>
+                  <span style={{ color: '#ffd700' }}>
+                    {displayStats?.manaPower || 0}
+                  </span>
+                </div>
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    color: '#858594',
+                    fontSize: '0.7rem',
+                  }}
+                >
+                  <span>Iniciativa</span>
+                  <span style={{ color: '#ffd700' }}>
+                    {displayStats?.initiative || 0}
+                  </span>
+                </div>
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    color: '#858594',
+                    fontSize: '0.7rem',
+                  }}
+                >
+                  <span>Velocidade</span>
+                  <span style={{ color: '#ffd700' }}>
+                    {displayStats?.speed || 0}m
+                  </span>
+                </div>
+              </div>
+            </CharacterStatsPanel>
+
+            <EquipmentGridWrapper>
+              <EquipmentSectionTitle>Equipamentos</EquipmentSectionTitle>
+              <EquipmentGrid>
+                {EQUIPMENT_SLOTS.map((slot) => {
+                  const item: Equipment | null = getSlotEquipment(slot.id);
+                  const isEmpty: boolean = !item;
+
+                  return (
+                    <SlotItem
+                      key={slot.id}
+                      isEmpty={isEmpty}
+                      rarity={item?.rarity}
+                      onClick={() => handleSlotClick(slot.id)}
+                      onMouseEnter={() => handleSlotHover(slot.id)}
+                      onMouseLeave={handleSlotLeave}
+                      title={
+                        item
+                          ? `${item.name} (${item.rarity})`
+                          : slot.description
+                      }
+                    >
+                      {item ? (
+                        <>
+                          <SlotEquipmentImage
+                            src={item.image}
+                            alt={item.name}
+                          />
+                          <SlotRarityBadge rarity={item.rarity} />
+                        </>
+                      ) : (
+                        <>
+                          <SlotIcon>{slot.icon}</SlotIcon>
+                          <SlotLabel>{slot.label}</SlotLabel>
+                        </>
+                      )}
+                    </SlotItem>
+                  );
+                })}
+              </EquipmentGrid>
+            </EquipmentGridWrapper>
+          </div>
 
           <EquipmentInfo>
             <InfoTitle>Detalhes do Item</InfoTitle>
@@ -383,6 +705,13 @@ export const EquipmentPage = () => {
             )}
           </EquipmentInfo>
         </MainContent>
+
+        {previewEquipment && characterDerivedStats && (
+          <EquipmentPreview
+            equipment={previewEquipment}
+            currentStats={characterDerivedStats}
+          />
+        )}
 
         <Actions>
           <BackButton onClick={handleBack}>Voltar a Ficha</BackButton>

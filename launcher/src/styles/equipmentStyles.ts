@@ -500,3 +500,166 @@ export const BackButton = styled.button`
     min-width: unset;
   }
 `;
+
+
+export const CharacterStatsPanel = styled.div`
+  width: 100%;
+  background: rgba(27, 24, 51, 0.8);
+  border-radius: 16px;
+  padding: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  margin-bottom: 12px;
+`;
+
+export const StatsTitle = styled.h3`
+  color: #ffd700;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin: 0 0 12px 0;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  text-align: center;
+`;
+
+export const StatBarContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+`;
+
+export const StatBarRow = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 10px;
+`;
+
+export const StatBarLabel = styled.span`
+  color: #dcdce5;
+  font-size: 0.75rem;
+  font-weight: 500;
+  min-width: 40px;
+  text-align: right;
+`;
+
+export const StatBarValue = styled.span`
+  color: #ffd700;
+  font-size: 0.8rem;
+  font-weight: 600;
+  min-width: 30px;
+  text-align: center;
+`;
+
+export const StatBarTrack = styled.div`
+  flex: 1;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 4px;
+  overflow: hidden;
+  position: relative;
+`;
+
+export interface StatBarFillProps {
+  $value: number;
+  $max: number;
+  $color: string;
+}
+
+export const StatBarFill = styled.div<StatBarFillProps>`
+  height: 100%;
+  width: ${({ $value, $max }) => ($max > 0 ? Math.min(($value / $max) * 100, 100) : 0)}%;
+  background: ${({ $color }) => $color};
+  border-radius: 4px;
+  transition: width 0.5s ease;
+`;
+
+export const EquipmentPreview = styled.div`
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: rgba(10, 8, 16, 0.95);
+  border: 1px solid rgba(255, 215, 0, 0.2);
+  border-radius: 12px;
+  padding: 16px 20px;
+  max-width: 320px;
+  z-index: 100;
+  backdrop-filter: blur(10px);
+  animation: slideUp 0.3s ease;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+`;
+
+export const PreviewTitle = styled.div`
+  color: #ffffff;
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-bottom: 6px;
+`;
+
+export const PreviewRarity = styled.span<{ rarity: string }>`
+  font-size: 0.6rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  margin-left: 6px;
+  color: ${({ rarity }) => {
+    const colors: Record<string, string> = {
+      Comum: '#8a8a8a',
+      Incomum: '#4caf50',
+      Rara: '#2196f3',
+      Epica: '#9c27b0',
+      Lendaria: '#ffd700',
+      Mitica: '#ff6b6b',
+    };
+    return colors[rarity] || '#8a8a8a';
+  }};
+`;
+
+export const PreviewStats = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px 12px;
+  margin-top: 6px;
+`;
+
+export const PreviewStat = styled.div<{ isPositive?: boolean }>`
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.7rem;
+  color: ${({ isPositive }) => (isPositive ? '#2ecc71' : '#ff6b6b')};
+  padding: 2px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+`;
+
+export const PreviewStatLabel = styled.span`
+  color: #9999aa;
+`;
+
+export const PreviewStatValue = styled.span<{ isPositive?: boolean }>`
+  color: ${({ isPositive }) => (isPositive ? '#2ecc71' : '#ff6b6b')};
+  font-weight: 600;
+`;
+
+export const EquipmentGridWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+`;
+
+export const EquipmentSectionTitle = styled.h3`
+  color: #dcdce5;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin: 0;
+  letter-spacing: 0.5px;
+`;

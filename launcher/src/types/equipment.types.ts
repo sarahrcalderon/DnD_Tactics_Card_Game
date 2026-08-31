@@ -1,4 +1,3 @@
-// launcher/src/types/equipment.types.ts
 
 export type EquipmentSlot = 
   | 'head'
