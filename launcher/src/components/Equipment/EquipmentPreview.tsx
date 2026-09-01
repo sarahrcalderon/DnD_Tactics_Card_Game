@@ -119,6 +119,7 @@ export const EquipmentPreview: React.FC<EquipmentPreviewProps> = ({
             </PreviewStat>
           );
         })}
+        to
       </PreviewStats>
     </PreviewContainer>
   );

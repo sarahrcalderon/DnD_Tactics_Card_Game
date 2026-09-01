@@ -14,6 +14,7 @@ import { NameSelectPage } from './pages/NameSelectPage';
 import { AttributeDistPage } from './pages/AttributeDistPage';
 import { EquipmentPage } from './pages/EquipamentPage';
 import { BagPage } from './pages/BagPage';
+import { MapScreen } from './pages/MapScreen';
 
 function App() {
   return (
@@ -44,6 +45,7 @@ function App() {
             <Route path="/attribute-dist" element={<AttributeDistPage />} />
             <Route path="/equipment" element={<EquipmentPage />} />
             <Route path="/bag" element={<BagPage />} />
+            <Route path="/map" element={<MapScreen />} />
           </Routes>
         </CharacterCreationProvider>
       </AudioProvider>

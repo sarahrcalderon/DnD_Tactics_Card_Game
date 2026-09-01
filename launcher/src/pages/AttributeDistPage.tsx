@@ -817,14 +817,8 @@ export const AttributeDistPage = () => {
   ============================================================ */
 
   const handleStartMatch = useCallback(() => {
-    toast.loading('Iniciando partida...', {
-      duration: 2000,
-    });
-
-    setTimeout(() => {
-      toast.success('Partida iniciada!');
-    }, 2000);
-  }, []);
+    navigate('/map');
+  }, [navigate]);
 
   /* ============================================================
      DELETAR PERSONAGEM
