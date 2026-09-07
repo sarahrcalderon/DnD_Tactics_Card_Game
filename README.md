@@ -19,7 +19,6 @@
 - [Variáveis de ambiente](#variáveis-de-ambiente)
 - [API](#api)
 - [Roteiro de desenvolvimento](#roteiro-de-desenvolvimento)
-- [Contribuindo](#contribuindo)
 - [Aviso de propriedade intelectual](#aviso-de-propriedade-intelectual)
 
 ## Visão geral
