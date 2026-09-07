@@ -1,13 +1,8 @@
-#!/bin/bash
-# ================================================================
-# D&D TACTICS CARD GAME - START ALL SERVICES
-# ================================================================
-
 echo "========================================="
-echo "  🎮 D&D TACTICS CARD GAME"
+echo "   D&D TACTICS CARD GAME"
 echo "========================================="
 echo ""
-echo "🚀 Iniciando todos os serviços..."
+echo " Iniciando todos os serviços..."
 echo ""
 
 RED='\033[0;31m'
@@ -26,10 +21,10 @@ LAUNCHER_DIR="$PROJECT_ROOT/launcher"
 FRONTEND_DIR="$PROJECT_ROOT/frontend"
 VENV_DIR="$PROJECT_ROOT/venv"
 
-print_status() { echo -e "${BLUE}▶${NC} $1"; }
-print_success() { echo -e "${GREEN}✅${NC} $1"; }
-print_error() { echo -e "${RED}❌${NC} $1"; }
-print_warning() { echo -e "${YELLOW}⚠️${NC} $1"; }
+print_status() { echo -e "${BLUE}${NC} $1"; }
+print_success() { echo -e "${GREEN}${NC} $1"; }
+print_error() { echo -e "${RED}${NC} $1"; }
+print_warning() { echo -e "${YELLOW}${NC} $1"; }
 
 print_title() {
     echo ""
@@ -39,7 +34,7 @@ print_title() {
 }
 
 check_dependencies() {
-    print_title "📦 VERIFICANDO DEPENDÊNCIAS"
+    print_title " VERIFICANDO DEPENDÊNCIAS"
     
     if command -v python &> /dev/null; then
         print_success "Python encontrado: $(python --version 2>&1)"
@@ -64,7 +59,7 @@ check_dependencies() {
 }
 
 activate_venv() {
-    print_title "🐍 ATIVANDO AMBIENTE VIRTUAL"
+    print_title " ATIVANDO AMBIENTE VIRTUAL"
     
     if [ -d "$VENV_DIR" ]; then
         print_status "VenV encontrado em: $VENV_DIR"
@@ -100,7 +95,7 @@ activate_venv() {
 }
 
 install_backend_deps() {
-    print_title "📦 INSTALANDO DEPENDÊNCIAS DO BACKEND"
+    print_title " INSTALANDO DEPENDÊNCIAS DO BACKEND"
     
     cd "$BACKEND_DIR"
     
@@ -119,7 +114,7 @@ install_backend_deps() {
 }
 
 install_launcher_deps() {
-    print_title "📦 INSTALANDO DEPENDÊNCIAS DO LAUNCHER"
+    print_title " INSTALANDO DEPENDÊNCIAS DO LAUNCHER"
     
     cd "$LAUNCHER_DIR"
     
@@ -142,7 +137,7 @@ install_launcher_deps() {
 
 install_frontend_deps() {
     if [ -d "$FRONTEND_DIR" ] && [ -f "$FRONTEND_DIR/package.json" ]; then
-        print_title "📦 INSTALANDO DEPENDÊNCIAS DO FRONTEND"
+        print_title " INSTALANDO DEPENDÊNCIAS DO FRONTEND"
         cd "$FRONTEND_DIR"
         print_status "Instalando dependências do frontend..."
         npm install --silent
@@ -151,13 +146,13 @@ install_frontend_deps() {
 }
 
 start_services() {
-    print_title "🚀 INICIANDO SERVIÇOS"
+    print_title " INICIANDO SERVIÇOS"
     
     # ============================================================
     # BACKEND API (FastAPI)
     # ============================================================
     
-    print_status "▶ Iniciando backend API (FastAPI)..."
+    print_status "Iniciando backend API (FastAPI)..."
     cd "$BACKEND_DIR"
     
     # Verifica se o uvicorn está instalado
@@ -173,9 +168,6 @@ start_services() {
     print_success "Backend API iniciado (PID: $BACKEND_PID) - http://localhost:8000"
     sleep 3
     
-    # ============================================================
-    # LAUNCHER
-    # ============================================================
     
     print_status "▶ Iniciando launcher (React/Vite)..."
     cd "$LAUNCHER_DIR"
@@ -190,18 +182,12 @@ start_services() {
     LAUNCHER_PID=$!
     print_success "Launcher iniciado (PID: $LAUNCHER_PID) - http://localhost:3000"
     
-    # ============================================================
-    # JOGO PYGAME (Launcher alternativo - opcional)
-    # ============================================================
+
+    # print_status " Pygame Launcher disponível em: python main.py"
     
-    # print_status "▶ Pygame Launcher disponível em: python main.py"
-    
-    # ============================================================
-    # FRONTEND (opcional)
-    # ============================================================
     
     if [ -d "$FRONTEND_DIR" ] && [ -f "$FRONTEND_DIR/package.json" ]; then
-        print_status "▶ Iniciando frontend (React/Vite)..."
+        print_status " Iniciando frontend (React/Vite)..."
         cd "$FRONTEND_DIR"
         
         if ! grep -q '"dev"' package.json; then
@@ -217,22 +203,22 @@ start_services() {
     
     echo ""
     echo -e "${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-    echo -e "${GREEN}  ✅ TODOS OS SERVIÇOS INICIADOS!${NC}"
+    echo -e "${GREEN}   TODOS OS SERVIÇOS INICIADOS!${NC}"
     echo -e "${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
     echo ""
-    echo -e "${CYAN}📌 URLs:${NC}"
-    echo -e "  🔹 ${YELLOW}Backend API:${NC}  http://localhost:8000"
-    echo -e "  🔹 ${YELLOW}Launcher:${NC}     http://localhost:3000"
+    echo -e "${CYAN} URLs:${NC}"
+    echo -e "   ${YELLOW}Backend API:${NC}  http://localhost:8000"
+    echo -e "   ${YELLOW}Launcher:${NC}     http://localhost:3000"
     if [ -n "$FRONTEND_PID" ]; then
-        echo -e "  🔹 ${YELLOW}Frontend:${NC}     http://localhost:3001"
+        echo -e "   ${YELLOW}Frontend:${NC}     http://localhost:3001"
     fi
     echo ""
-    echo -e "${CYAN}📌 Comandos manuais:${NC}"
-    echo -e "  🔹 ${YELLOW}Backend API:${NC}  cd backend && uvicorn api.server:app --reload"
-    echo -e "  🔹 ${YELLOW}Pygame:${NC}       cd backend && python main.py"
-    echo -e "  🔹 ${YELLOW}Launcher:${NC}     cd launcher && npm run dev"
+    echo -e "${CYAN} Comandos manuais:${NC}"
+    echo -e "   ${YELLOW}Backend API:${NC}  cd backend && uvicorn api.server:app --reload"
+    echo -e "   ${YELLOW}Pygame:${NC}       cd backend && python main.py"
+    echo -e "  ${YELLOW}Launcher:${NC}     cd launcher && npm run dev"
     echo ""
-    echo -e "${RED}⚠️  Pressione CTRL+C para parar todos os serviços${NC}"
+    echo -e "${RED}  Pressione CTRL+C para parar todos os serviços${NC}"
     echo ""
     
     if [ -n "$FRONTEND_PID" ]; then
@@ -244,14 +230,14 @@ start_services() {
 
 cleanup() {
     echo ""
-    echo -e "${YELLOW}🛑 Parando todos os serviços...${NC}"
+    echo -e "${YELLOW}Parando todos os serviços...${NC}"
     
     kill $BACKEND_PID 2>/dev/null && echo -e "  ${GREEN}✅ Backend API parado${NC}"
     kill $LAUNCHER_PID 2>/dev/null && echo -e "  ${GREEN}✅ Launcher parado${NC}"
     [ -n "$FRONTEND_PID" ] && kill $FRONTEND_PID 2>/dev/null && echo -e "  ${GREEN}✅ Frontend parado${NC}"
     
     deactivate 2>/dev/null
-    echo -e "${GREEN}✅ Todos os serviços parados!${NC}"
+    echo -e "${GREEN} Todos os serviços parados!${NC}"
     exit 0
 }
 
@@ -261,7 +247,7 @@ main() {
     clear
     echo -e "${PURPLE}╔══════════════════════════════════════════════════════════╗${NC}"
     echo -e "${PURPLE}║                                                          ║${NC}"
-    echo -e "${PURPLE}║     ⚔️  D&D TACTICS CARD GAME  🛡️                        ║${NC}"
+    echo -e "${PURPLE}║           D&D TACTICS CARD GAME                          ║${NC}"
     echo -e "${PURPLE}║                                                          ║${NC}"
     echo -e "${PURPLE}╚══════════════════════════════════════════════════════════╝${NC}"
     echo ""
