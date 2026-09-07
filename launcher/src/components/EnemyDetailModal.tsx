@@ -1,5 +1,3 @@
-// src/components/EnemyDetailModal.tsx
-
 import React from 'react';
 import {
   ModalOverlay,
@@ -45,7 +43,13 @@ const EnemyDetailModal: React.FC<EnemyDetailModalProps> = ({
       >
         <ModalHeader>
           <h2>{enemy.name}</h2>
-          <ModalCloseButton onClick={onClose}>✕</ModalCloseButton>
+          <ModalCloseButton
+            type="button"
+            onClick={onClose}
+            aria-label="Fechar detalhes do inimigo"
+          >
+            &times;
+          </ModalCloseButton>
         </ModalHeader>
 
         <ModalBody $orientation={orientation}>

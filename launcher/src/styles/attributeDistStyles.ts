@@ -55,6 +55,23 @@ export const Container = styled.div`
     background: rgba(255, 215, 0, 0.45);
   }
 
+  /* Keeps the existing background visible while giving the complete character sheet a shared RPG frame. */
+  > div[style] {
+    max-width: 1280px;
+    padding: clamp(18px, 2vw, 28px);
+    box-sizing: border-box;
+    border: 1px solid rgba(198, 151, 68, 0.34);
+    border-top-color: rgba(239, 204, 126, 0.66);
+    background: linear-gradient(135deg, rgba(16, 19, 27, 0.78), rgba(8, 10, 16, 0.72));
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.42), inset 0 0 0 4px rgba(6, 8, 13, 0.35);
+  }
+
+  button:focus-visible {
+    outline: 2px solid #f2cf7d;
+    outline-offset: 3px;
+    box-shadow: 0 0 0 4px rgba(242, 207, 125, 0.16);
+  }
+
   @media (max-width: 768px) {
     padding: 16px 12px 32px;
   }
@@ -123,12 +140,23 @@ export const Header = styled.header`
 
   position: relative;
   z-index: 1;
+  padding: 8px 12px 0;
+
+  &::after {
+    content: '';
+    display: block;
+    width: min(420px, 78%);
+    height: 1px;
+    margin: 16px auto 0;
+    background: linear-gradient(90deg, transparent, #b98b3e 18%, #f0d188 50%, #b98b3e 82%, transparent);
+    box-shadow: 0 0 10px rgba(232, 191, 105, 0.35);
+  }
 `;
 
 export const Title = styled.h1`
   margin: 0 0 6px;
 
-  color: #ffd700;
+  color: #f4d88f;
 
   font-family: 'Cinzel', serif;
 
@@ -136,7 +164,8 @@ export const Title = styled.h1`
 
   font-weight: 700;
 
-  letter-spacing: 1.2px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 
   text-shadow:
     0 2px 2px rgba(0, 0, 0, 0.9),
@@ -195,19 +224,19 @@ export const CharacterSheet = styled.aside`
 
   padding: 24px;
 
-  border-radius: 18px;
+  border-radius: 3px;
 
   background:
     linear-gradient(
       145deg,
-      rgba(34, 29, 60, 0.94),
-      rgba(18, 15, 32, 0.94)
+      rgba(37, 39, 45, 0.97),
+      rgba(14, 17, 23, 0.99)
     );
 
-  border: 1px solid rgba(255, 215, 0, 0.14);
+  border: 1px solid rgba(198, 151, 68, 0.48);
 
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.04),
+    inset 0 0 0 3px rgba(0, 0, 0, 0.2),
     0 12px 40px rgba(0, 0, 0, 0.38);
 
   backdrop-filter: blur(12px);
@@ -242,7 +271,7 @@ export const SheetTitle = styled.h2`
 
   padding-bottom: 12px;
 
-  color: #ffd700;
+  color: #f2d692;
 
   font-family: 'Cinzel', serif;
 
@@ -276,7 +305,7 @@ export const AvatarWrapper = styled.div`
   width: 120px;
   height: 120px;
 
-  border-radius: 50%;
+  border-radius: 3px;
 
   overflow: hidden;
 
@@ -322,7 +351,7 @@ export const AvatarFallback = styled.div`
   width: 120px;
   height: 120px;
 
-  border-radius: 50%;
+  border-radius: 3px;
 
   display: flex;
   align-items: center;
@@ -404,7 +433,7 @@ export const AttributeRow = styled.div`
 
   gap: 10px;
 
-  padding: 7px 4px;
+  padding: 8px 7px;
 
   border-bottom:
     1px solid rgba(255, 255, 255, 0.045);
@@ -420,6 +449,10 @@ export const AttributeRow = styled.div`
         rgba(255, 215, 0, 0.035),
         transparent
       );
+  }
+
+  &:focus-within {
+    background: linear-gradient(90deg, transparent, rgba(220, 177, 91, 0.1), transparent);
   }
 
   &:last-child {
@@ -487,7 +520,7 @@ export const AttributeButton =
     align-items: center;
     justify-content: center;
 
-    border-radius: 50%;
+    border-radius: 2px;
 
     border: 1px solid
       ${({ disabled, $variant }) => {
@@ -567,7 +600,7 @@ export const PointsAvailable = styled.div`
 
   text-align: center;
 
-  border-radius: 12px;
+  border-radius: 2px;
 
   background:
     linear-gradient(
@@ -627,17 +660,17 @@ export const DeckHeader = styled.div`
 
   padding: 17px 20px;
 
-  border-radius: 16px;
+  border-radius: 3px;
 
   background:
     linear-gradient(
       145deg,
-      rgba(34, 29, 60, 0.94),
-      rgba(18, 15, 32, 0.94)
+      rgba(37, 39, 45, 0.97),
+      rgba(14, 17, 23, 0.99)
     );
 
   border:
-    1px solid rgba(255, 215, 0, 0.13);
+    1px solid rgba(198, 151, 68, 0.48);
 
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.035),
@@ -660,7 +693,7 @@ export const DeckBadge =
   styled.span<{ color: string }>`
     padding: 5px 14px;
 
-    border-radius: 20px;
+    border-radius: 2px;
 
     background:
       ${({ color }) => `${color}18`};
@@ -781,13 +814,13 @@ export const StatItem = styled.div`
   align-items: center;
   justify-content: center;
 
-  border-radius: 10px;
+  border-radius: 2px;
 
   background:
     linear-gradient(
       145deg,
-      rgba(255, 255, 255, 0.055),
-      rgba(0, 0, 0, 0.15)
+      rgba(47, 47, 48, 0.82),
+      rgba(10, 13, 18, 0.78)
     );
 
   border:
@@ -944,7 +977,7 @@ export const EquipmentButton = styled.button`
 
   gap: 8px;
 
-  border-radius: 10px;
+  border-radius: 2px;
 
   border:
     1.5px solid rgba(255, 215, 0, 0.25);
@@ -1059,7 +1092,7 @@ export const BottomActions = styled.div`
 `;
 
 interface BottomActionButtonProps {
-  variant?: 'gold' | 'blue' | 'green';
+  $variant?: 'gold' | 'blue' | 'green';
 }
 
 export const BottomActionButton =
@@ -1072,7 +1105,7 @@ export const BottomActionButton =
 
     gap: 8px;
 
-    border-radius: 10px;
+    border-radius: 2px;
 
     font-size: 0.85rem;
 
@@ -1085,8 +1118,8 @@ export const BottomActionButton =
       background 0.25s ease,
       box-shadow 0.25s ease;
 
-    ${({ variant }) => {
-      switch (variant) {
+    ${({ $variant }) => {
+      switch ($variant) {
         case 'gold':
           return `
             background:
@@ -1216,15 +1249,16 @@ export const BackButton = styled.button`
 
   padding: 13px 24px;
 
-  border-radius: 12px;
+  border-radius: 2px;
 
   border:
-    1px solid rgba(255, 255, 255, 0.16);
+    1px solid rgba(216, 176, 98, 0.65);
 
   background:
-    rgba(10, 8, 16, 0.55);
+    linear-gradient(180deg, rgba(64, 53, 39, 0.95), rgba(25, 25, 28, 0.95));
 
-  color: #dcdce5;
+  color: #dfc995;
+  font-family: 'Cinzel', Georgia, serif;
 
   font-size: 0.92rem;
 
@@ -1267,19 +1301,19 @@ export const ConfirmButton =
 
     padding: 13px 28px;
 
-    border: none;
+    border: 1px solid ${({ disabled }) => (disabled ? '#4b4b50' : '#f2cf7d')};
 
-    border-radius: 12px;
+    border-radius: 2px;
 
     background:
       ${({ disabled }) =>
         disabled
           ? 'rgba(90, 90, 90, 0.65)'
-          : 'linear-gradient(135deg, #ffe066, #d4a900)'};
+          : 'linear-gradient(180deg, #b68435, #72501d)'};
 
     color:
       ${({ disabled }) =>
-        disabled ? '#9a9a9a' : '#120d00'};
+        disabled ? '#9a9a9a' : '#fff1c4'};
 
     font-size: 0.95rem;
 
@@ -1332,30 +1366,22 @@ export const ConfirmButton =
 
 export const DeleteButton = styled.button`
   min-width: clamp(180px, 20vw, 240px);
-
-  padding: 12px 36px;
-
-  border: none;
-
-  border-radius: 12px;
-
+  padding: 13px 28px;
+  border: 1px solid #b86d55;
+  border-radius: 2px;
   background:
-    linear-gradient(
-      135deg,
-      #e74c3c,
-      #b83227
-    );
-
-  color: #ffffff;
-
-  font-size: 1rem;
-
-  font-weight: 700;
+    linear-gradient(180deg, rgba(112, 47, 34, 0.98), rgba(55, 20, 20, 0.98));
+  color: #f5d5bd;
+  font-family: 'Cinzel', Georgia, serif;
+  font-size: 0.9rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 
   cursor: pointer;
-
   box-shadow:
-    0 6px 18px rgba(231, 76, 60, 0.16);
+    0 8px 24px rgba(64, 12, 10, 0.32),
+    inset 0 0 0 2px rgba(247, 193, 145, 0.1);
 
   transition:
     transform 0.25s ease,
@@ -1364,11 +1390,12 @@ export const DeleteButton = styled.button`
 
   &:hover {
     transform: translateY(-2px);
-
-    filter: brightness(1.08);
-
+    border-color: #e4a077;
+    color: #fff0df;
+    filter: brightness(1.12);
     box-shadow:
-      0 8px 28px rgba(231, 76, 60, 0.3);
+      0 10px 30px rgba(93, 20, 15, 0.5),
+      0 0 16px rgba(202, 91, 62, 0.22);
   }
 
   &:active {

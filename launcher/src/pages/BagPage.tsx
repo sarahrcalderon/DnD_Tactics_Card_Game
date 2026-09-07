@@ -4,6 +4,7 @@ import toast from 'react-hot-toast';
 import styled from 'styled-components';
 import { Equipment, EquipmentSlot } from '../types/equipment.types';
 import { open5eApi } from '../services/open5eApi';
+import { getGold } from '../utils/goldUtils';
 import {
   Container,
   BackgroundImage,
@@ -106,7 +107,7 @@ const BagSlotEmpty = styled.div`
 `;
 
 interface RarityBadgeProps {
-  rarity: string;
+  $rarity: string;
 }
 
 const BagSlotRarityBadge = styled.div<RarityBadgeProps>`
@@ -116,7 +117,7 @@ const BagSlotRarityBadge = styled.div<RarityBadgeProps>`
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: ${({ rarity }) => {
+  background: ${({ $rarity }) => {
     const colors: Record<string, string> = {
       Comum: '#8a8a8a',
       Incomum: '#4caf50',
@@ -125,7 +126,7 @@ const BagSlotRarityBadge = styled.div<RarityBadgeProps>`
       Lendaria: '#ffd700',
       Mitica: '#ff6b6b',
     };
-    return colors[rarity] || '#8a8a8a';
+    return colors[$rarity] || '#8a8a8a';
   }};
   border: 1px solid rgba(255, 255, 255, 0.15);
 `;
@@ -175,11 +176,11 @@ const TooltipName = styled.div`
 `;
 
 interface TooltipRarityProps {
-  rarity: string;
+  $rarity: string;
 }
 
 const TooltipRarity = styled.div<TooltipRarityProps>`
-  color: ${({ rarity }) => {
+  color: ${({ $rarity }) => {
     const colors: Record<string, string> = {
       Comum: '#8a8a8a',
       Incomum: '#4caf50',
@@ -188,7 +189,7 @@ const TooltipRarity = styled.div<TooltipRarityProps>`
       Lendaria: '#ffd700',
       Mitica: '#ff6b6b',
     };
-    return colors[rarity] || '#8a8a8a';
+    return colors[$rarity] || '#8a8a8a';
   }};
   font-size: 0.6rem;
   font-weight: 600;
@@ -291,22 +292,21 @@ const MOCK_BAG_ITEMS: Omit<Equipment, 'image'>[] = [
 interface LocationState {
   gold?: number;
   equipment?: Record<EquipmentSlot, Equipment | null>;
+  inventory?: Equipment[];
 }
 
 export const BagPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [bagItems, setBagItems] = useState<(Equipment | null)[]>([]);
-  const [gold, setGold] = useState<number>(1250);
+  const [gold, setGold] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     const loadBagItems = async () => {
       setLoading(true);
       const state = location.state as LocationState | null;
-      if (state?.gold) {
-        setGold(state.gold);
-      }
+      setGold(state?.gold ?? getGold());
 
       // Carregar imagens para os itens da bag
       const itemsWithImages = await Promise.all(
@@ -331,7 +331,13 @@ export const BagPage = () => {
         }),
       );
 
-      setBagItems(itemsWithImages);
+      // An inventory received from the equipment screen is the source of truth.
+      // Mock items are only used for a bag opened outside that flow.
+      setBagItems(
+        state?.inventory
+          ? state.inventory
+          : itemsWithImages,
+      );
       setLoading(false);
     };
 
@@ -349,11 +355,34 @@ export const BagPage = () => {
       const item = bagItems[index];
       if (!item) return;
 
-      toast.success(`${item.name} - ${item.rarity}`, {
+      const state = location.state as LocationState | null;
+      const equipment = {
+        ...(state?.equipment || {}),
+      } as Record<EquipmentSlot, Equipment | null>;
+      const displacedItem = equipment[item.slot];
+      const nextInventory = bagItems
+        .filter((_, bagIndex) => bagIndex !== index)
+        .filter((bagItem): bagItem is Equipment => bagItem !== null);
+
+      if (displacedItem) {
+        nextInventory.push({ ...displacedItem, isEquipped: false });
+      }
+
+      equipment[item.slot] = { ...item, isEquipped: true };
+
+      toast.success(`${item.name} equipado em ${item.type}!`, {
         duration: 2000,
       });
+
+      navigate('/equipment', {
+        state: {
+          ...state,
+          equipment,
+          inventory: nextInventory,
+        },
+      });
     },
-    [bagItems],
+    [bagItems, location.state, navigate],
   );
 
   const equippedCount: number = bagItems.filter(
@@ -419,10 +448,10 @@ export const BagPage = () => {
                         getDefaultIconForSlot(item.slot);
                     }}
                   />
-                  <BagSlotRarityBadge rarity={item.rarity} />
+                  <BagSlotRarityBadge $rarity={item.rarity} />
                   <BagItemTooltip>
                     <TooltipName>{item.name}</TooltipName>
-                    <TooltipRarity rarity={item.rarity}>
+                    <TooltipRarity $rarity={item.rarity}>
                       {item.rarity}
                     </TooltipRarity>
                     {Object.entries(item.stats).length > 0 && (

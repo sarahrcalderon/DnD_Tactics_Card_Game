@@ -1,4 +1,3 @@
-
 export const DEITY_FULL_DATA: Record<string, any> = {
   tyr: {
     description:

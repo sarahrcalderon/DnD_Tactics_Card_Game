@@ -39,7 +39,6 @@ export interface Deity {
       reason: string;
     };
   };
-  // Matchups
   strongAgainst: string[];
   weakAgainst: string[];
 }
@@ -51,7 +50,29 @@ export interface DeitySelection {
   deckId: string;
 }
 
+export type FilterType =
+  | 'all'
+  | 'combat'
+  | 'magic'
+  | 'nature'
+  | 'justice'
+  | 'protection'
+  | 'death'
+  | 'perception';
 
+const FILTERS: {
+  id: FilterType;
+  label: string;
+}[] = [
+  { id: 'all', label: 'Todas' },
+  { id: 'combat', label: 'Combate' },
+  { id: 'magic', label: 'Magia' },
+  { id: 'nature', label: 'Natureza' },
+  { id: 'justice', label: 'Justiça' },
+  { id: 'protection', label: 'Proteção' },
+  { id: 'death', label: 'Morte' },
+  { id: 'perception', label: 'Percepção' },
+];
 
   
 

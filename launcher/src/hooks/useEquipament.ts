@@ -6,7 +6,7 @@ import {
   EquipmentTier, 
   EquipmentRarity 
 } from '../types/equipment.types';
-import { equipmentLoader } from '../services/equipamentLoader';
+import { equipmentLoader } from '../services/equipment/EquipmentLoader';
 import { CLASS_ARCHETYPE_MAP } from '../data/classMapping';
 
 interface UseEquipmentOptions {

@@ -28,6 +28,13 @@ import {
   EmptyText,
   Header,
   LoadingText,
+  ModalCardImage,
+  ModalCloseButton,
+  ModalContent,
+  ModalDeckMark,
+  ModalDetails,
+  ModalOverlay,
+  ModalTitle,
   Subtitle,
   Title,
   BackgroundImage,
@@ -74,7 +81,16 @@ const parseSavedDecks = (raw: string | null): DeckData[] => {
   try {
     const parsed: unknown = JSON.parse(raw);
     if (!Array.isArray(parsed)) return [];
-    return parsed as DeckData[];
+    return (parsed as DeckData[]).map((deck) => ({
+      ...deck,
+      cards: deck.cards.map((card) => ({
+        ...card,
+        image: card.image?.replace(
+          '/assets/images/cards/paladino/tank/',
+          '/assets/images/cards/paladino/deckTank/',
+        ),
+      })),
+    }));
   } catch (error) {
     console.error('Erro ao carregar decks salvos:', error);
     return [];
@@ -95,6 +111,7 @@ export const DeckViewPage = () => {
 
   const [loading, setLoading] = useState(false);
   const [deck, setDeck] = useState<DeckData | null>(null);
+  const [selectedCard, setSelectedCard] = useState<DeckData['cards'][number] | null>(null);
 
   const className = routeState.className ?? '';
   const raceName = routeState.raceName ?? '';
@@ -144,6 +161,15 @@ export const DeckViewPage = () => {
       description: 'Deck temporário - gere um deck completo no jogo.',
     });
   }, [className, navigate, routeState.deckId]);
+
+  useEffect(() => {
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setSelectedCard(null);
+    };
+
+    window.addEventListener('keydown', closeOnEscape);
+    return () => window.removeEventListener('keydown', closeOnEscape);
+  }, []);
 
   const handleBack = useCallback(() => {
     navigate('/deck-select', {
@@ -233,7 +259,13 @@ export const DeckViewPage = () => {
               const iconSvg = getIconSvg(card.icon || '✨');
 
               return (
-                <CardItem key={card.id} color={card.color || '#ffd700'}>
+                <CardItem
+                  key={card.id}
+                  type="button"
+                  color={card.color || '#ffd700'}
+                  onClick={() => setSelectedCard(card)}
+                  aria-label={`Ver carta completa: ${card.name}`}
+                >
                   <CardImageWrapper>
                     {card.image ? (
                       <CardImage
@@ -330,6 +362,36 @@ export const DeckViewPage = () => {
           </ConfirmButton>
         </Actions>
       </ContentWrapper>
+
+      {selectedCard && (
+        <ModalOverlay
+          role="presentation"
+          onMouseDown={() => setSelectedCard(null)}
+        >
+          <ModalContent
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="full-card-title"
+            onMouseDown={(event) => event.stopPropagation()}
+          >
+            <ModalCloseButton
+              type="button"
+              onClick={() => setSelectedCard(null)}
+              aria-label="Fechar carta completa"
+            >
+              ×
+            </ModalCloseButton>
+            <ModalDeckMark>Arquivo do aventureiro</ModalDeckMark>
+            <ModalTitle id="full-card-title">{selectedCard.name}</ModalTitle>
+            {selectedCard.image ? (
+              <ModalCardImage src={selectedCard.image} alt={selectedCard.name} />
+            ) : (
+              <ModalDetails>Arte da carta indisponível.</ModalDetails>
+            )}
+            <ModalDetails>{selectedCard.effect}</ModalDetails>
+          </ModalContent>
+        </ModalOverlay>
+      )}
     </Container>
   );
 };

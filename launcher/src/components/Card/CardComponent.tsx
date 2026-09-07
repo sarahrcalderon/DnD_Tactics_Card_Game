@@ -1,4 +1,3 @@
-// launcher/src/components/Card/CardComponent.tsx
 import React from 'react';
 import { CardData } from '../../types/card.types';
 import {

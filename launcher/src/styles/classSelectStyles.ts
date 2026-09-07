@@ -10,11 +10,22 @@ export const BackgroundImage = styled.div`
   background-size: cover;
   pointer-events: none;
 
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(circle at 50% 0%, rgba(205, 157, 68, 0.22), transparent 35%),
+      linear-gradient(90deg, rgba(4, 7, 12, 0.82), transparent 26%, transparent 74%, rgba(4, 7, 12, 0.82));
+  }
+
   &::after {
     content: '';
     position: absolute;
     inset: 0;
-    background: rgba(0, 0, 0, 0.7);
+    background:
+      linear-gradient(180deg, rgba(4, 7, 13, 0.66) 0%, rgba(8, 10, 17, 0.5) 42%, rgba(4, 5, 9, 0.9) 100%),
+      repeating-linear-gradient(90deg, rgba(255, 214, 132, 0.025) 0 1px, transparent 1px 5px);
   }
 `;
 
@@ -67,16 +78,53 @@ export const ContentWrapper = styled.div`
   position: relative;
   z-index: 2;
   flex: 1;
+  padding: clamp(18px, 2.5vw, 32px);
+  border: 1px solid rgba(198, 151, 68, 0.33);
+  border-top-color: rgba(239, 204, 126, 0.65);
+  background: linear-gradient(135deg, rgba(16, 19, 27, 0.78), rgba(8, 10, 16, 0.72));
+  box-shadow:
+    0 24px 60px rgba(0, 0, 0, 0.42),
+    inset 0 0 0 4px rgba(6, 8, 13, 0.38),
+    inset 0 0 38px rgba(202, 152, 63, 0.08);
+
+  &::before,
+  &::after {
+    content: '◆';
+    position: absolute;
+    color: #d6ad58;
+    font-size: 0.75rem;
+    text-shadow: 0 0 12px rgba(255, 215, 128, 0.8);
+  }
+
+  &::before { top: 10px; left: 12px; }
+  &::after { right: 12px; bottom: 10px; }
+
+  @media (max-width: 480px) {
+    padding: 16px 10px;
+    border-left: 0;
+    border-right: 0;
+  }
 `;
 
 export const Header = styled.header`
   width: 100%;
   max-width: 900px;
   padding: 0 8px;
-  margin-bottom: 28px;
+  margin-bottom: 24px;
   box-sizing: border-box;
   text-align: center;
   flex-shrink: 0;
+  position: relative;
+
+  &::after {
+    content: '';
+    display: block;
+    width: min(380px, 78%);
+    height: 1px;
+    margin: 16px auto 0;
+    background: linear-gradient(90deg, transparent, #b98b3e 18%, #f0d188 50%, #b98b3e 82%, transparent);
+    box-shadow: 0 0 10px rgba(232, 191, 105, 0.35);
+  }
 
   @media (max-width: 768px) {
     margin-bottom: 22px;
@@ -89,13 +137,14 @@ export const Header = styled.header`
 
 export const Title = styled.h1`
   margin: 0 0 8px;
-  color: #ffd700;
+  color: #f4d88f;
   font-family: 'Cinzel', serif;
   font-size: clamp(2.2rem, 5vw, 3.4rem);
   font-weight: 700;
   line-height: 1.1;
-  letter-spacing: 0.5px;
-  text-shadow: 0 0 40px rgba(255, 215, 0, 0.2);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-shadow: 0 2px 0 #35230e, 0 0 32px rgba(255, 215, 0, 0.3);
 
   @media (max-width: 480px) {
     font-size: 1.8rem;
@@ -154,7 +203,7 @@ export const Grid = styled.div`
   width: 100%;
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 24px;
+  gap: 18px;
   padding: 4px 2px 8px;
   box-sizing: border-box;
 
@@ -177,32 +226,35 @@ interface CardProps {
 export const Card = styled.div<CardProps>`
   position: relative;
   width: 100%;
-  min-height: 340px;
-  padding: clamp(20px, 2.5vw, 28px);
+  min-height: 350px;
+  padding: clamp(22px, 2.5vw, 28px);
   display: flex;
   flex-direction: column;
   align-items: center;
   box-sizing: border-box;
   background: ${({ selected }) =>
     selected
-      ? 'rgba(60, 50, 80, 0.95)'
-      : 'rgba(27, 24, 51, 0.85)'};
-  border: 2px solid
+      ? 'linear-gradient(145deg, rgba(59, 49, 37, 0.97), rgba(21, 23, 31, 0.98))'
+      : 'linear-gradient(145deg, rgba(35, 37, 45, 0.94), rgba(14, 17, 24, 0.97))'};
+  border: 1px solid
     ${({ selected, color }) =>
       selected
         ? color
-        : 'rgba(62, 55, 82, 0.4)'};
-  border-radius: clamp(16px, 1.5vw, 20px);
+        : 'rgba(169, 131, 67, 0.45)'};
+  border-radius: 3px;
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   box-shadow: ${({ selected, color }) =>
     selected
       ? `
-        0 0 40px ${color}33,
-        inset 0 0 20px ${color}22
+        0 0 35px ${color}33,
+        0 12px 28px rgba(0, 0, 0, 0.45),
+        inset 0 0 0 3px rgba(255, 227, 159, 0.08),
+        inset 0 0 24px ${color}22
       `
       : `
-        0 4px 16px rgba(0, 0, 0, 0.3)
+        0 9px 20px rgba(0, 0, 0, 0.35),
+        inset 0 0 0 3px rgba(0, 0, 0, 0.22)
       `};
   cursor: pointer;
   transform: translateY(0);
@@ -220,8 +272,8 @@ export const Card = styled.div<CardProps>`
       selected
         ? color
         : `${color}77`};
-    background: rgba(40, 35, 60, 0.92);
-    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.5);
+    background: linear-gradient(145deg, rgba(58, 52, 43, 0.98), rgba(20, 23, 30, 0.98));
+    box-shadow: 0 14px 32px rgba(0, 0, 0, 0.58), inset 0 0 0 3px rgba(255, 225, 154, 0.1);
   }
 
   &:focus-visible {
@@ -246,6 +298,20 @@ export const Card = styled.div<CardProps>`
     padding: 18px 16px;
   }
 
+  &::before,
+  &::after {
+    content: '';
+    position: absolute;
+    width: 15px;
+    height: 15px;
+    border-color: ${({ color }) => color};
+    opacity: 0.75;
+    pointer-events: none;
+  }
+
+  &::before { top: 6px; left: 6px; border-top: 1px solid; border-left: 1px solid; }
+  &::after { right: 6px; bottom: 6px; border-right: 1px solid; border-bottom: 1px solid; }
+
   @media (max-width: 480px) {
     min-height: 260px;
     padding: 16px 14px;
@@ -260,6 +326,16 @@ export const CardImageWrapper = styled.div`
   justify-content: center;
   margin-bottom: clamp(10px, 1.5vh, 18px);
   flex-shrink: 0;
+  position: relative;
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    width: 58%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(227, 189, 112, 0.85), transparent);
+  }
 
   @media (max-width: 820px) {
     height: 75px;
@@ -305,11 +381,13 @@ export const CardContent = styled.div`
 
 export const CardName = styled.h2`
   margin: 0 0 4px;
-  color: #ffffff;
+  color: #f5dfad;
+  font-family: 'Cinzel', Georgia, serif;
   font-size: clamp(1.2rem, 1.8vw, 1.5rem);
   font-weight: 700;
   line-height: 1.2;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
   text-align: center;
   text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
 
@@ -380,9 +458,9 @@ export const AttributeItem = styled.div<AttributeItemProps>`
   align-items: center;
   padding: 4px 14px;
   box-sizing: border-box;
-  background: rgba(255, 255, 255, 0.06);
-  border-radius: 6px;
-  border: 1px solid ${({ color }) => `${color}18`};
+  background: rgba(5, 8, 13, 0.48);
+  border-radius: 2px;
+  border: 1px solid ${({ color }) => `${color}55`};
 
   @media (max-width: 820px) {
     min-width: 34px;
@@ -440,7 +518,7 @@ export const Tag = styled.span<{ color: string }>`
   color: ${({ color }) => color};
   background: ${({ color }) => `${color}22`};
   border: 1px solid ${({ color }) => `${color}44`};
-  border-radius: 10px;
+  border-radius: 2px;
   font-size: clamp(0.6rem, 0.8vw, 0.75rem);
   font-weight: 500;
   white-space: nowrap;
@@ -462,9 +540,10 @@ export const SelectBadge = styled.div<{ color: string }>`
   right: clamp(8px, 0.8vw, 12px);
   z-index: 2;
   padding: clamp(4px, 0.4vw, 6px) clamp(10px, 1.2vw, 16px);
-  color: #000;
-  background: ${({ color }) => color};
-  border-radius: clamp(10px, 1vw, 14px);
+  color: #fff5d2;
+  background: #221c15;
+  border: 1px solid ${({ color }) => color};
+  border-radius: 2px;
   font-size: clamp(0.5rem, 0.6vw, 0.6rem);
   font-weight: 700;
   letter-spacing: 0.3px;
@@ -516,7 +595,7 @@ export const Actions = styled.div`
   justify-content: center;
   flex-wrap: wrap;
   gap: clamp(12px, 1.5vw, 20px);
-  padding: 16px 8px 20px;
+  padding: 16px 8px 8px;
   margin-top: 8px;
   box-sizing: border-box;
   flex-shrink: 0;
@@ -531,10 +610,11 @@ export const Actions = styled.div`
 export const BackButton = styled.button`
   min-width: clamp(140px, 15vw, 180px);
   padding: clamp(12px, 1.2vw, 16px) clamp(32px, 4vw, 48px);
-  color: #dcdce5;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1.5px solid rgba(255, 255, 255, 0.12);
-  border-radius: clamp(12px, 1.2vw, 16px);
+  color: #dfc995;
+  font-family: 'Cinzel', Georgia, serif;
+  background: linear-gradient(180deg, rgba(64, 53, 39, 0.95), rgba(25, 25, 28, 0.95));
+  border: 1px solid rgba(216, 176, 98, 0.65);
+  border-radius: 2px;
   font-size: clamp(1rem, 1.2vw, 1.1rem);
   font-weight: 600;
   cursor: pointer;
@@ -566,10 +646,14 @@ interface ConfirmButtonProps {
 export const ConfirmButton = styled.button<ConfirmButtonProps>`
   min-width: clamp(180px, 20vw, 240px);
   padding: clamp(12px, 1.2vw, 16px) clamp(36px, 5vw, 60px);
-  color: ${({ disabled }) => disabled ? '#888' : '#0a0810'};
-  background: ${({ disabled }) => disabled ? '#444' : '#ffd700'};
-  border: none;
-  border-radius: clamp(12px, 1.2vw, 16px);
+  color: ${({ disabled }) => (disabled ? '#888' : '#fff1c4')};
+  font-family: 'Cinzel', Georgia, serif;
+  background: ${({ disabled }) =>
+    disabled
+      ? '#303034'
+      : 'linear-gradient(180deg, #b68435, #72501d)'};
+  border: 1px solid ${({ disabled }) => (disabled ? '#4b4b50' : '#f2cf7d')};
+  border-radius: 2px;
   font-size: clamp(1rem, 1.2vw, 1.1rem);
   font-weight: 700;
   letter-spacing: 0.3px;
@@ -582,7 +666,7 @@ export const ConfirmButton = styled.button<ConfirmButtonProps>`
     box-shadow: ${({ disabled }) =>
       disabled
         ? 'none'
-        : '0 6px 28px rgba(255, 215, 0, 0.3)'};
+        : '0 6px 28px rgba(255, 215, 0, 0.3), inset 0 0 12px rgba(255, 240, 185, 0.3)'};
   }
 
   &:active {

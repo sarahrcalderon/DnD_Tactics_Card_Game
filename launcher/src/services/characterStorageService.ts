@@ -1,4 +1,3 @@
-// launcher/src/services/characterStorageService.ts
 import { Character } from '../types/character.types';
 
 const CHARACTER_DATA_KEY = 'characterData';

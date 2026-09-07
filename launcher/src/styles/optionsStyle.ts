@@ -16,7 +16,7 @@ export const BackgroundImage = styled.div`
   right: 0;
   bottom: 0;
   background: url('/assets/images/backgrounds/menuWallpaper.png') center/cover no-repeat;
-  opacity: 0.6;
+  opacity: 0.72;
   z-index: 0;
 `;
 
@@ -27,8 +27,8 @@ export const ContentWrapper = styled.div`
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  padding: 2rem;
-  background: rgba(0, 0, 0, 0.5);
+  padding: clamp(1rem, 2.5vw, 2rem);
+  background: linear-gradient(180deg, rgba(4, 7, 13, 0.5), rgba(4, 5, 9, 0.76));
 `;
 
 export const Header = styled.div`
@@ -36,18 +36,22 @@ export const Header = styled.div`
   align-items: center;
   justify-content: space-between;
   padding: 1rem 2rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid rgba(224, 181, 95, 0.42);
+  background: linear-gradient(135deg, rgba(16, 19, 27, 0.8), rgba(8, 10, 16, 0.74));
+  border-left: 1px solid rgba(198, 151, 68, 0.34);
+  border-right: 1px solid rgba(198, 151, 68, 0.34);
   flex-shrink: 0;
 `;
 
 export const Title = styled.h1`
   font-size: 2rem;
   font-weight: bold;
-  color: #ffd700;
+  color: #f4d88f;
   margin: 0;
-  text-shadow: 0 0 30px rgba(255, 215, 0, 0.3);
+  text-shadow: 0 2px 0 #35230e, 0 0 30px rgba(255, 215, 0, 0.25);
   font-family: 'Cinzel', serif;
-  letter-spacing: 2px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 `;
 
 export const CloseButton = styled.button`
@@ -58,7 +62,7 @@ export const CloseButton = styled.button`
   cursor: pointer;
   padding: 0.5rem 1rem;
   transition: all 0.2s;
-  border-radius: 8px;
+  border-radius: 2px;
 
   &:hover {
     color: #fff;
@@ -71,8 +75,14 @@ export const MainContent = styled.div`
   display: flex;
   flex: 1;
   overflow: hidden;
-  padding: 2rem;
-  gap: 2rem;
+  padding: clamp(1rem, 2.5vw, 2rem);
+  gap: clamp(1rem, 2.5vw, 2rem);
+  border: 1px solid rgba(198, 151, 68, 0.34);
+  border-top: 0;
+  background: linear-gradient(135deg, rgba(16, 19, 27, 0.84), rgba(8, 10, 16, 0.8));
+  box-shadow: 0 22px 58px rgba(0, 0, 0, 0.42), inset 0 0 0 4px rgba(6, 8, 13, 0.3);
+
+  @media (max-width: 700px) { flex-direction: column; overflow: visible; }
 `;
 
 export const Sidebar = styled.div`
@@ -81,23 +91,25 @@ export const Sidebar = styled.div`
   gap: 0.5rem;
   min-width: 200px;
   padding-right: 2rem;
-  border-right: 1px solid rgba(255, 255, 255, 0.1);
+  border-right: 1px solid rgba(224, 181, 95, 0.3);
   overflow-y: auto;
   flex-shrink: 0;
+
+  @media (max-width: 700px) { flex-direction: row; min-width: 0; padding-right: 0; padding-bottom: 0.75rem; border-right: 0; border-bottom: 1px solid rgba(224, 181, 95, 0.3); overflow-x: auto; }
 `;
 
 export const SectionButton = styled.button<{ active: boolean }>`
-  background: ${props => props.active ? 'rgba(255, 215, 0, 0.15)' : 'transparent'};
-  border: none;
-  color: ${props => props.active ? '#ffd700' : '#aaa'};
+  background: ${props => props.active ? 'linear-gradient(90deg, rgba(112, 81, 34, 0.65), rgba(50, 42, 32, 0.92))' : 'rgba(5, 8, 13, 0.35)'};
+  border: 1px solid ${props => props.active ? '#d5aa59' : 'rgba(224, 181, 95, 0.18)'};
+  color: ${props => props.active ? '#f4d88f' : '#d6cbb7'};
   padding: 0.75rem 1.5rem;
   text-align: left;
   font-size: 1rem;
   cursor: pointer;
-  border-radius: 8px;
+  border-radius: 2px;
   transition: all 0.2s;
   font-weight: ${props => props.active ? 'bold' : 'normal'};
-  border: 1px solid ${props => props.active ? 'rgba(255, 215, 0, 0.3)' : 'transparent'};
+  font-family: 'Cinzel', Georgia, serif;
 
   &:hover {
     background: rgba(255, 215, 0, 0.1);
@@ -126,7 +138,7 @@ export const Panel = styled.div`
 `;
 
 export const SectionTitle = styled.h2`
-  color: #fff;
+  color: #f5dfad;
   font-size: 1.5rem;
   margin: 0 0 1.5rem 0;
   font-family: 'Cinzel', serif;
@@ -135,15 +147,16 @@ export const SectionTitle = styled.h2`
 
 export const OptionGroup = styled.div`
   margin-bottom: 1.5rem;
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(5, 8, 13, 0.48);
   padding: 1.5rem;
-  border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 2px;
+  border: 1px solid rgba(190, 148, 73, 0.35);
 `;
 
 export const OptionLabel = styled.label`
   display: block;
-  color: #dcdce5;
+  color: #e9cf93;
+  font-family: 'Cinzel', Georgia, serif;
   font-size: 0.9rem;
   margin-bottom: 0.5rem;
   font-weight: 500;
@@ -160,10 +173,10 @@ export const Select = styled.select`
   width: 100%;
   max-width: 300px;
   padding: 0.6rem 1rem;
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 8px;
-  color: #fff;
+  background: rgba(4, 7, 11, 0.78);
+  border: 1px solid rgba(224, 181, 95, 0.42);
+  border-radius: 2px;
+  color: #fff2d2;
   font-size: 1rem;
   cursor: pointer;
   transition: all 0.2s;
@@ -174,7 +187,8 @@ export const Select = styled.select`
 
   &:focus {
     outline: none;
-    border-color: #ffd700;
+    border-color: #f2cf7d;
+    box-shadow: 0 0 0 3px rgba(242, 207, 125, 0.16);
   }
 
   option {
@@ -192,6 +206,8 @@ export const Slider = styled.input.attrs({ type: 'range' })`
   border-radius: 3px;
   outline: none;
   transition: all 0.2s;
+
+  &:focus-visible { outline: 2px solid #f2cf7d; outline-offset: 4px; }
 
   &::-webkit-slider-thumb {
     -webkit-appearance: none;
@@ -237,7 +253,8 @@ export const Toggle = styled.div<{ active: boolean }>`
   width: 48px;
   height: 26px;
   background: ${props => props.active ? '#ffd700' : 'rgba(255, 255, 255, 0.2)'};
-  border-radius: 13px;
+  border-radius: 2px;
+  border: 1px solid rgba(224, 181, 95, 0.42);
   position: relative;
   transition: all 0.3s;
   flex-shrink: 0;
@@ -251,7 +268,7 @@ export const Toggle = styled.div<{ active: boolean }>`
     width: 22px;
     height: 22px;
     background: white;
-    border-radius: 50%;
+    border-radius: 1px;
     transition: all 0.3s;
   }
 `;
@@ -273,8 +290,8 @@ export const ShortcutItem = styled.div`
   align-items: center;
   justify-content: space-between;
   padding: 0.5rem 1rem;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 6px;
+  background: rgba(5, 8, 13, 0.48);
+  border-radius: 2px;
 `;
 
 export const ShortcutAction = styled.span`
@@ -304,14 +321,16 @@ export const Actions = styled.div`
   gap: 1rem;
   margin-top: 2rem;
   padding: 1.5rem 2rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(198, 151, 68, 0.34);
+  border-top-color: rgba(224, 181, 95, 0.42);
+  background: linear-gradient(135deg, rgba(16, 19, 27, 0.86), rgba(8, 10, 16, 0.82));
   flex-shrink: 0;
 `;
 
 export const Button = styled.button<{ variant?: 'primary' | 'secondary' | 'danger' }>`
   padding: 0.75rem 2rem;
-  border: none;
-  border-radius: 8px;
+  border: 1px solid rgba(216, 176, 98, 0.58);
+  border-radius: 2px;
   font-size: 1rem;
   cursor: pointer;
   transition: all 0.2s;
@@ -322,8 +341,8 @@ export const Button = styled.button<{ variant?: 'primary' | 'secondary' | 'dange
     switch (props.variant) {
       case 'primary':
         return `
-          background: #ffd700;
-          color: #0a0810;
+          background: linear-gradient(180deg, #b68435, #72501d);
+          color: #fff1c4;
           &:hover {
             background: #f0c800;
             transform: translateY(-2px);

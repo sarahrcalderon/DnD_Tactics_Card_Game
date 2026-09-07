@@ -63,10 +63,16 @@ export interface EquipmentData {
   actionPoints: number;
   speed: number;
   criticalSeverity: number;
+  str?: number;
+  dex?: number;
+  con?: number;
+  int?: number;
+  wis?: number;
+  cha?: number;
   rarity: EquipmentRarity;
   value: number;
   description: string;
-  image?: string; // ← Adicionado campo image como opcional
+  image?: string; 
 }
 
 export interface Equipment {
@@ -80,6 +86,14 @@ export interface Equipment {
   level: number;
   stats: {
     attack?: number;
+    str?: number;
+    dex?: number;
+    con?: number;
+    int?: number;
+    wis?: number;
+    cha?: number;
+    manaRegen?: number;
+    manaPower?: number;
     defense?: number;
     hp?: number;
     critical?: number;
@@ -124,4 +138,10 @@ export interface EquipmentIndex {
   byTier: Map<EquipmentTier, EquipmentData[]>;
   byClass: Map<string, EquipmentData[]>;
   byId: Map<string, EquipmentData>;
+}
+export interface TierConfig {
+  tier: EquipmentTier;
+  level: number;
+  multiplier: number;
+  rarity: EquipmentRarity;
 }

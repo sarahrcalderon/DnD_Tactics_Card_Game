@@ -8,11 +8,6 @@ import {
   DeckTemplate,
 } from '../types/deck.types';
 
-/**
- * =========================================================
- * UTILITÁRIOS
- * =========================================================
- */
 
 const generateId = (): string => {
   return Math.random()
@@ -116,23 +111,48 @@ const CARD_IMAGE_MAP: Record<string, string> = {
     'escudo_da_fe.jfif',
 };
 
+const FULL_CARD_IMAGE_MAP: Record<string, string> = {
+  'Golpe Justo': 'Golpe_Justo.png',
+  'Estocada Sagrada': 'Estocada_Sagrada.png',
+  'Ataque da Fé': 'Ataque_daFe.png',
+  'Lâmina da Aurora': 'Lamina_Aurora.png',
+  'Golpe do Escudeiro': 'Golpe_DoEscudeiro.png',
+  'Espada da Justiça': 'Espada_daJustica.png',
+  'Investida Protetora': 'Investida_Protetora.png',
+  'Golpe do Crepúsculo': 'Golpe_doCrepusculo.png',
+  'Julgamento Divino': 'Julgamento_Divino.png',
+  'Golpe Penitente': 'Golpe_Penitente.png',
+  'Lança do Alvorecer': 'Lanca_doAlvorecer.png',
+  'Ataque Vingativo': 'Ataque_Vingativo.png',
+  'Martelo do Juízo Final': 'Martelo_doJuizoFinal.png',
+  'Golpe do Arcanjo': 'Golpe_doArcanjo.png',
+  'Espada do Pacto Sagrado': 'Pacto_sagrado.png',
+  'Escudo da Fé': 'Escudo_daFe.png',
+  'Postura Defensiva': 'Escudo_daFe.png',
+  'Proteção Divina': 'Protecao_divina.png',
+  'Parede de Luz': 'Parede_deLuz.png',
+  'Armadura de Ouro': 'Armadura_deOuro.png',
+  'Escudo de Escamas': 'Escudo_deEscamas.png',
+};
+
 const getCardImage = (
   cardName: string,
   classId: string,
   deckStyle: string,
 ): string => {
   const fileName =
+    FULL_CARD_IMAGE_MAP[cardName] ??
     CARD_IMAGE_MAP[cardName] ??
     'default.jfif';
 
-  return `/assets/images/cards/${classId}/${deckStyle}/${fileName}`;
+  const assetDirectory =
+    classId === 'paladino' && deckStyle === 'tank'
+      ? 'deckTank'
+      : deckStyle;
+
+  return `/assets/images/cards/${classId}/${assetDirectory}/${fileName}`;
 };
 
-/**
- * =========================================================
- * ÍCONES
- * =========================================================
- */
 
 const CARD_ICON_MAP: Record<
   string,
@@ -814,12 +834,6 @@ export const PALADINO_TANK_CARDS: CardTemplate[] =
     },
   ];
 
-/**
- * =========================================================
- * TEMPLATES DE CARTAS POR CLASSE
- * =========================================================
- */
-
 export const CARD_TEMPLATES: Record<
   string,
   CardTemplate[]
@@ -941,11 +955,7 @@ export const DECK_TEMPLATES: DeckTemplate[] =
     },
   ];
 
-/**
- * =========================================================
- * MAPA DE ESTILOS
- * =========================================================
- */
+
 
 const STYLE_MAP: Record<
   string,
@@ -962,11 +972,6 @@ const STYLE_MAP: Record<
   duelista: 'Magico',
 };
 
-/**
- * =========================================================
- * NOMES DAS CLASSES
- * =========================================================
- */
 
 const CLASS_NAME_MAP: Record<
   string,
@@ -1043,11 +1048,6 @@ const createCard = (
   };
 };
 
-/**
- * =========================================================
- * EMBARALHAR
- * =========================================================
- */
 
 const shuffleCards = (
   cards: CardData[],
@@ -1076,11 +1076,6 @@ const shuffleCards = (
   return shuffled;
 };
 
-/**
- * =========================================================
- * GERAR DECK
- * =========================================================
- */
 
 export const generateDeck = (
   templateId: string,
@@ -1114,10 +1109,6 @@ export const generateDeck = (
   const deckStyle =
     template.style ?? 'tank';
 
-  /**
-   * Cria primeiro uma carta de cada
-   * template.
-   */
   const cards: CardData[] =
     template.cards.map(
       (cardTemplate) =>
@@ -1128,9 +1119,6 @@ export const generateDeck = (
         ),
     );
 
-  /**
-   * Completa o deck até 40 cartas.
-   */
   while (cards.length < 40) {
     const randomIndex =
       Math.floor(
@@ -1150,10 +1138,6 @@ export const generateDeck = (
     );
   }
 
-  /**
-   * Embaralha e garante exatamente
-   * 40 cartas.
-   */
   const finalDeck =
     shuffleCards(cards).slice(
       0,
@@ -1203,11 +1187,6 @@ export const generateDeck = (
   return deck;
 };
 
-/**
- * =========================================================
- * BUSCAR DECKS POR CLASSE
- * =========================================================
- */
 
 export const getDecksByClass = (
   classId: string,
@@ -1220,11 +1199,6 @@ export const getDecksByClass = (
   );
 };
 
-/**
- * =========================================================
- * GERAR TODOS OS DECKS DE UMA CLASSE
- * =========================================================
- */
 
 export const generateAndSaveDecks = (
   classId: string,
@@ -1277,9 +1251,6 @@ export const generateAndSaveDecks = (
       ),
     );
 
-    console.log(
-      `${generatedDecks.length} decks salvos no localStorage.`,
-    );
   } else {
     console.warn(
       'Nenhum deck foi gerado.',

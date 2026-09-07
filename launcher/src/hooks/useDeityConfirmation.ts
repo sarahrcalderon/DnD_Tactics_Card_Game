@@ -9,25 +9,14 @@ export function useDeityConfirmation<T>({
 }: UseDeityConfirmationProps<T> = {}) {
   const [isConfirming, setIsConfirming] = useState(false);
 
-  // ============================================================
-  // ABRIR CONFIRMAÇÃO
-  // ============================================================
-
   const openConfirmation = useCallback(() => {
     setIsConfirming(true);
   }, []);
-
-  // ============================================================
-  // CANCELAR CONFIRMAÇÃO
-  // ============================================================
 
   const cancelConfirmation = useCallback(() => {
     setIsConfirming(false);
   }, []);
 
-  // ============================================================
-  // CONFIRMAR DIVINDADE
-  // ============================================================
 
   const confirmDeity = useCallback(
     (deity: T) => {

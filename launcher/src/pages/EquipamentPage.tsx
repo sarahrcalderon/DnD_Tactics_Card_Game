@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { CharacterData } from '../types/characterData.types';
@@ -50,13 +50,12 @@ import {
   EQUIPMENT_SLOTS,
   EquipmentData as EquipmentDataType,
 } from '../types/equipment.types';
-import { equipmentLoader } from '../services/equipamentLoader';
+import { equipmentLoader } from '../services/equipment/EquipmentLoader';
 import { getStartingEquipment } from '../data/startingEquipment';
 import { EquipmentPreview } from '../components/Equipment/EquipmentPreview';
 import { calculateCharacter } from '../utils/characterCalculator';
 import { DerivedStats, Attributes } from '../types/character.types';
-
-const GOLD_AMOUNT = 1250;
+import { getGold } from '../utils/goldUtils';
 
 const getSlotType = (slot: EquipmentSlot): string => {
   const types: Record<EquipmentSlot, string> = {
@@ -120,6 +119,10 @@ const defaultDerivedStats: DerivedStats = {
   manaPower: 0,
 };
 
+type EquipmentRouteState = Partial<CharacterData> & {
+  inventory?: Equipment[];
+};
+
 export const EquipmentPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -127,6 +130,7 @@ export const EquipmentPage = () => {
   const [equipment, setEquipment] = useState<
     Record<EquipmentSlot, Equipment | null>
   >({} as Record<EquipmentSlot, Equipment | null>);
+  const [inventory, setInventory] = useState<Equipment[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [equipmentData, setEquipmentData] = useState<EquipmentDataType[]>([]);
   const [characterData, setCharacterData] = useState<CharacterData | null>(
@@ -137,13 +141,23 @@ export const EquipmentPage = () => {
   );
   const [characterDerivedStats, setCharacterDerivedStats] =
     useState<DerivedStats | null>(null);
+  const [characterTotalAttributes, setCharacterTotalAttributes] =
+    useState<Attributes | null>(null);
   const [hoverStats, setHoverStats] = useState<DerivedStats | null>(null);
+  const [hoverAttributes, setHoverAttributes] = useState<Attributes | null>(
+    null,
+  );
+  const [gold, setGold] = useState(0);
+
+  useEffect(() => {
+    setGold(getGold());
+  }, []);
 
   useEffect(() => {
     const loadEquipmentData = async (): Promise<void> => {
       try {
         setLoading(true);
-        const state = location.state as Partial<CharacterData> | null;
+        const state = location.state as EquipmentRouteState | null;
 
         let classId: string = state?.classId || '';
         let build: string = state?.build || '';
@@ -215,7 +229,12 @@ export const EquipmentPage = () => {
         const startingEquip = getStartingEquipment(finalClassId);
         const newEquipment: Record<EquipmentSlot, Equipment | null> = {
           ...startingEquip,
+          ...(state?.equipment || {}),
         };
+        const hasPassedEquipment = Boolean(
+          state?.equipment && Object.keys(state.equipment).length > 0,
+        );
+        setInventory(state?.inventory || []);
 
         if (classId && build) {
           const index = await equipmentLoader.loadData();
@@ -251,7 +270,9 @@ export const EquipmentPage = () => {
               )[0];
               if (
                 bestItem &&
-                bestItem.level > (newEquipment[slot]?.level || 0)
+                !hasPassedEquipment &&
+                !newEquipment[slot] &&
+                bestItem.level > 0
               ) {
                 newEquipment[slot] = {
                   id: bestItem.id,
@@ -264,6 +285,12 @@ export const EquipmentPage = () => {
                   level: bestItem.level,
                   stats: {
                     attack: bestItem.attack || 0,
+                    str: bestItem.str || 0,
+                    dex: bestItem.dex || 0,
+                    con: bestItem.con || 0,
+                    int: bestItem.int || 0,
+                    wis: bestItem.wis || 0,
+                    cha: bestItem.cha || 0,
                     defense: bestItem.defense || 0,
                     hp: bestItem.hp || 0,
                     critical: bestItem.critical || 0,
@@ -294,33 +321,36 @@ export const EquipmentPage = () => {
     loadEquipmentData();
   }, [location]);
 
-  const calculateStats = useCallback(
-    (equip: Record<EquipmentSlot, Equipment | null>) => {
-      if (characterData?.classId) {
-        const stats = calculateCharacter(characterData.classId, equip);
-        return stats.derivedStats.total;
-      }
-      return null;
-    },
-    [characterData?.classId],
-  );
-
   useEffect(() => {
-    const stats = calculateStats(equipment);
-    setCharacterDerivedStats(stats);
-  }, [equipment, calculateStats]);
+    if (!characterData?.classId) return;
+    const calculated = calculateCharacter(
+      characterData.classId,
+      equipment,
+      characterData.attributes,
+    );
+    setCharacterDerivedStats(calculated.derivedStats.total);
+    setCharacterTotalAttributes(calculated.attributes.total);
+  }, [equipment, characterData]);
 
   useEffect(() => {
     if (previewEquipment) {
       const tempEquipment = { ...equipment };
       const slot = previewEquipment.slot as EquipmentSlot;
       tempEquipment[slot] = previewEquipment;
-      const stats = calculateStats(tempEquipment);
-      setHoverStats(stats);
+      if (characterData?.classId) {
+        const calculated = calculateCharacter(
+          characterData.classId,
+          tempEquipment,
+          characterData.attributes,
+        );
+        setHoverStats(calculated.derivedStats.total);
+        setHoverAttributes(calculated.attributes.total);
+      }
     } else {
       setHoverStats(null);
+      setHoverAttributes(null);
     }
-  }, [previewEquipment, equipment, calculateStats]);
+  }, [previewEquipment, equipment, characterData]);
 
   const handleSlotClick = (slotId: EquipmentSlot): void => {
     setSelectedSlot(slotId);
@@ -347,8 +377,12 @@ export const EquipmentPage = () => {
       ...prev,
       [slotId]: null,
     }));
+    setInventory((previousInventory) => [
+      ...previousInventory,
+      { ...item, isEquipped: false },
+    ]);
 
-    toast.success(`${item.name} removido!`);
+    toast.success(`${item.name} movido para o inventário!`);
     setSelectedSlot(null);
   };
 
@@ -376,6 +410,8 @@ export const EquipmentPage = () => {
         deityName: characterData?.deityName || state?.deityName || '',
         isSaved: characterData?.isSaved || state?.isSaved || false,
         saveId: characterData?.saveId || state?.saveId || null,
+        pointsRemaining:
+          characterData?.pointsRemaining ?? state?.pointsRemaining ?? 0,
       },
     });
   };
@@ -385,7 +421,8 @@ export const EquipmentPage = () => {
       state: {
         ...location.state,
         equipment,
-        gold: GOLD_AMOUNT,
+        inventory,
+        gold,
         isSaved: characterData?.isSaved || false,
       },
     });
@@ -400,6 +437,15 @@ export const EquipmentPage = () => {
     : null;
 
   const displayStats = hoverStats || characterDerivedStats;
+  const displayAttributes = hoverAttributes || characterTotalAttributes;
+  const equipmentAttack = useMemo(
+    () =>
+      Object.values(equipment).reduce(
+        (total, item) => total + (item?.stats.attack || 0),
+        0,
+      ),
+    [equipment],
+  );
 
   if (loading) {
     return (
@@ -428,7 +474,7 @@ export const EquipmentPage = () => {
           <HeaderActions>
             <GoldDisplay>
               <span>🪙</span>
-              {GOLD_AMOUNT.toLocaleString()}
+              {gold.toLocaleString()}
             </GoldDisplay>
             <BagButton onClick={handleOpenBag}>Bolsa</BagButton>
           </HeaderActions>
@@ -445,6 +491,40 @@ export const EquipmentPage = () => {
           >
             <CharacterStatsPanel>
               <StatsTitle>Atributos do Personagem</StatsTitle>
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(3, 1fr)',
+                  gap: '8px',
+                  marginBottom: '16px',
+                }}
+              >
+                {(
+                  [
+                    ['STR', 'str'],
+                    ['DEX', 'dex'],
+                    ['CON', 'con'],
+                    ['INT', 'int'],
+                    ['WIS', 'wis'],
+                    ['CHA', 'cha'],
+                  ] as const
+                ).map(([label, key]) => (
+                  <div
+                    key={key}
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      color: '#858594',
+                      fontSize: '0.72rem',
+                    }}
+                  >
+                    <span>{label}</span>
+                    <strong style={{ color: '#ffd700' }}>
+                      {displayAttributes?.[key] || 0}
+                    </strong>
+                  </div>
+                ))}
+              </div>
               <StatBarContainer>
                 <StatBarRow>
                   <StatBarLabel>HP</StatBarLabel>
@@ -515,6 +595,17 @@ export const EquipmentPage = () => {
                   <span style={{ color: '#ffd700' }}>
                     {displayStats?.defense || 0}
                   </span>
+                </div>
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    color: '#858594',
+                    fontSize: '0.7rem',
+                  }}
+                >
+                  <span>Ataque</span>
+                  <span style={{ color: '#ffd700' }}>+{equipmentAttack}</span>
                 </div>
                 <div
                   style={{
@@ -620,8 +711,8 @@ export const EquipmentPage = () => {
                   return (
                     <SlotItem
                       key={slot.id}
-                      isEmpty={isEmpty}
-                      rarity={item?.rarity}
+                      $isEmpty={isEmpty}
+                      $rarity={item?.rarity}
                       onClick={() => handleSlotClick(slot.id)}
                       onMouseEnter={() => handleSlotHover(slot.id)}
                       onMouseLeave={handleSlotLeave}
@@ -637,7 +728,7 @@ export const EquipmentPage = () => {
                             src={item.image}
                             alt={item.name}
                           />
-                          <SlotRarityBadge rarity={item.rarity} />
+                          <SlotRarityBadge $rarity={item.rarity} />
                         </>
                       ) : (
                         <>
@@ -657,7 +748,7 @@ export const EquipmentPage = () => {
             {selectedEquipment ? (
               <InfoContent>
                 <InfoName>{selectedEquipment.name}</InfoName>
-                <InfoRarity rarity={selectedEquipment.rarity}>
+                <InfoRarity $rarity={selectedEquipment.rarity}>
                   {selectedEquipment.rarity}
                 </InfoRarity>
                 <InfoStats>
@@ -675,6 +766,8 @@ export const EquipmentPage = () => {
                         actionPoints: 'Acao',
                         speed: 'Velocidade',
                         criticalSeverity: 'Severidade',
+                        manaRegen: 'Reg. Mana',
+                        manaPower: 'Potencia Magica',
                       };
                       return (
                         <InfoStat key={key}>

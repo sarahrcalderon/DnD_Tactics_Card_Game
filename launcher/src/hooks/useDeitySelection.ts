@@ -1,493 +1,189 @@
 import { useCallback, useMemo, useState } from 'react';
-
+import { DEITIES_DATA } from '../data/deitiesData';
 import { DEITY_FULL_DATA } from '../data/deitiesModalData';
-
-// ============================================================
-// TIPOS
-// ============================================================
-
-export type Deity = {
-  id: string;
-  name: string;
-  image: string;
-  color: string;
-  domain: string[];
-};
-
-export type FilterType =
-  | 'all'
-  | 'combat'
-  | 'magic'
-  | 'nature'
-  | 'justice'
-  | 'protection'
-  | 'death'
-  | 'trickery';
-
-export type DeityFullData = Deity & {
-  description?: string;
-
-  generalAdvantage?: {
-    name: string;
-    description: string;
-  };
-
-  enemyAdvantage?: {
-    name: string;
-    description: string;
-  };
-
-  disadvantage?: {
-    name: string;
-    description: string;
-  };
-
-  strongAgainst?: string[];
-
-  weakAgainst?: string[];
-};
-
-// ============================================================
-// DADOS DAS DIVINDADES
-// ============================================================
-
-const DEITIES_LIST: Deity[] = [
-  {
-    id: 'amaunator',
-    name: 'Amaunator',
-    image: '/assets/images/deities/amaunator.svg',
-    color: '#af8a10',
-    domain: ['Sol', 'Ordem', 'Lei'],
-  },
-
-  {
-    id: 'bahamut',
-    name: 'Bahamut',
-    image: '/assets/images/deities/bahamut.svg',
-    color: '#3498db',
-    domain: ['Virtude', 'Justiça', 'Dragões'],
-  },
-
-  {
-    id: 'chauntea',
-    name: 'Chauntea',
-    image: '/assets/images/deities/chauntea.svg',
-    color: '#0d9445',
-    domain: ['Natureza', 'Agricultura', 'Vida'],
-  },
-
-  {
-    id: 'corellon',
-    name: 'Corellon',
-    image: '/assets/images/deities/corellon.svg',
-    color: '#447e44',
-    domain: ['Elfos', 'Magia', 'Arte'],
-  },
-
-  {
-    id: 'gond',
-    name: 'Gond',
-    image: '/assets/images/deities/gond.svg',
-    color: '#e67e22',
-    domain: ['Forja', 'Invenção', 'Criação'],
-  },
-
-  {
-    id: 'helm',
-    name: 'Helm',
-    image: '/assets/images/deities/helm.svg',
-    color: '#4a9eff',
-    domain: ['Proteção', 'Vigilância', 'Guarda'],
-  },
-
-  {
-    id: 'ilmater',
-    name: 'Ilmater',
-    image: '/assets/images/deities/iimater.svg',
-    color: '#e74c3c',
-    domain: ['Sacrifício', 'Compaixão', 'Cura'],
-  },
-
-  {
-    id: 'kelemvor',
-    name: 'Kelemvor',
-    image: '/assets/images/deities/kelemvor.svg',
-    color: '#2c3e50',
-    domain: ['Morte', 'Equilíbrio', 'Cemitério'],
-  },
-
-  {
-    id: 'lathander',
-    name: 'Lathander',
-    image: '/assets/images/deities/lathander.svg',
-    color: '#ff7300',
-    domain: ['Amanhecer', 'Renovação', 'Vida'],
-  },
-
-  {
-    id: 'leira',
-    name: 'Leira',
-    image: '/assets/images/deities/leira.svg',
-    color: '#95a5a6',
-    domain: ['Ilusão', 'Engano', 'Furtividade'],
-  },
-
-  {
-    id: 'lliira',
-    name: 'Lliira',
-    image: '/assets/images/deities/lliira.svg',
-    color: '#e91e63',
-    domain: ['Alegria', 'Dança', 'Felicidade'],
-  },
-
-  {
-    id: 'mask',
-    name: 'Mask',
-    image: '/assets/images/deities/mask.svg',
-    color: '#2c3e50',
-    domain: ['Engano', 'Furtividade', 'Roubo'],
-  },
-
-  {
-    id: 'mielikki',
-    name: 'Mielikki',
-    image: '/assets/images/deities/mielikki.svg',
-    color: '#1d7241',
-    domain: ['Natureza', 'Florestas', 'Criaturas'],
-  },
-
-  {
-    id: 'moradin',
-    name: 'Moradin',
-    image: '/assets/images/deities/moradin.svg',
-    color: '#5622e6',
-    domain: ['Forja', 'Resistência', 'Equipamentos'],
-  },
-
-  {
-    id: 'mystra',
-    name: 'Mystra',
-    image: '/assets/images/deities/mystra.svg',
-    color: '#52126b',
-    domain: ['Magia', 'Conhecimento', 'Mana'],
-  },
-
-  {
-    id: 'oghma',
-    name: 'Oghma',
-    image: '/assets/images/deities/oghma.svg',
-    color: '#3498db',
-    domain: ['Conhecimento', 'Inspiração', 'História'],
-  },
-
-  {
-    id: 'savras',
-    name: 'Savras',
-    image: '/assets/images/deities/savras.svg',
-    color: '#8e44ad',
-    domain: ['Profecia', 'Destino', 'Visão'],
-  },
-
-  {
-    id: 'selune',
-    name: 'Selûne',
-    image: '/assets/images/deities/selune.svg',
-    color: '#1a1a30',
-    domain: ['Lua', 'Navegação', 'Transformação'],
-  },
-
-  {
-    id: 'silvanus',
-    name: 'Silvanus',
-    image: '/assets/images/deities/silvanus.svg',
-    color: '#15552f',
-    domain: ['Natureza', 'Crescimento', 'Regeneração'],
-  },
-
-  {
-    id: 'sune',
-    name: 'Sune',
-    image: '/assets/images/deities/sune.svg',
-    color: '#e91e63',
-    domain: ['Beleza', 'Amor', 'Paixão'],
-  },
-
-  {
-    id: 'tempus',
-    name: 'Tempus',
-    image: '/assets/images/deities/tempus.svg',
-    color: '#e74c3c',
-    domain: ['Guerra', 'Força', 'Combate'],
-  },
-
-  {
-    id: 'tymora',
-    name: 'Tymora',
-    image: '/assets/images/deities/tymora.svg',
-    color: '#228a78',
-    domain: ['Sorte', 'Aventura', 'Fortuna'],
-  },
-
-  {
-    id: 'tyr',
-    name: 'Tyr',
-    image: '/assets/images/deities/tyr.svg',
-    color: '#6e1a42',
-    domain: ['Justiça', 'Ordem', 'Punição'],
-  },
-];
-
-// ============================================================
-// RECOMENDAÇÕES POR CLASSE
-// ============================================================
+import type { Deity, FilterType } from '../types/deity.types';
 
 const CLASS_RECOMMENDATIONS: Record<string, string[]> = {
   paladino: ['helm', 'tyr', 'bahamut', 'amaunator'],
-
   clerigo: ['lathander', 'ilmater', 'chauntea', 'selune'],
-
   barbaro: ['tempus', 'silvanus', 'mielikki'],
-
   guerreiro: ['tempus', 'tyr', 'helm'],
-
   mago: ['mystra', 'corellon', 'savras', 'oghma'],
-
   ladino: ['mask', 'leira', 'tymora'],
-
   arqueiro: ['mielikki', 'silvanus', 'chauntea'],
 };
 
-// ============================================================
-// MAPA DE FILTROS
-// ============================================================
-
-const FILTER_MAP: Record<
-  Exclude<FilterType, 'all'>,
-  string[]
-> = {
-  combat: [
-    'Guerra',
-    'Força',
-    'Combate',
-    'Dragões',
-  ],
-
-  magic: [
-    'Magia',
-    'Mana',
-    'Conhecimento',
-    'Profecia',
-    'Visão',
-  ],
-
-  nature: [
-    'Natureza',
-    'Agricultura',
-    'Florestas',
-    'Criaturas',
-    'Crescimento',
-  ],
-
-  justice: [
-    'Justiça',
-    'Ordem',
-    'Lei',
-    'Punição',
-    'Virtude',
-  ],
-
-  protection: [
-    'Proteção',
-    'Guarda',
-    'Vigilância',
-    'Resistência',
-    'Cura',
-  ],
-
-  death: [
-    'Morte',
-    'Cemitério',
-    'Equilíbrio',
-  ],
-
-  trickery: [
-    'Engano',
-    'Furtividade',
-    'Ilusão',
-    'Roubo',
-  ],
+const DEITY_DOMAINS: Record<string, string[]> = {
+  tyr: ['Justiça', 'Proteção'],
+  tempus: ['Combate'],
+  mystra: ['Magia'],
+  moradin: ['Combate', 'Proteção'],
+  mask: ['Percepção'],
+  silvanus: ['Natureza'],
+  bahamut: ['Combate', 'Justiça', 'Proteção'],
+  kelemvor: ['Morte'],
+  amaunator: ['Justiça'],
+  chauntea: ['Natureza'],
+  corellon: ['Magia', 'Natureza'],
+  gond: ['Magia', 'Combate'],
+  helm: ['Proteção'],
+  ilmater: ['Proteção'],
+  lathander: ['Magia', 'Proteção'],
+  leira: ['Percepção'],
+  lliira: ['Natureza'],
+  mielikki: ['Natureza'],
+  oghma: ['Magia'],
+  savras: ['Magia'],
+  selune: ['Magia', 'Proteção'],
+  tymora: ['Percepção'],
+  sune: ['Percepção'],
 };
 
-// ============================================================
-// HOOK
-// ============================================================
+const DEITY_CATEGORY: Record<string, Exclude<FilterType, 'all'>> = {
+  chauntea: 'nature',
+  silvanus: 'nature',
+  lliira: 'nature',
+  mielikki: 'nature',
+  mystra: 'magic',
+  corellon: 'magic',
+  gond: 'magic',
+  lathander: 'magic',
+  oghma: 'magic',
+  savras: 'magic',
+  selune: 'magic',
+  tempus: 'combat',
+  moradin: 'combat',
+  helm: 'protection',
+  ilmater: 'protection',
+  tyr: 'justice',
+  amaunator: 'justice',
+  bahamut: 'justice',
+  kelemvor: 'death',
+  mask: 'perception',
+  leira: 'perception',
+  tymora: 'perception',
+  sune: 'perception',
+};
 
-export const useDeitySelection = (
-  classId: string | null,
-) => {
-  // ==========================================================
-  // ESTADOS
-  // ==========================================================
+const DEITY_COLORS: Record<string, string> = {
+  // Natureza
+  chauntea: '#2e9d50',
+  silvanus: '#2e9d50',
+  mielikki: '#2e9d50',
+  lliira: '#2e9d50',
+  // Magia
+  mystra: '#8b5cf6',
+  corellon: '#8b5cf6',
+  gond: '#8b5cf6',
+  lathander: '#8b5cf6',
+  oghma: '#8b5cf6',
+  savras: '#8b5cf6',
+  selune: '#8b5cf6',
+  // Combate
+  tempus: '#d94b4b',
+  moradin: '#d94b4b',
+  // Proteção
+  helm: '#3b82c4',
+  ilmater: '#3b82c4',
+  // Justiça
+  tyr: '#e58a2b',
+  amaunator: '#e58a2b',
+  bahamut: '#e58a2b',
+  // Morte
+  kelemvor: '#858585',
+  // Percepção
+  mask: '#e56aa8',
+  leira: '#e56aa8',
+  tymora: '#e56aa8',
+  sune: '#e56aa8',
+};
 
-  const [selectedDeity, setSelectedDeity] =
-    useState<string | null>(null);
+const getDeityAssetPath = (id: string) =>
+  `/assets/images/deities/${id === 'ilmater' ? 'iimater' : id}.svg`;
 
-  const [selectedDeityForModal, setSelectedDeityForModal] =
-    useState<DeityFullData | null>(null);
 
-  const [activeFilter, setActiveFilter] =
-    useState<FilterType>('all');
+function createDeityFromId(id: string): Deity {
+  const base = DEITIES_DATA.find(d => d.id === id);
+  const extended = DEITY_FULL_DATA[id] || {};
+  
 
-  // ==========================================================
-  // RECOMENDAÇÕES
-  // ==========================================================
+  if (base) {
+    return {
+      ...base,
+      icon: getDeityAssetPath(id),
+      color: DEITY_COLORS[id] || base.color,
+      description: extended.description || base.description || '',
+      generalAdvantage: extended.generalAdvantage || base.generalAdvantage || { name: '', description: '', effect: '' },
+      enemyAdvantage: extended.enemyAdvantage || base.enemyAdvantage || { name: '', description: '', effect: '', targets: [] },
+      disadvantage: extended.disadvantage || base.disadvantage || { name: '', description: '', effect: '' },
+      strongAgainst: extended.strongAgainst || base.strongAgainst || [],
+      weakAgainst: extended.weakAgainst || base.weakAgainst || [],
+
+    };
+  }
+
+  return {
+    id,
+    name: extended.name || id.charAt(0).toUpperCase() + id.slice(1),
+    icon: getDeityAssetPath(id),
+    color: DEITY_COLORS[id] || extended.color || '#888888',
+    description: extended.description || '',
+    domain: DEITY_DOMAINS[id] || extended.domain || [],
+    generalAdvantage: extended.generalAdvantage || { name: '', description: '', effect: '' },
+    enemyAdvantage: extended.enemyAdvantage || { name: '', description: '', effect: '', targets: [] },
+    disadvantage: extended.disadvantage || { name: '', description: '', effect: '' },
+    classModifications: extended.classModifications || {},
+    raceSynergy: extended.raceSynergy || {},
+    strongAgainst: extended.strongAgainst || [],
+    weakAgainst: extended.weakAgainst || [],
+  };
+}
+
+const ALL_DEITY_IDS = Object.keys(DEITY_FULL_DATA);
+
+
+const ALL_DEITIES: Deity[] = ALL_DEITY_IDS.map(id => createDeityFromId(id));
+
+export const useDeitySelection = (classId: string | null) => {
+  const [selectedDeity, setSelectedDeity] = useState<string | null>(null);
+  const [activeFilter, setActiveFilter] = useState<FilterType>('all');
 
   const recommendedDeityIds = useMemo(() => {
-    if (!classId) {
-      return [];
-    }
-
-    return (
-      CLASS_RECOMMENDATIONS[
-        classId.toLowerCase()
-      ] || []
-    );
+    if (!classId) return [];
+    return CLASS_RECOMMENDATIONS[classId.toLowerCase()] || [];
   }, [classId]);
 
-  // ==========================================================
-  // DIVINDADE SELECIONADA
-  // ==========================================================
-
   const selectedDeityData = useMemo(() => {
-    if (!selectedDeity) {
-      return null;
-    }
-
-    return (
-      DEITIES_LIST.find(
-        (deity) => deity.id === selectedDeity,
-      ) || null
-    );
+    if (!selectedDeity) return null;
+    return ALL_DEITIES.find((deity) => deity.id === selectedDeity) || null;
   }, [selectedDeity]);
 
-  // ==========================================================
-  // DADOS COMPLETOS
-  // ==========================================================
-
-  const selectedDeityFullData =
-    useMemo<DeityFullData | null>(() => {
-      if (!selectedDeityData) {
-        return null;
-      }
-
-      const fullData =
-        DEITY_FULL_DATA[selectedDeityData.id];
-
-      return {
-        ...selectedDeityData,
-
-        ...fullData,
-      };
-    }, [selectedDeityData]);
-
-  // ==========================================================
-  // FILTRAGEM
-  // ==========================================================
+ 
+  const selectedDeityFullData = useMemo(() => {
+    if (!selectedDeityData) return null;
+    return { ...selectedDeityData, image: selectedDeityData.icon };
+  }, [selectedDeityData]);
 
   const filteredDeities = useMemo(() => {
-    if (activeFilter === 'all') {
-      return DEITIES_LIST;
-    }
-
-    const acceptedDomains =
-      FILTER_MAP[activeFilter];
-
-    return DEITIES_LIST.filter((deity) =>
-      deity.domain.some((domain) =>
-        acceptedDomains.includes(domain),
-      ),
+    if (activeFilter === 'all') return ALL_DEITIES;
+    return ALL_DEITIES.filter((deity) =>
+      DEITY_CATEGORY[deity.id] === activeFilter,
     );
   }, [activeFilter]);
 
-  // ==========================================================
-  // HANDLERS
-  // ==========================================================
-
-  const handleSelect = useCallback(
-    (deityId: string) => {
-      setSelectedDeity(deityId);
-    },
-    [],
-  );
-
-  // ==========================================================
-  // ABRIR MODAL
-  // ==========================================================
-
-  const handleOpenModal = useCallback(
-    (deityId: string) => {
-      const deity = DEITIES_LIST.find(
-        (item) => item.id === deityId,
-      );
-
-      if (!deity) {
-        return;
-      }
-
-      const fullData =
-        DEITY_FULL_DATA[deityId];
-
-      setSelectedDeityForModal({
-        ...deity,
-
-        ...fullData,
-      });
-    },
-    [],
-  );
-
-  // ==========================================================
-  // FECHAR MODAL
-  // ==========================================================
-
-  const handleCloseModal = useCallback(() => {
-    setSelectedDeityForModal(null);
+  const handleSelect = useCallback((deityId: string) => {
+    setSelectedDeity(deityId);
   }, []);
 
-  // ==========================================================
-  // RETORNO
-  // ==========================================================
-
   return {
-    // Estados
-
     selectedDeity,
-
-    selectedDeityForModal,
-
     activeFilter,
-
-
     setActiveFilter,
-
-    // Dados
-
-    deities: DEITIES_LIST,
-
+    deities: ALL_DEITIES,
     filteredDeities,
-
     recommendedDeityIds,
-
     selectedDeityData,
-
     selectedDeityFullData,
-
-
-
     handleSelect,
-
-    handleOpenModal,
-
-    handleCloseModal,
   };
 };

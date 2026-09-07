@@ -213,7 +213,7 @@ export const ENEMY_DETAILS: Record<string, EnemyDetail> = {
   },
   frog_man: {
     id: 'frog_man',
-    name: 'Homem-Rã',
+    name: 'Homem-sapo',
     type: 'Humanoide',
     role: 'Ataque',
     image: '/assets/images/bestiario/blackmoor/homemRa_blackmoor.jfif',

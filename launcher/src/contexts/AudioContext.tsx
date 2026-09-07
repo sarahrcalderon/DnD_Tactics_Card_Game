@@ -94,7 +94,6 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({
   }, [audioOptions.volumeMaster, audioOptions.volumeMusic, isMuted]);
 
   const playSound = (soundName: string) => {
-    // Não faz nada se estiver mudo
     if (isMuted) return;
 
     const masterVolume = audioOptions.volumeMaster;
@@ -103,16 +102,12 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({
 
     if (finalVolume === 0) return;
 
-    // Toca apenas o som de hover que existe
     if (soundName === 'hover') {
       try {
-        // Cria um áudio temporário para o hover
         const audio = new Audio('/assets/sounds/som_botao.mp3');
         audio.volume = Math.min(Math.max(finalVolume, 0), 1);
         audio.play().catch(() => {});
-      } catch (error) {
-        // Ignora erro
-      }
+      } catch (error) {}
     }
   };
 

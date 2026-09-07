@@ -1,44 +1,17 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-
 import {
   useLocation,
   useNavigate,
 } from 'react-router-dom';
+import { DeityNavigationState,
+  NavigateToDeckSelectionParams,
+} from '../types/deityNavigation.type';
 
-// ============================================================
-// TIPOS
-// ============================================================
-
-type DeityNavigationState = {
-  classId?: string;
-
-  raceId?: string;
-
-  raceName?: string;
-
-  raceImage?: string;
-
-  raceIcon?: string;
-};
-
-type NavigateToDeckSelectionParams = {
-  deityId: string;
-
-  deityName: string;
-};
-
-// ============================================================
-// HOOK
-// ============================================================
 
 export const useDeityNavigation = () => {
   const location = useLocation();
 
   const navigate = useNavigate();
-
-  // ==========================================================
-  // ESTADOS
-  // ==========================================================
 
   const [classId, setClassId] =
     useState<string | null>(null);
@@ -55,17 +28,10 @@ export const useDeityNavigation = () => {
   const [raceIcon, setRaceIcon] =
     useState<string | null>(null);
 
-  // ==========================================================
-  // RECUPERAR DADOS DA NAVEGAÇÃO
-  // ==========================================================
 
   useEffect(() => {
     const state =
       location.state as DeityNavigationState | null;
-
-    // ========================================================
-    // VALIDAÇÃO
-    // ========================================================
 
     if (!state?.classId) {
       navigate('/race-select', {
@@ -75,15 +41,8 @@ export const useDeityNavigation = () => {
       return;
     }
 
-    // ========================================================
-    // CLASSE
-    // ========================================================
 
     setClassId(state.classId);
-
-    // ========================================================
-    // RAÇA
-    // ========================================================
 
     setRaceId(state.raceId || null);
 
@@ -94,9 +53,6 @@ export const useDeityNavigation = () => {
     setRaceIcon(state.raceIcon || null);
   }, [location.state, navigate]);
 
-  // ==========================================================
-  // NOME FORMATADO DA CLASSE
-  // ==========================================================
 
   const className = useMemo(() => {
     if (!classId) {
@@ -109,9 +65,6 @@ export const useDeityNavigation = () => {
     );
   }, [classId]);
 
-  // ==========================================================
-  // VOLTAR
-  // ==========================================================
 
   const handleBack = useCallback(() => {
     navigate('/race-select', {
@@ -129,9 +82,6 @@ export const useDeityNavigation = () => {
     raceId,
   ]);
 
-  // ==========================================================
-  // NAVEGAR PARA DECK
-  // ==========================================================
 
   const navigateToDeckSelection = useCallback(
     ({
@@ -164,9 +114,6 @@ export const useDeityNavigation = () => {
     ],
   );
 
-  // ==========================================================
-  // RETORNO
-  // ==========================================================
 
   return {
 

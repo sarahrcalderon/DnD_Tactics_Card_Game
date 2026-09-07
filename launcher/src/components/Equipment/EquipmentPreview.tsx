@@ -91,7 +91,7 @@ export const EquipmentPreview: React.FC<EquipmentPreviewProps> = ({
     <PreviewContainer>
       <PreviewTitle>
         {equipment.name}
-        <PreviewRarity rarity={equipment.rarity}>
+        <PreviewRarity $rarity={equipment.rarity}>
           {equipment.rarity}
         </PreviewRarity>
       </PreviewTitle>
@@ -102,9 +102,9 @@ export const EquipmentPreview: React.FC<EquipmentPreviewProps> = ({
           const isPositive = value > 0;
 
           return (
-            <PreviewStat key={key} isPositive={isPositive}>
+            <PreviewStat key={key} $isPositive={isPositive}>
               <PreviewStatLabel>{getStatName(key)}</PreviewStatLabel>
-              <PreviewStatValue isPositive={isPositive}>
+              <PreviewStatValue $isPositive={isPositive}>
                 {currentValue} → {newValue}
                 <span
                   style={{

@@ -1,10 +1,7 @@
-// launcher/src/data/deitiesData.ts
 import { Deity } from '../types/deity.types';
 
 export const DEITIES_DATA: Deity[] = [
-  // ============================================================
-  // 1. TYR - Justiça e Ordem
-  // ============================================================
+
   {
     id: 'tyr',
     name: 'Tyr',

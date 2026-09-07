@@ -221,13 +221,21 @@ export const NameSelectPage = () => {
               placeholder="Digite o nome do seu herói..."
               value={name}
               onChange={handleNameChange}
+              onKeyDown={(event) => {
+                if (event.key === 'Enter' && isNameValid) {
+                  event.preventDefault();
+                  handleConfirm();
+                }
+              }}
               maxLength={20}
               autoFocus
+              aria-invalid={!!error}
+              aria-describedby="name-counter name-error"
             />
-            <NameCounter isLimit={name.length >= 20}>
+            <NameCounter id="name-counter" $isLimit={name.length >= 20}>
               {name.length}/20 caracteres
             </NameCounter>
-            {error && <ErrorText>{error}</ErrorText>}
+            {error && <ErrorText id="name-error">{error}</ErrorText>}
           </InputGroup>
         </FormContainer>
 

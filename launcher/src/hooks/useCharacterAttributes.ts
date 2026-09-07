@@ -1,4 +1,3 @@
-// launcher/src/hooks/useCharacterAttributes.ts
 import { useState, useCallback, useMemo } from 'react';
 import { Attributes, DerivedStats } from '../types/character.types';
 import { CLASS_BASE_ATTRIBUTES } from '../data/classes';

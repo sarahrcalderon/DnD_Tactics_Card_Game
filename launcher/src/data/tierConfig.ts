@@ -1,12 +1,6 @@
-// launcher/src/data/tierConfig.ts
-import { EquipmentTier, EquipmentRarity, ClassArchetype } from '../types/equipment.types';
+import { EquipmentTier, EquipmentRarity, ClassArchetype,TierConfig } from '../types/equipment.types';
 
-export interface TierConfig {
-  tier: EquipmentTier;
-  level: number;
-  multiplier: number;
-  rarity: EquipmentRarity;
-}
+
 
 export const TIER_CONFIG: Record<EquipmentTier, TierConfig> = {
   Inicio: { tier: 'Inicio', level: 1, multiplier: 0.5, rarity: 'Comum' },

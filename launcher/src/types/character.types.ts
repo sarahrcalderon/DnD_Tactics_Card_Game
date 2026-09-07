@@ -147,6 +147,7 @@ export interface RaceDefinition {
 }
 
 export interface EquipmentStats {
+  attack?: number;
   str?: number;
   dex?: number;
   con?: number;
@@ -159,6 +160,8 @@ export interface EquipmentStats {
   avoidance?: number;
   deflect?: number;
   actionPoints?: number;
+  manaRegen?: number;
+  manaPower?: number;
   criticalSeverity?: number;
   initiative?: number;
   hp?: number;

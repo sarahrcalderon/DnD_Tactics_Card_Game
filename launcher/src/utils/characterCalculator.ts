@@ -59,6 +59,9 @@ export const calculateTotalDerivedStats = (
   equipment: Record<string, Equipment | null>
 ): { base: DerivedStats; bonus: DerivedStats; total: DerivedStats } => {
   const baseStats = CLASS_BASE_STATS[classId] || CLASS_BASE_STATS.paladino;
+  const classBaseAttributes =
+    CLASS_BASE_ATTRIBUTES[classId] || CLASS_BASE_ATTRIBUTES.paladino;
+  const isMagicClass = ['mago', 'bruxo', 'clerigo'].includes(classId);
   
   const strMod = getModifier(totalAttributes.str);
   const dexMod = getModifier(totalAttributes.dex);
@@ -68,7 +71,8 @@ export const calculateTotalDerivedStats = (
   const chaMod = getModifier(totalAttributes.cha);
 
   // Cálculo de MANA baseado em INT, WIS e CHA
-  const baseMaxMana = 10 + (intMod * 2);
+  const baseMaxMana = (isMagicClass ? 15 : 5) +
+    Math.max(0, totalAttributes.int - classBaseAttributes.int) * 2;
   const baseManaRegen = 1 + Math.floor(wisMod / 2);
   const baseManaPower = 5 + chaMod;
 
@@ -103,6 +107,8 @@ export const calculateTotalDerivedStats = (
     if (item.stats.int) bonusStats.maxMana += item.stats.int * 2;
     if (item.stats.wis) bonusStats.manaRegen += Math.floor(item.stats.wis / 2);
     if (item.stats.cha) bonusStats.manaPower += item.stats.cha;
+    if (item.stats.manaRegen) bonusStats.manaRegen += item.stats.manaRegen;
+    if (item.stats.manaPower) bonusStats.manaPower += item.stats.manaPower;
   });
 
   const base: DerivedStats = {
@@ -114,7 +120,11 @@ export const calculateTotalDerivedStats = (
     actionPoints: Math.max(1, baseStats.actionPoints + Math.floor(chaMod / 2)),
     criticalSeverity: Math.max(100, baseStats.criticalSeverity + (strMod * 5)),
     initiative: baseStats.initiative + dexMod,
-    maxHP: Math.max(1, baseStats.hp + (conMod * 5)),
+    maxHP: Math.max(
+      1,
+      (isMagicClass ? 15 : 20) +
+        Math.max(0, totalAttributes.con - classBaseAttributes.con) * 2,
+    ),
     speed: Math.max(1, baseStats.speed + Math.floor(dexMod / 2)),
     maxMana: Math.max(1, baseMaxMana),
     manaRegen: Math.max(0, baseManaRegen),
@@ -144,12 +154,27 @@ export const calculateTotalDerivedStats = (
 
 export const calculateCharacter = (
   classId: string,
-  equipment: Record<string, Equipment | null>
+  equipment: Record<string, Equipment | null>,
+  characterAttributes?: Attributes,
 ): {
   attributes: { base: Attributes; bonus: Attributes; total: Attributes };
   derivedStats: { base: DerivedStats; bonus: DerivedStats; total: DerivedStats };
 } => {
-  const attributes = calculateTotalAttributes(classId, equipment);
+  const equipmentAttributes = calculateTotalAttributes(classId, equipment);
+  const attributes = characterAttributes
+    ? {
+        base: characterAttributes,
+        bonus: equipmentAttributes.bonus,
+        total: {
+          str: characterAttributes.str + equipmentAttributes.bonus.str,
+          dex: characterAttributes.dex + equipmentAttributes.bonus.dex,
+          con: characterAttributes.con + equipmentAttributes.bonus.con,
+          int: characterAttributes.int + equipmentAttributes.bonus.int,
+          wis: characterAttributes.wis + equipmentAttributes.bonus.wis,
+          cha: characterAttributes.cha + equipmentAttributes.bonus.cha,
+        },
+      }
+    : equipmentAttributes;
   const derivedStats = calculateTotalDerivedStats(classId, attributes.total, equipment);
 
   return { attributes, derivedStats };

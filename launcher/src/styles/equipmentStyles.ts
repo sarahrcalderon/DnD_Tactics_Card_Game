@@ -40,11 +40,18 @@ export const BackgroundImage = styled.div`
   background-size: cover;
   pointer-events: none;
 
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 50% 0%, rgba(205, 157, 68, 0.2), transparent 35%), linear-gradient(90deg, rgba(4, 7, 12, 0.78), transparent 26%, transparent 74%, rgba(4, 7, 12, 0.78));
+  }
+
   &::after {
     content: '';
     position: absolute;
     inset: 0;
-    background: rgba(0, 0, 0, 0.85);
+    background: linear-gradient(180deg, rgba(4, 7, 13, 0.68), rgba(4, 5, 9, 0.9));
   }
 `;
 
@@ -58,6 +65,11 @@ export const ContentWrapper = styled.div`
   position: relative;
   z-index: 1;
   flex: 1;
+  padding: clamp(18px, 2.5vw, 30px);
+  border: 1px solid rgba(198, 151, 68, 0.36);
+  border-top-color: rgba(239, 204, 126, 0.66);
+  background: linear-gradient(135deg, rgba(16, 19, 27, 0.8), rgba(8, 10, 16, 0.76));
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.46), inset 0 0 0 4px rgba(6, 8, 13, 0.36);
 `;
 
 export const Header = styled.header`
@@ -67,7 +79,7 @@ export const Header = styled.header`
   justify-content: space-between;
   padding: 0 8px 20px;
   margin-bottom: 20px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid rgba(224, 181, 95, 0.38);
 `;
 
 export const TitleGroup = styled.div`
@@ -77,12 +89,13 @@ export const TitleGroup = styled.div`
 
 export const Title = styled.h1`
   margin: 0;
-  color: #ffd700;
+  color: #f4d88f;
   font-family: 'Cinzel', serif;
   font-size: clamp(1.6rem, 3vw, 2.2rem);
   font-weight: 700;
-  letter-spacing: 0.5px;
-  text-shadow: 0 0 40px rgba(255, 215, 0, 0.2);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-shadow: 0 2px 0 #35230e, 0 0 32px rgba(255, 215, 0, 0.3);
 `;
 
 export const Subtitle = styled.p`
@@ -102,9 +115,9 @@ export const GoldDisplay = styled.div`
   display: flex;
   align-items: center;
   gap: 8px;
-  background: rgba(255, 215, 0, 0.1);
-  border: 1px solid rgba(255, 215, 0, 0.2);
-  border-radius: 12px;
+  background: linear-gradient(180deg, rgba(72, 58, 37, 0.9), rgba(26, 26, 29, 0.92));
+  border: 1px solid rgba(224, 181, 95, 0.55);
+  border-radius: 2px;
   padding: 8px 16px;
   color: #ffd700;
   font-size: 1rem;
@@ -119,11 +132,12 @@ export const BagButton = styled.button`
   display: flex;
   align-items: center;
   gap: 8px;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 12px;
+  background: linear-gradient(180deg, rgba(64, 53, 39, 0.95), rgba(25, 25, 28, 0.95));
+  border: 1px solid rgba(216, 176, 98, 0.65);
+  border-radius: 2px;
   padding: 8px 18px;
-  color: #dcdce5;
+  color: #dfc995;
+  font-family: 'Cinzel', Georgia, serif;
   font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
@@ -153,10 +167,10 @@ export const EquipmentGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 12px;
-  background: rgba(27, 24, 51, 0.6);
-  border-radius: 16px;
+  background: linear-gradient(145deg, rgba(37, 39, 45, 0.96), rgba(14, 17, 23, 0.98));
+  border-radius: 3px;
   padding: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(190, 148, 73, 0.48);
   backdrop-filter: blur(10px);
 
   @media (max-width: 600px) {
@@ -170,14 +184,14 @@ export const EquipmentGrid = styled.div`
   }
 `;
 
-export const SlotItem = styled.div<{ isEmpty: boolean; rarity?: string }>`
+export const SlotItem = styled.div<{ $isEmpty: boolean; $rarity?: string }>`
   aspect-ratio: 1 / 1;
-  border-radius: 12px;
-  background: ${({ isEmpty }) =>
-    isEmpty ? 'rgba(255, 255, 255, 0.04)' : 'rgba(27, 24, 51, 0.8)'};
-  border: 2px solid
-    ${({ isEmpty, rarity }) => {
-      if (isEmpty) return 'rgba(255, 255, 255, 0.08)';
+  border-radius: 2px;
+  background: ${({ $isEmpty }) =>
+    $isEmpty ? 'rgba(5, 8, 13, 0.58)' : 'linear-gradient(145deg, rgba(47, 47, 48, 0.9), rgba(10, 13, 18, 0.94))'};
+  border: 1px solid
+    ${({ $isEmpty, $rarity }) => {
+      if ($isEmpty) return 'rgba(255, 255, 255, 0.08)';
       const colors = {
         Comum: '#8a8a8a',
         Incomum: '#4caf50',
@@ -185,7 +199,7 @@ export const SlotItem = styled.div<{ isEmpty: boolean; rarity?: string }>`
         Epica: '#9c27b0',
         Lendaria: '#ffd700',
       };
-      return colors[rarity as keyof typeof colors] || 'rgba(255, 255, 255, 0.2)';
+      return colors[$rarity as keyof typeof colors] || 'rgba(255, 255, 255, 0.2)';
     }};
   display: flex;
   flex-direction: column;
@@ -199,7 +213,7 @@ export const SlotItem = styled.div<{ isEmpty: boolean; rarity?: string }>`
 
   &:hover {
     transform: translateY(-3px);
-    border-color: ${({ rarity }) => {
+    border-color: ${({ $rarity }) => {
       const colors = {
         Comum: '#8a8a8a',
         Incomum: '#4caf50',
@@ -207,16 +221,18 @@ export const SlotItem = styled.div<{ isEmpty: boolean; rarity?: string }>`
         Epica: '#9c27b0',
         Lendaria: '#ffd700',
       };
-      return colors[rarity as keyof typeof colors] || 'rgba(255, 255, 255, 0.3)';
+      return colors[$rarity as keyof typeof colors] || 'rgba(255, 255, 255, 0.3)';
     }};
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
   }
+
+  &:focus-visible { outline: 2px solid #f2cf7d; outline-offset: 3px; }
 
   &::after {
     content: '';
     position: absolute;
     inset: 0;
-    border-radius: 10px;
+    border-radius: 1px;
     background: linear-gradient(
       135deg,
       rgba(255, 255, 255, 0.05) 0%,
@@ -248,14 +264,14 @@ export const SlotEquipmentImage = styled.img`
   border-radius: 8px;
 `;
 
-export const SlotRarityBadge = styled.div<{ rarity: string }>`
+export const SlotRarityBadge = styled.div<{ $rarity: string }>`
   position: absolute;
   top: 4px;
   right: 4px;
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  background: ${({ rarity }) => {
+  background: ${({ $rarity }) => {
     const colors = {
       Comum: '#8a8a8a',
       Incomum: '#4caf50',
@@ -263,10 +279,10 @@ export const SlotRarityBadge = styled.div<{ rarity: string }>`
       Epica: '#9c27b0',
       Lendaria: '#ffd700',
     };
-    return colors[rarity as keyof typeof colors] || '#8a8a8a';
+    return colors[$rarity as keyof typeof colors] || '#8a8a8a';
   }};
   border: 1px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 0 0 10px ${({ rarity }) => {
+  box-shadow: 0 0 10px ${({ $rarity }) => {
     const colors = {
       Comum: '#8a8a8a',
       Incomum: '#4caf50',
@@ -274,15 +290,16 @@ export const SlotRarityBadge = styled.div<{ rarity: string }>`
       Epica: '#9c27b0',
       Lendaria: '#ffd700',
     };
-    return colors[rarity as keyof typeof colors] || '#8a8a8a';
+    return colors[$rarity as keyof typeof colors] || '#8a8a8a';
   }}44;
 `;
 
 export const EquipmentInfo = styled.div`
-  background: rgba(27, 24, 51, 0.8);
-  border-radius: 16px;
+  background: linear-gradient(145deg, rgba(37, 39, 45, 0.97), rgba(14, 17, 23, 0.99));
+  border-radius: 3px;
   padding: 24px;
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(190, 148, 73, 0.48);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.38), inset 0 0 0 3px rgba(0, 0, 0, 0.18);
   backdrop-filter: blur(10px);
   display: flex;
   flex-direction: column;
@@ -295,7 +312,8 @@ export const EquipmentInfo = styled.div`
 
 export const InfoTitle = styled.h3`
   margin: 0;
-  color: #dcdce5;
+  color: #e9cf93;
+  font-family: 'Cinzel', Georgia, serif;
   font-size: 1rem;
   font-weight: 600;
   text-align: center;
@@ -332,14 +350,15 @@ export const InfoContent = styled.div`
 
 export const InfoName = styled.h2`
   margin: 0;
-  color: #ffffff;
+  color: #f5dfad;
+  font-family: 'Cinzel', Georgia, serif;
   font-size: 1.2rem;
   font-weight: 700;
 `;
 
-export const InfoRarity = styled.span<{ rarity: string }>`
+export const InfoRarity = styled.span<{ $rarity: string }>`
   padding: 4px 12px;
-  border-radius: 6px;
+  border-radius: 2px;
   font-size: 0.7rem;
   font-weight: 600;
   text-transform: uppercase;
@@ -353,7 +372,7 @@ export const InfoRarity = styled.span<{ rarity: string }>`
     };
     return colors[rarity as keyof typeof colors] || '#8a8a8a22';
   }};
-  color: ${({ rarity }) => {
+  color: ${({ $rarity }) => {
     const colors = {
       Comum: '#8a8a8a',
       Incomum: '#4caf50',
@@ -361,7 +380,7 @@ export const InfoRarity = styled.span<{ rarity: string }>`
       Epica: '#9c27b0',
       Lendaria: '#ffd700',
     };
-    return colors[rarity as keyof typeof colors] || '#8a8a8a';
+    return colors[$rarity as keyof typeof colors] || '#8a8a8a';
   }};
   border: 1px solid ${({ rarity }) => {
     const colors = {
@@ -387,8 +406,8 @@ export const InfoStat = styled.div`
   display: flex;
   justify-content: space-between;
   padding: 4px 8px;
-  background: rgba(255, 255, 255, 0.03);
-  border-radius: 4px;
+  background: rgba(5, 8, 13, 0.48);
+  border-radius: 2px;
   font-size: 0.8rem;
 
   span:first-child {
@@ -418,7 +437,7 @@ export const ActionButton = styled.button<{ variant?: 'primary' | 'danger' | 'se
   flex: 1;
   padding: 10px 16px;
   border: none;
-  border-radius: 8px;
+  border-radius: 2px;
   font-size: 0.85rem;
   font-weight: 600;
   cursor: pointer;
@@ -479,10 +498,11 @@ export const Actions = styled.div`
 export const BackButton = styled.button`
   min-width: clamp(140px, 15vw, 180px);
   padding: 12px 32px;
-  color: #dcdce5;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1.5px solid rgba(255, 255, 255, 0.12);
-  border-radius: 12px;
+  color: #dfc995;
+  font-family: 'Cinzel', Georgia, serif;
+  background: linear-gradient(180deg, rgba(64, 53, 39, 0.95), rgba(25, 25, 28, 0.95));
+  border: 1px solid rgba(216, 176, 98, 0.65);
+  border-radius: 2px;
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
@@ -504,16 +524,17 @@ export const BackButton = styled.button`
 
 export const CharacterStatsPanel = styled.div`
   width: 100%;
-  background: rgba(27, 24, 51, 0.8);
-  border-radius: 16px;
+  background: linear-gradient(145deg, rgba(37, 39, 45, 0.97), rgba(14, 17, 23, 0.99));
+  border-radius: 3px;
   padding: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(190, 148, 73, 0.48);
   backdrop-filter: blur(10px);
   margin-bottom: 12px;
 `;
 
 export const StatsTitle = styled.h3`
-  color: #ffd700;
+  color: #e9cf93;
+  font-family: 'Cinzel', Georgia, serif;
   font-size: 0.85rem;
   font-weight: 600;
   margin: 0 0 12px 0;
@@ -554,7 +575,7 @@ export const StatBarTrack = styled.div`
   flex: 1;
   height: 8px;
   background: rgba(255, 255, 255, 0.08);
-  border-radius: 4px;
+  border-radius: 2px;
   overflow: hidden;
   position: relative;
 `;
@@ -569,7 +590,7 @@ export const StatBarFill = styled.div<StatBarFillProps>`
   height: 100%;
   width: ${({ $value, $max }) => ($max > 0 ? Math.min(($value / $max) * 100, 100) : 0)}%;
   background: ${({ $color }) => $color};
-  border-radius: 4px;
+  border-radius: 1px;
   transition: width 0.5s ease;
 `;
 
@@ -606,12 +627,12 @@ export const PreviewTitle = styled.div`
   margin-bottom: 6px;
 `;
 
-export const PreviewRarity = styled.span<{ rarity: string }>`
+export const PreviewRarity = styled.span<{ $rarity: string }>`
   font-size: 0.6rem;
   font-weight: 600;
   text-transform: uppercase;
   margin-left: 6px;
-  color: ${({ rarity }) => {
+  color: ${({ $rarity }) => {
     const colors: Record<string, string> = {
       Comum: '#8a8a8a',
       Incomum: '#4caf50',
@@ -620,7 +641,7 @@ export const PreviewRarity = styled.span<{ rarity: string }>`
       Lendaria: '#ffd700',
       Mitica: '#ff6b6b',
     };
-    return colors[rarity] || '#8a8a8a';
+    return colors[$rarity] || '#8a8a8a';
   }};
 `;
 
@@ -631,11 +652,11 @@ export const PreviewStats = styled.div`
   margin-top: 6px;
 `;
 
-export const PreviewStat = styled.div<{ isPositive?: boolean }>`
+export const PreviewStat = styled.div<{ $isPositive?: boolean }>`
   display: flex;
   justify-content: space-between;
   font-size: 0.7rem;
-  color: ${({ isPositive }) => (isPositive ? '#2ecc71' : '#ff6b6b')};
+  color: ${({ $isPositive }) => ($isPositive ? '#2ecc71' : '#ff6b6b')};
   padding: 2px 0;
   border-bottom: 1px solid rgba(255, 255, 255, 0.03);
 `;
@@ -644,8 +665,8 @@ export const PreviewStatLabel = styled.span`
   color: #9999aa;
 `;
 
-export const PreviewStatValue = styled.span<{ isPositive?: boolean }>`
-  color: ${({ isPositive }) => (isPositive ? '#2ecc71' : '#ff6b6b')};
+export const PreviewStatValue = styled.span<{ $isPositive?: boolean }>`
+  color: ${({ $isPositive }) => ($isPositive ? '#2ecc71' : '#ff6b6b')};
   font-weight: 600;
 `;
 
@@ -657,7 +678,8 @@ export const EquipmentGridWrapper = styled.div`
 `;
 
 export const EquipmentSectionTitle = styled.h3`
-  color: #dcdce5;
+  color: #e9cf93;
+  font-family: 'Cinzel', Georgia, serif;
   font-size: 0.85rem;
   font-weight: 600;
   margin: 0;

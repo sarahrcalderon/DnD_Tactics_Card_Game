@@ -34,7 +34,7 @@ const Container = styled.div`
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.7);
+    background: linear-gradient(180deg, rgba(4, 7, 13, 0.56), rgba(4, 5, 9, 0.82));
     z-index: 0;
   }
 `;
@@ -57,16 +57,20 @@ const Content = styled.div`
   text-align: center;
   max-width: 500px;
   width: 100%;
-  padding: 40px;
+  padding: clamp(28px, 4vw, 48px);
+  border: 1px solid rgba(198, 151, 68, 0.38);
+  border-top-color: rgba(239, 204, 126, 0.68);
+  background: linear-gradient(135deg, rgba(16, 19, 27, 0.82), rgba(8, 10, 16, 0.78));
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5), inset 0 0 0 4px rgba(6, 8, 13, 0.36);
 `;
 
 const Title = styled.h1`
   font-size: 3.5rem;
-  color: #ffd700;
+  color: #f4d88f;
   font-family: 'Cinzel', serif;
   margin-bottom: 4px;
-  text-shadow: 0 0 40px rgba(255, 215, 0, 0.3);
-  letter-spacing: 4px;
+  text-shadow: 0 2px 0 #35230e, 0 0 36px rgba(255, 215, 0, 0.3);
+  letter-spacing: 0.12em;
 
   @media (max-width: 768px) {
     font-size: 2.5rem;
@@ -79,6 +83,7 @@ const Subtitle = styled.p`
   margin-bottom: 40px;
   letter-spacing: 3px;
   font-weight: 300;
+  color: #e0d5be;
 `;
 
 const MenuContainer = styled.div`
@@ -88,6 +93,8 @@ const MenuContainer = styled.div`
   width: 100%;
   max-width: 350px;
   margin: 0 auto;
+  position: relative;
+  &::before { content: ''; display: block; height: 1px; margin: 0 auto 14px; width: 72%; background: linear-gradient(90deg, transparent, #b98b3e, transparent); }
 `;
 
 interface MenuItemProps {
@@ -101,9 +108,9 @@ const MenuItem = styled.div<MenuItemProps>`
   gap: 12px;
   padding: 14px 24px;
   background: ${(props: MenuItemProps) =>
-    props.selected ? 'rgba(255, 215, 0, 0.15)' : 'rgba(0, 0, 0, 0.4)'};
-  border-radius: 10px;
-  border: 2px solid
+    props.selected ? 'linear-gradient(90deg, rgba(112, 81, 34, 0.65), rgba(50, 42, 32, 0.92))' : 'linear-gradient(90deg, rgba(38, 40, 45, 0.94), rgba(14, 17, 23, 0.96))'};
+  border-radius: 2px;
+  border: 1px solid
     ${(props: MenuItemProps) =>
       props.selected ? '#ffd700' : 'rgba(255, 255, 255, 0.1)'};
   cursor: pointer;
@@ -116,6 +123,8 @@ const MenuItem = styled.div<MenuItemProps>`
     transform: translateX(6px);
     background: rgba(255, 215, 0, 0.1);
   }
+
+  &:focus-visible { outline: 2px solid #f2cf7d; outline-offset: 3px; }
 
   ${(props: MenuItemProps) =>
     props.selected &&
@@ -132,7 +141,8 @@ const IconText = styled.span`
 
 const LabelText = styled.span<{ selected: boolean }>`
   font-size: 1.1rem;
-  color: ${(props) => (props.selected ? '#ffd700' : '#ffffff')};
+  color: ${(props) => (props.selected ? '#f4d88f' : '#f2ead9')};
+  font-family: 'Cinzel', Georgia, serif;
   font-weight: 500;
   letter-spacing: 0.5px;
 `;
@@ -166,7 +176,7 @@ const StatusBadge = styled.div`
   color: #4caf50;
   font-size: 0.65rem;
   padding: 4px 14px;
-  border-radius: 20px;
+  border-radius: 2px;
   margin-bottom: 16px;
   border: 1px solid rgba(76, 175, 80, 0.2);
 `;
@@ -205,11 +215,11 @@ const ModalContent = styled.div`
   max-width: 800px;
   max-height: 85vh;
   overflow-y: auto;
-  background: linear-gradient(145deg, #1a1530 0%, #0d0a16 100%);
-  border-radius: 20px;
+  background: linear-gradient(145deg, rgba(37, 39, 45, 0.99), rgba(14, 17, 23, 0.99));
+  border-radius: 3px;
   padding: 32px;
-  border: 1px solid rgba(255, 215, 0, 0.15);
-  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.8);
+  border: 1px solid rgba(198, 151, 68, 0.5);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.8), inset 0 0 0 4px rgba(0, 0, 0, 0.2);
 
   scrollbar-width: thin;
   scrollbar-color: rgba(255, 215, 0, 0.3) transparent;
@@ -228,7 +238,7 @@ const ModalContent = styled.div`
 
 const ModalTitle = styled.h2`
   margin: 0 0 8px;
-  color: #ffd700;
+  color: #f4d88f;
   font-family: 'Cinzel', serif;
   font-size: 1.8rem;
   text-align: center;
@@ -248,10 +258,10 @@ const SaveGrid = styled.div`
 `;
 
 const SaveCard = styled.div`
-  background: rgba(255, 255, 255, 0.04);
-  border-radius: 12px;
+  background: rgba(5, 8, 13, 0.48);
+  border-radius: 2px;
   padding: 16px 20px;
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(190, 148, 73, 0.35);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -273,7 +283,8 @@ const SaveInfo = styled.div`
 `;
 
 const SaveName = styled.span`
-  color: #ffffff;
+  color: #f5dfad;
+  font-family: 'Cinzel', Georgia, serif;
   font-size: 1rem;
   font-weight: 600;
 `;
@@ -296,8 +307,8 @@ const SaveActions = styled.div`
 
 const SaveButton = styled.button<{ variant?: 'primary' | 'danger' }>`
   padding: 6px 14px;
-  border: none;
-  border-radius: 6px;
+  border: 1px solid rgba(216, 176, 98, 0.5);
+  border-radius: 2px;
   font-size: 0.75rem;
   font-weight: 600;
   cursor: pointer;

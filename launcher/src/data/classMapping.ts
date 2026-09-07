@@ -1,4 +1,3 @@
-// launcher/src/data/classMapping.ts
 import { EquipmentSlot, ClassArchetype } from '../types/equipment.types';
 
 export const CLASS_ARCHETYPE_MAP: Record<string, ClassArchetype> = {

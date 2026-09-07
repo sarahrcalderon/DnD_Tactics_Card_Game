@@ -74,15 +74,18 @@ export const Container = styled.div`
   overflow-x: hidden;
 
   background:
-    radial-gradient(
-      ellipse at 50% 0%,
-      #1a1530 0%,
-      #0a0810 58%,
-      #05040a 100%
-    );
+    linear-gradient(
+      180deg,
+      rgba(35, 24, 16, 0.54),
+      rgba(35, 24, 16, 0.66)
+    ),
+    url('/assets/images/backgrounds/background_divindades.png');
+  background-position: center;
+  background-size: cover;
+  background-attachment: fixed;
 
   scrollbar-width: thin;
-  scrollbar-color: rgba(255, 215, 0, 0.3) transparent;
+    scrollbar-color: rgba(75, 47, 22, 0.55) transparent;
 
   &::before {
     content: '';
@@ -97,27 +100,27 @@ export const Container = styled.div`
     background-image:
       radial-gradient(
         1px 1px at 10% 20%,
-        rgba(255, 215, 0, 0.15),
+          rgba(255, 238, 190, 0.2),
         transparent
       ),
       radial-gradient(
         1px 1px at 30% 70%,
-        rgba(255, 215, 0, 0.1),
+          rgba(70, 42, 20, 0.12),
         transparent
       ),
       radial-gradient(
         1.5px 1.5px at 50% 10%,
-        rgba(255, 215, 0, 0.2),
+          rgba(255, 238, 190, 0.16),
         transparent
       ),
       radial-gradient(
         1px 1px at 80% 40%,
-        rgba(255, 215, 0, 0.1),
+          rgba(70, 42, 20, 0.1),
         transparent
       ),
       radial-gradient(
         1px 1px at 90% 80%,
-        rgba(255, 215, 0, 0.15),
+          rgba(255, 238, 190, 0.14),
         transparent
       ),
       radial-gradient(
@@ -164,6 +167,10 @@ export const Header = styled.header`
   z-index: 1;
 
   animation: ${slideUp} 0.4s ease;
+  padding: clamp(14px, 2vw, 24px);
+  border: 1px solid rgba(224, 181, 95, 0.42);
+  background: linear-gradient(135deg, rgba(17, 19, 25, 0.8), rgba(9, 11, 16, 0.68));
+  box-shadow: 0 16px 38px rgba(0, 0, 0, 0.36), inset 0 0 0 3px rgba(255, 227, 159, 0.05);
 
   &::after {
     content: '';
@@ -178,7 +185,7 @@ export const Header = styled.header`
     background: linear-gradient(
       90deg,
       transparent,
-      rgba(255, 215, 0, 0.8),
+      #f0d188,
       transparent
     );
   }
@@ -187,7 +194,7 @@ export const Header = styled.header`
 export const Title = styled.h1`
   margin: 0 0 6px;
 
-  color: #ffd700;
+  color: #f4d88f;
 
   font-family: 'Cinzel', serif;
 
@@ -195,11 +202,12 @@ export const Title = styled.h1`
 
   font-weight: 700;
 
-  letter-spacing: 2px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 
   text-shadow:
-    0 0 30px rgba(255, 215, 0, 0.2),
-    0 4px 20px rgba(0, 0, 0, 0.6);
+    0 2px 0 #35230e,
+    0 0 30px rgba(255, 215, 0, 0.28);
 
   &::before {
     content: '✦ ';
@@ -217,7 +225,7 @@ export const Subtitle = styled.p`
 
   margin: 0 auto 14px;
 
-  color: #bcbccc;
+  color: rgba(241, 229, 202, 0.86);
 
   font-size: clamp(0.9rem, 1.4vw, 1.05rem);
 
@@ -238,11 +246,11 @@ export const ClassInfo = styled.div`
 
   padding: 8px 24px;
 
-  border-radius: 30px;
+  border-radius: 2px;
 
-  border: 1px solid rgba(255, 215, 0, 0.25);
+  border: 1px solid rgba(224, 181, 95, 0.55);
 
-  background: rgba(255, 215, 0, 0.04);
+  background: linear-gradient(180deg, rgba(73, 58, 37, 0.9), rgba(27, 26, 28, 0.92));
 
   box-shadow:
     inset 0 0 20px rgba(255, 215, 0, 0.02),
@@ -252,7 +260,7 @@ export const ClassInfo = styled.div`
 `;
 
 export const ClassInfoText = styled.span`
-  color: #ffd700;
+  color: #f2d692;
 
   font-size: 0.82rem;
 
@@ -264,7 +272,7 @@ export const ClassInfoText = styled.span`
 `;
 
 export const RaceInfo = styled.span`
-  color: #aaaaba;
+  color: rgba(241, 229, 202, 0.76);
 
   font-size: 0.8rem;
 
@@ -276,7 +284,7 @@ export const RaceInfo = styled.span`
 export const DeityCount = styled.div`
   margin-top: 12px;
 
-  color: #777786;
+  color: rgba(241, 229, 202, 0.7);
 
   font-size: 0.7rem;
 
@@ -307,15 +315,16 @@ export const SelectionLayout = styled.div`
   z-index: 1;
 
   animation: ${slideUp} 0.5s ease;
+  padding: clamp(14px, 1.8vw, 24px);
+  border: 1px solid rgba(191, 145, 65, 0.35);
+  background: linear-gradient(135deg, rgba(17, 19, 25, 0.78), rgba(8, 10, 15, 0.76));
+  box-shadow: 0 22px 58px rgba(0, 0, 0, 0.42), inset 0 0 0 4px rgba(0, 0, 0, 0.2);
 
   @media (max-width: 1100px) {
     grid-template-columns: 1fr;
   }
 `;
 
-// ============================================================
-// ÁREA DE DIVINDADES
-// ============================================================
 
 export const DeityBrowser = styled.section`
   min-width: 0;
@@ -326,9 +335,7 @@ export const DeityBrowser = styled.section`
   gap: 16px;
 `;
 
-// ============================================================
-// FILTROS
-// ============================================================
+
 
 export const FilterContainer = styled.div`
   display: flex;
@@ -341,75 +348,42 @@ export const FilterContainer = styled.div`
 
   padding: 12px;
 
-  border-radius: 12px;
+  border-radius: 2px;
 
-  border: 1px solid rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(224, 181, 95, 0.35);
 
-  background: rgba(255, 255, 255, 0.02);
+  background: rgba(7, 10, 15, 0.64);
 
   backdrop-filter: blur(6px);
 `;
 
-interface FilterButtonProps {
-  active: boolean;
-}
 
-export const FilterButton = styled.button<FilterButtonProps>`
+
+export const FilterButton = styled.button<{
+  $active: boolean;
+  $color: string;
+}>`
+  appearance: none;
+  padding: 9px 14px;
   border: 1px solid
-    ${({ active }) =>
-      active
-        ? 'rgba(255, 215, 0, 0.6)'
-        : 'rgba(255, 255, 255, 0.1)'};
-
-  border-radius: 20px;
-
-  padding: 7px 14px;
-
-  background:
-    ${({ active }) =>
-      active
-        ? 'rgba(255, 215, 0, 0.12)'
-        : 'rgba(255, 255, 255, 0.025)'};
-
-  color:
-    ${({ active }) =>
-      active
-        ? '#ffd700'
-        : '#9c9cab'};
-
-  font-size: 0.68rem;
-
-  font-family: 'Cinzel', serif;
-
-  font-weight: 700;
-
-  letter-spacing: 0.5px;
-
-  text-transform: uppercase;
-
+    ${({ $active, $color }) => ($active ? $color : 'rgba(224, 181, 95, 0.3)')};
+  border-radius: 2px;
+  background: ${({ $active }) =>
+    $active ? 'rgba(104, 75, 33, 0.48)' : 'rgba(255, 238, 190, 0.06)'};
+  color: ${({ $active, $color }) => ($active ? $color : '#e7d8b5')};
   cursor: pointer;
-
-  transition: all 0.2s ease;
+  font: inherit;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
 
   &:hover {
-    color: #ffd700;
-
-    border-color: rgba(255, 215, 0, 0.45);
-
-    background: rgba(255, 215, 0, 0.07);
+    border-color: ${({ $color }) => $color};
+    color: ${({ $color }) => $color};
   }
-
-  ${({ active }) =>
-    active &&
-    css`
-      box-shadow:
-        0 0 18px rgba(255, 215, 0, 0.08);
-    `}
 `;
 
-// ============================================================
-// SEÇÃO RECOMENDADA
-// ============================================================
 
 export const SectionHeader = styled.div`
   display: flex;
@@ -425,7 +399,7 @@ export const SectionHeader = styled.div`
 export const SectionTitle = styled.h2`
   margin: 0;
 
-  color: #d6d6e2;
+  color: #3b2412;
 
   font-family: 'Cinzel', serif;
 
@@ -437,7 +411,7 @@ export const SectionTitle = styled.h2`
 `;
 
 export const SectionHint = styled.span`
-  color: #686877;
+  color: rgba(59, 36, 18, 0.7);
 
   font-size: 0.65rem;
 
@@ -446,9 +420,7 @@ export const SectionHint = styled.span`
   text-transform: uppercase;
 `;
 
-// ============================================================
-// GRID
-// ============================================================
+
 
 export const Grid = styled.div`
   width: 100%;
@@ -473,14 +445,12 @@ export const Grid = styled.div`
   }
 `;
 
-// ============================================================
-// CARD DA DIVINDADE
-// ============================================================
+
 
 interface DeityCardProps {
   selected: boolean;
   color: string;
-  recommended?: boolean;
+  $recommended?: boolean;
 }
 
 export const DeityCard = styled.button<DeityCardProps>`
@@ -498,7 +468,7 @@ export const DeityCard = styled.button<DeityCardProps>`
 
   overflow: hidden;
 
-  border-radius: 12px;
+  border-radius: 3px;
 
   cursor: pointer;
 
@@ -506,13 +476,13 @@ export const DeityCard = styled.button<DeityCardProps>`
     ${({ selected, color }) =>
       selected
         ? color
-        : 'rgba(255, 255, 255, 0.1)'};
+        : 'rgba(190, 148, 73, 0.48)'};
 
   background:
     linear-gradient(
       160deg,
-      rgba(28, 25, 45, 0.96),
-      rgba(8, 7, 12, 0.98)
+      rgba(39, 40, 43, 0.97),
+      rgba(14, 17, 23, 0.99)
     );
 
   color: inherit;
@@ -522,10 +492,12 @@ export const DeityCard = styled.button<DeityCardProps>`
       selected
         ? `
           0 0 28px ${color}55,
-          0 12px 30px rgba(0, 0, 0, 0.6)
+          0 12px 30px rgba(0, 0, 0, 0.54),
+          inset 0 0 0 3px rgba(255, 227, 159, 0.08)
         `
         : `
-          0 6px 20px rgba(0, 0, 0, 0.35)
+          0 8px 22px rgba(0, 0, 0, 0.42),
+          inset 0 0 0 3px rgba(0, 0, 0, 0.18)
         `};
 
   transition:
@@ -564,7 +536,7 @@ export const DeityCard = styled.button<DeityCardProps>`
     border-color: ${({ color }) => color};
 
     box-shadow:
-      0 12px 30px rgba(0, 0, 0, 0.6),
+      0 12px 30px rgba(48, 29, 13, 0.35),
       0 0 22px ${({ color }) => `${color}33`};
   }
 
@@ -577,8 +549,8 @@ export const DeityCard = styled.button<DeityCardProps>`
     outline-offset: 3px;
   }
 
-  ${({ recommended }) =>
-    recommended &&
+  ${({ $recommended }) =>
+    $recommended &&
     css`
       &::after {
         content: '';
@@ -632,7 +604,7 @@ export const DeityImageWrapper = styled.div`
   background:
     radial-gradient(
       circle at 50% 35%,
-      rgba(255, 255, 255, 0.035),
+      rgba(222, 183, 109, 0.12),
       transparent 65%
     );
 `;
@@ -668,7 +640,7 @@ export const DeityImageFallback = styled.div`
   align-items: center;
   justify-content: center;
 
-  color: rgba(255, 255, 255, 0.15);
+  color: rgba(59, 36, 18, 0.5);
 
   font-family: 'Cinzel', serif;
 
@@ -690,20 +662,20 @@ export const DeityCardInfo = styled.div`
 
   text-align: center;
 
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  border-top: 1px solid rgba(224, 181, 95, 0.3);
 
   background:
     linear-gradient(
       180deg,
-      rgba(10, 8, 16, 0.5),
-      rgba(5, 4, 10, 0.95)
+      rgba(55, 51, 42, 0.96),
+      rgba(20, 22, 28, 0.98)
     );
 `;
 
 export const DeityName = styled.h3`
   margin: 0 0 5px;
 
-  color: #ffffff;
+  color: #f3dca6;
 
   font-family: 'Cinzel', serif;
 
@@ -713,7 +685,7 @@ export const DeityName = styled.h3`
 
   letter-spacing: 0.4px;
 
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
+  text-shadow: 0 2px 5px rgba(0, 0, 0, 0.6);
 `;
 
 export const DeityDomainsPreview = styled.div`
@@ -806,9 +778,7 @@ export const SelectBadge = styled.div<{ color: string }>`
     0 3px 12px rgba(0, 0, 0, 0.5);
 `;
 
-// ============================================================
-// PAINEL DE DETALHES
-// ============================================================
+
 
 export const DeityPreviewPanel = styled.aside`
   position: sticky;
@@ -821,19 +791,20 @@ export const DeityPreviewPanel = styled.aside`
 
   overflow: hidden;
 
-  border-radius: 16px;
+  border-radius: 3px;
 
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(224, 181, 95, 0.46);
 
   background:
     linear-gradient(
       160deg,
-      rgba(24, 21, 40, 0.96),
-      rgba(7, 6, 12, 0.98)
+      rgba(39, 40, 43, 0.98),
+      rgba(14, 17, 23, 0.99)
     );
 
   box-shadow:
-    0 20px 60px rgba(0, 0, 0, 0.45);
+    0 20px 60px rgba(0, 0, 0, 0.52),
+    inset 0 0 0 4px rgba(0, 0, 0, 0.22);
 
   backdrop-filter: blur(12px);
 
@@ -886,7 +857,7 @@ export const PreviewEmpty = styled.div`
 
   padding: 30px;
 
-  color: #858594;
+  color: rgba(241, 229, 202, 0.65);
 
   gap: 12px;
 `;
@@ -894,7 +865,7 @@ export const PreviewEmpty = styled.div`
 export const PreviewEmptyTitle = styled.h2`
   margin: 0;
 
-  color: #d4d4df;
+  color: #f3dca6;
 
   font-family: 'Cinzel', serif;
 
@@ -910,7 +881,7 @@ export const PreviewEmptyText = styled.p`
 
   line-height: 1.6;
 
-  color: #777785;
+  color: rgba(241, 229, 202, 0.72);
 `;
 
 // ============================================================
@@ -995,7 +966,7 @@ export const PreviewTitle = styled.h2<{ color: string }>`
 `;
 
 export const PreviewSubtitle = styled.div`
-  color: #8d8d9d;
+  color: rgba(241, 229, 202, 0.7);
 
   font-size: 0.68rem;
 
@@ -1053,14 +1024,14 @@ export const PreviewDescription = styled.p`
 
   padding: 13px 14px;
 
-  border-radius: 8px;
+  border-radius: 2px;
 
-  border-left: 3px solid rgba(255, 215, 0, 0.45);
+  border-left: 3px solid rgba(224, 181, 95, 0.7);
 
   background:
-    rgba(255, 255, 255, 0.025);
+    rgba(0, 0, 0, 0.28);
 
-  color: #b8b8c5;
+  color: #eee1c2;
 
   font-size: 0.82rem;
 
@@ -1076,13 +1047,13 @@ export const PreviewSection = styled.section`
 
   padding-top: 16px;
 
-  border-top: 1px solid rgba(255, 255, 255, 0.07);
+  border-top: 1px solid rgba(224, 181, 95, 0.26);
 `;
 
 export const PreviewSectionTitle = styled.h3`
   margin: 0 0 10px;
 
-  color: #d6d6e0;
+  color: #e9cf93;
 
   font-family: 'Cinzel', serif;
 
@@ -1147,7 +1118,7 @@ export const GameplayAbilityTitle = styled.div<{ type: string }>`
 export const GameplayAbilityDescription = styled.p`
   margin: 0;
 
-  color: #a9a9b6;
+  color: #eee1c2;
 
   font-size: 0.75rem;
 
@@ -1209,7 +1180,7 @@ export const PreviewMatchupLabel = styled.div<{ type: 'strong' | 'weak' }>`
 `;
 
 export const PreviewMatchupItem = styled.div`
-  color: #aaaab6;
+  color: #eee1c2;
 
   font-size: 0.7rem;
 
@@ -1217,13 +1188,11 @@ export const PreviewMatchupItem = styled.div`
 
   &::before {
     content: '• ';
-    color: #777785;
+    color: rgba(59, 36, 18, 0.65);
   }
 `;
 
-// ============================================================
-// BOTÕES DO PREVIEW
-// ============================================================
+
 
 export const PreviewActions = styled.div`
   display: grid;
@@ -1240,13 +1209,13 @@ export const LoreButton = styled.button`
 
   padding: 10px 14px;
 
-  border-radius: 8px;
+  border-radius: 2px;
 
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(224, 181, 95, 0.55);
 
-  background: rgba(255, 255, 255, 0.025);
+  background: linear-gradient(180deg, rgba(64, 53, 39, 0.95), rgba(25, 25, 28, 0.95));
 
-  color: #b8b8c5;
+  color: #dfc995;
 
   cursor: pointer;
 
@@ -1263,11 +1232,11 @@ export const LoreButton = styled.button`
   transition: all 0.2s ease;
 
   &:hover {
-    color: #ffd700;
+    color: #3b2412;
 
-    border-color: rgba(255, 215, 0, 0.35);
+    border-color: rgba(75, 47, 22, 0.55);
 
-    background: rgba(255, 215, 0, 0.05);
+    background: rgba(255, 238, 190, 0.4);
   }
 `;
 
@@ -1276,18 +1245,18 @@ export const PreviewSelectButton = styled.button<{ color: string }>`
 
   padding: 13px 16px;
 
-  border: none;
+  border: 1px solid ${({ color }) => color};
 
-  border-radius: 8px;
+  border-radius: 2px;
 
   background:
     linear-gradient(
       135deg,
-      ${({ color }) => color},
-      ${({ color }) => `${color}bb`}
+      ${({ color }) => `${color}bb`},
+      rgba(42, 31, 18, 0.96)
     );
 
-  color: #08070c;
+  color: #fff1c4;
 
   cursor: pointer;
 
@@ -1316,9 +1285,6 @@ export const PreviewSelectButton = styled.button<{ color: string }>`
   }
 `;
 
-// ============================================================
-// MODAL - LORE
-// ============================================================
 
 export const ModalOverlay = styled.div`
   position: fixed;
@@ -1337,7 +1303,8 @@ export const ModalOverlay = styled.div`
   justify-content: center;
 
   background:
-    rgba(0, 0, 0, 0.86);
+    radial-gradient(circle at 50% 40%, rgba(151, 107, 46, 0.16), transparent 45%),
+    rgba(0, 0, 0, 0.9);
 
   backdrop-filter: blur(10px);
 
@@ -1349,6 +1316,7 @@ export const ModalOverlay = styled.div`
 `;
 
 export const ModalContent = styled.div`
+  position: relative;
   width: 100%;
 
   max-width: 820px;
@@ -1356,6 +1324,8 @@ export const ModalContent = styled.div`
   max-height: 88vh;
 
   overflow-y: auto;
+  padding: 14px 10px;
+  box-sizing: border-box;
 
   background: transparent;
 
@@ -1374,38 +1344,50 @@ export const ModalContent = styled.div`
     background: #8b7355;
     border-radius: 10px;
   }
+
+  &::before,
+  &::after {
+    content: '';
+    position: absolute;
+    left: 1px;
+    right: 1px;
+    height: 18px;
+    z-index: 3;
+    pointer-events: none;
+    border: 1px solid #65431f;
+    border-radius: 50%;
+    background: linear-gradient(180deg, #573717, #bf8b45 45%, #432a12);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.55), inset 0 2px 2px rgba(255, 225, 158, 0.28);
+  }
+
+  &::before { top: 5px; }
+  &::after { bottom: 5px; }
 `;
 
-// ============================================================
-// PERGAMINHO
-// ============================================================
 
 export const ScrollContainer = styled.div`
   position: relative;
 
-  padding: 40px 50px 45px;
+  padding: 52px 50px 57px;
 
   overflow: hidden;
 
-  border-radius: 4px;
+  border-radius: 3px;
 
   border: 2px solid #8b7355;
+  border-top-color: #d3ad6d;
+  border-bottom-color: #6f4820;
 
   background:
-    linear-gradient(
-      180deg,
-      #f5e6c8 0%,
-      #eedcc0 10%,
-      #e8d4b5 30%,
-      #f0dec4 60%,
-      #e8d4b5 80%,
-      #dcc8a8 100%
-    );
+    radial-gradient(ellipse at 50% 0%, rgba(255, 240, 194, 0.7), transparent 36%),
+    radial-gradient(ellipse at 15% 70%, rgba(117, 72, 27, 0.15), transparent 35%),
+    linear-gradient(90deg, #d2b07a 0%, #f5e6c8 8%, #ead3a6 50%, #f5e6c8 92%, #c99d61 100%);
 
   color: #3d2b1f;
 
   box-shadow:
-    inset 0 0 60px rgba(139, 115, 85, 0.15),
+    inset 0 0 60px rgba(93, 59, 28, 0.25),
+    inset 0 0 0 8px rgba(96, 59, 25, 0.06),
     0 10px 40px rgba(0, 0, 0, 0.5);
 
   animation:
@@ -1418,9 +1400,9 @@ export const ScrollContainer = styled.div`
 
     position: absolute;
 
-    inset: 10px;
+    inset: 16px 12px;
 
-    border: 1px solid rgba(139, 115, 85, 0.15);
+    border: 1px solid rgba(102, 66, 31, 0.28);
 
     pointer-events: none;
   }
@@ -1448,7 +1430,7 @@ export const ScrollContainer = styled.div`
   }
 
   @media (max-width: 600px) {
-    padding: 28px 22px 32px;
+    padding: 42px 22px 47px;
   }
 `;
 
@@ -1459,7 +1441,7 @@ export const ScrollHeader = styled.div`
 
   text-align: center;
 
-  padding-bottom: 16px;
+  padding: 0 12px 16px;
 
   margin-bottom: 18px;
 
@@ -1494,7 +1476,9 @@ export const ScrollTitle = styled.h2`
 
   font-size: clamp(1.5rem, 4vw, 2rem);
 
-  letter-spacing: 1px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-shadow: 0 1px 0 rgba(255, 240, 200, 0.7);
 `;
 
 export const ScrollSubtitle = styled.p`
@@ -1529,7 +1513,7 @@ export const ModalDomain = styled.div`
 export const DomainTag = styled.span<{ color: string }>`
   padding: 4px 14px;
 
-  border-radius: 20px;
+  border-radius: 2px;
 
   border: 1px solid ${({ color }) => `${color}55`};
 
@@ -1551,11 +1535,11 @@ export const ScrollDescription = styled.p`
 
   padding: 12px 16px;
 
-  border-radius: 8px;
+  border-radius: 2px;
 
   border-left: 3px solid #8b7355;
 
-  background: rgba(255, 255, 255, 0.14);
+  background: rgba(255, 249, 224, 0.22);
 
   color: #3d2b1f;
 
@@ -1589,7 +1573,7 @@ interface AbilityItemProps {
 export const AbilityItem = styled.div<AbilityItemProps>`
   padding: 12px 16px;
 
-  border-radius: 8px;
+  border-radius: 2px;
 
   background:
     ${({ type }) => {
@@ -1665,9 +1649,7 @@ export const AbilityDescription = styled.p`
   line-height: 1.5;
 `;
 
-// ============================================================
-// MATCHUPS MODAL
-// ============================================================
+
 
 interface MatchupColumnProps {
   type: 'strong' | 'weak';
@@ -1682,9 +1664,9 @@ export const MatchupContainer = styled.div`
 
   padding: 12px;
 
-  border-radius: 8px;
+  border-radius: 2px;
 
-  background: rgba(139, 115, 85, 0.06);
+  background: rgba(104, 68, 33, 0.09);
 
   @media (max-width: 480px) {
     grid-template-columns: 1fr;
@@ -1735,9 +1717,7 @@ export const MatchupItem = styled.span`
   }
 `;
 
-// ============================================================
-// RODAPÉ MODAL
-// ============================================================
+
 
 export const ScrollFooter = styled.div`
   position: relative;
@@ -1759,14 +1739,14 @@ export const ScrollFooter = styled.div`
 `;
 
 interface ModalButtonProps {
-  primary?: boolean;
+  $primary?: boolean;
   color?: string;
 }
 
 export const ModalButton = styled.button<ModalButtonProps>`
   padding: 10px 24px;
 
-  border-radius: 8px;
+  border-radius: 2px;
 
   cursor: pointer;
 
@@ -1777,22 +1757,22 @@ export const ModalButton = styled.button<ModalButtonProps>`
   font-weight: 700;
 
   border:
-    ${({ primary, color }) =>
-      primary
+    ${({ $primary, color }) =>
+      $primary
         ? `2px solid ${color || '#8b7355'}`
         : '1px solid rgba(139, 115, 85, 0.4)'};
 
   background:
-    ${({ primary, color }) =>
-      primary
-        ? `linear-gradient(135deg, ${color || '#d4c4a0'}, ${color || '#b8a080'}cc)`
-        : 'transparent'};
+    ${({ $primary, color }) =>
+      $primary
+        ? `linear-gradient(180deg, ${color || '#9f7237'}, #422b15)`
+        : 'linear-gradient(180deg, rgba(255, 245, 213, 0.55), rgba(190, 150, 91, 0.38))'};
 
   color:
-    ${({ primary }) =>
-      primary
-        ? '#ffffff'
-        : '#6b5a4a'};
+    ${({ $primary }) =>
+      $primary
+        ? '#fff8df'
+        : '#4a3019'};
 
   transition: all 0.2s ease;
 
@@ -1801,9 +1781,7 @@ export const ModalButton = styled.button<ModalButtonProps>`
   }
 `;
 
-// ============================================================
-// BARRA DE AÇÕES STICKY
-// ============================================================
+
 
 export const Actions = styled.div`
   position: fixed;
@@ -1826,15 +1804,16 @@ export const Actions = styled.div`
 
   z-index: 100;
 
-  border-radius: 14px;
+  border-radius: 3px;
 
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(224, 181, 95, 0.5);
 
   background:
-    rgba(12, 10, 20, 0.88);
+    linear-gradient(135deg, rgba(38, 39, 42, 0.96), rgba(14, 16, 21, 0.98));
 
   box-shadow:
-    0 15px 45px rgba(0, 0, 0, 0.55);
+    0 15px 45px rgba(0, 0, 0, 0.65),
+    inset 0 0 0 3px rgba(255, 227, 159, 0.05);
 
   backdrop-filter: blur(16px);
 
@@ -1850,13 +1829,13 @@ export const BackButton = styled.button`
 
   padding: 12px 20px;
 
-  border-radius: 9px;
+  border-radius: 2px;
 
-  border: 1px solid rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(216, 176, 98, 0.65);
 
-  background: rgba(255, 255, 255, 0.025);
+  background: linear-gradient(180deg, rgba(64, 53, 39, 0.95), rgba(25, 25, 28, 0.95));
 
-  color: #c8c8d4;
+  color: #dfc995;
 
   cursor: pointer;
 
@@ -1898,7 +1877,7 @@ export const SelectedDeityLabel = styled.span`
   font-family: 'Cinzel', serif;
 
   text-transform: uppercase;
-
+      border: 1px solid rgba(75, 47, 22, 0.28);
   letter-spacing: 0.8px;
 `;
 
@@ -1917,23 +1896,23 @@ export const SelectedDeityName = styled.span<{ color?: string }>`
 export const ConfirmButton = styled.button<{ disabled: boolean }>`
   min-width: 220px;
 
-  padding: 12px 22px;
+      ${({ $active, $color }) => ($active ? $color : 'rgba(75, 47, 22, 0.3)')};
 
-  border: none;
-
-  border-radius: 9px;
+  border: 1px solid ${({ disabled }) => (disabled ? '#4b4b50' : '#f2cf7d')};
+      $active ? 'rgba(75, 47, 22, 0.65)' : 'rgba(255, 238, 190, 0.2)'};
+  border-radius: 2px;
 
   background:
     ${({ disabled }) =>
       disabled
         ? '#2c2c34'
-        : 'linear-gradient(135deg, #ffd700, #d9ae00)'};
+        : 'linear-gradient(180deg, #b68435, #72501d)'};
 
   color:
     ${({ disabled }) =>
       disabled
         ? '#707078'
-        : '#0a0810'};
+        : '#fff1c4'};
 
   cursor:
     ${({ disabled }) =>
@@ -1963,12 +1942,12 @@ export const ConfirmButton = styled.button<{ disabled: boolean }>`
 
   transition: all 0.2s ease;
 
-  &:hover:not(:disabled) {
-    transform: translateY(-2px);
-
-    box-shadow:
-      0 12px 28px rgba(255, 215, 0, 0.28);
-  }
+    background:
+      linear-gradient(
+        180deg,
+        rgba(75, 47, 22, 0.45),
+        rgba(255, 238, 190, 0.2)
+      );
 
   @media (max-width: 500px) {
     width: 100%;
@@ -1982,7 +1961,7 @@ export const ConfirmButton = styled.button<{ disabled: boolean }>`
 export const LoadingText = styled.div`
   min-height: 100vh;
 
-  display: flex;
+    border-left: 3px solid rgba(75, 47, 22, 0.45);
 
   align-items: center;
   justify-content: center;

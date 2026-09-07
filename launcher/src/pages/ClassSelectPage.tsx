@@ -2,6 +2,7 @@ import { useState, useCallback, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { ClassData } from '../types/classSelect.types';
+import { resetGold } from '../utils/goldUtils';
 
 import {
   Container,
@@ -186,6 +187,7 @@ export const ClassSelectPage = () => {
   const handleConfirm = useCallback(() => {
     if (!selectedClass) return;
 
+    resetGold();
     setLoading(true);
     toast.loading(`Selecionando ${selectedClass.name}...`);
 

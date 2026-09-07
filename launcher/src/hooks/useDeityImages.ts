@@ -11,11 +11,6 @@ interface DeityImages {
 }
 
 const DEITY_IMAGES: Record<string, DeityImages> = {
-  // ============================================================
-  // EXEMPLOS
-  // Substitua os caminhos conforme suas imagens reais
-  // ============================================================
-
   palor: {
     portrait: '/assets/images/deities/palor.png',
     background: '/assets/images/deities/palor_background.png',
@@ -26,9 +21,6 @@ const DEITY_IMAGES: Record<string, DeityImages> = {
     background: '/assets/images/deities/pelor_background.png',
   },
 
-  // ============================================================
-  // FALLBACK
-  // ============================================================
 
   default: {
     portrait: '/assets/images/deities/default.png',
@@ -46,7 +38,6 @@ export function useDeityImages({
       return DEITY_IMAGES[deityId];
     }
 
-    // Fallback usando o nome
     if (deityName) {
       const normalizedName = deityName
         .toLowerCase()

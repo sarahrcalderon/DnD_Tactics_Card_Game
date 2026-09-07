@@ -58,32 +58,6 @@ export const Container = styled.div`
   background: #0a0810;
 `;
 
-// ============================================================
-// BACKGROUND IMAGE
-// ============================================================
-
-export const BackgroundImage = styled.div`
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  background-image: url('/assets/images/maps/mapa_blackmoor.png');
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: contain;
-  background-color: #0a0810;
-  pointer-events: none;
-
-  &::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(rgba(10, 8, 16, 0.7), rgba(10, 8, 16, 0.9));
-  }
-`;
-
-// ============================================================
-// LOADING
-// ============================================================
 
 export const LoadingContainer = styled.div`
   position: relative;
@@ -181,24 +155,7 @@ export const MapContainer = styled.div`
   overflow: hidden;
 `;
 
-export const MapBackground = styled.div`
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  background-image: url('/assets/images/maps/mapa_blackmoor.png');
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: contain;
-  background-color: #0a0810;
-  pointer-events: none;
-
-  &::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.18);
-  }
-`;
+// REMOVIDO: export const MapBackground = styled.div` ... `;
 
 export const MapContent = styled.div`
   position: relative;
@@ -291,36 +248,40 @@ export const MenuButton = styled.button<{ $active?: boolean }>`
 export const Battlefield = styled.main`
   position: relative;
   z-index: 1;
-
   flex: 1;
-
   min-height: 0;
-
   display: flex;
   flex-direction: row;
-
   align-items: stretch;
-  justify-content: flex-start;
-
+  justify-content: center;
   margin: 0;
   padding: 0;
   gap: 0;
-
   overflow: hidden;
 `;
+
+
 
 export const RouteContainer = styled.div`
   position: relative;
-  width: min(100%, 1400px);
-  aspect-ratio: 1586 / 992;   
-  max-height: calc(100dvh - 180px);
+  flex: 1;
   min-height: 320px;
   overflow: hidden;
-`;
+  background-image: url('/assets/images/maps/mapa_blackmoor.png');
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;           
+  background-color: #0a0810;
 
-// ============================================================
-// SVG
-// ============================================================
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.18);
+    pointer-events: none;
+    z-index: 0;
+  }
+`;
 
 export const RouteSVG = styled.svg`
   position: absolute;
@@ -329,6 +290,7 @@ export const RouteSVG = styled.svg`
   height: 100%;
   pointer-events: none;
   overflow: visible;
+  z-index: 1;
 `;
 
 export const RouteLine = styled.path`
@@ -351,7 +313,7 @@ export const RouteLineCompleted = styled.path`
 `;
 
 // ============================================================
-// MARCADORES - CORRIGIDO
+// MARCADORES
 // ============================================================
 
 export const RouteMarker = styled.div<{
@@ -547,33 +509,22 @@ export const CampaignStatusText = styled.span`
 `;
 
 // ============================================================
-// MENU LATERAL 
+// MENU LATERAL ESQUERDO
 // ============================================================
 
 export const SideMenuContainer = styled.nav`
   position: relative;
   z-index: 5;
-
   width: 220px;
   min-width: 220px;
-
   height: 100vh;
   height: 100dvh;
-
   display: flex;
   flex-direction: column;
-
   flex-shrink: 0;
-
   margin: 0;
   padding: 14px 10px;
-
   box-sizing: border-box;
-
-  /*
-   * Fundo de pergaminho antigo,
-   * combinando com o mapa.
-   */
   background:
     linear-gradient(
       90deg,
@@ -581,28 +532,19 @@ export const SideMenuContainer = styled.nav`
       rgba(153, 116, 70, 0.94),
       rgba(187, 151, 96, 0.92)
     );
-
   border: none;
-
   border-right: 2px solid rgba(75, 47, 22, 0.55);
-
   border-radius: 0;
-
   box-shadow:
     inset -3px 0 10px rgba(48, 29, 13, 0.3),
     inset 0 0 30px rgba(255, 225, 160, 0.08);
-
   overflow-y: auto;
 
   &::before {
     content: '';
-
     position: absolute;
-
     inset: 0;
-
     pointer-events: none;
-
     background:
       radial-gradient(
         circle at 20% 15%,
@@ -629,44 +571,30 @@ export const SideMenuContainer = styled.nav`
   @media (max-width: 640px) {
     width: 70px;
     min-width: 70px;
-
     padding: 10px 6px;
   }
 `;
 
 export const SideMenuItem = styled.button<{ disabled?: boolean }>`
   width: 100%;
-
   min-height: 52px;
-
   display: flex;
   align-items: center;
-
   gap: 12px;
-
   padding: 10px 12px;
-
   box-sizing: border-box;
-
   border: 1px solid rgba(75, 48, 24, 0.28);
-
   border-radius: 4px;
-
   background:
     linear-gradient(
       90deg,
       rgba(255, 235, 190, 0.14),
       rgba(98, 62, 31, 0.08)
     );
-
   color: #3d2715;
-
   cursor: pointer;
-
   text-align: left;
-
   font-family: 'Cinzel', serif;
-
   transition:
     background 0.2s ease,
     transform 0.2s ease,
@@ -680,13 +608,10 @@ export const SideMenuItem = styled.button<{ disabled?: boolean }>`
         rgba(255, 225, 150, 0.48),
         rgba(181, 126, 55, 0.28)
       );
-
     border-color: rgba(99, 61, 24, 0.65);
-
     box-shadow:
       inset 4px 0 0 rgba(121, 75, 30, 0.85),
       0 3px 8px rgba(55, 33, 14, 0.2);
-
     transform: translateX(3px);
   }
 
@@ -696,17 +621,13 @@ export const SideMenuItem = styled.button<{ disabled?: boolean }>`
 
   &:disabled {
     cursor: not-allowed;
-
     opacity: 0.48;
-
     filter: grayscale(0.35);
   }
 
   @media (max-width: 640px) {
     justify-content: center;
-
     padding: 10px 4px;
-
     gap: 0;
   }
 `;
@@ -714,15 +635,11 @@ export const SideMenuItem = styled.button<{ disabled?: boolean }>`
 export const SideMenuIcon = styled.span`
   width: 30px;
   min-width: 30px;
-
   display: flex;
   align-items: center;
   justify-content: center;
-
   font-size: 1.35rem;
-
   line-height: 1;
-
   filter:
     drop-shadow(0 1px 1px rgba(255, 255, 255, 0.35))
     drop-shadow(0 2px 2px rgba(55, 30, 10, 0.3));
@@ -730,26 +647,18 @@ export const SideMenuIcon = styled.span`
   @media (max-width: 640px) {
     width: auto;
     min-width: auto;
-
     font-size: 1.3rem;
   }
 `;
 
 export const SideMenuLabel = styled.span`
   flex: 1;
-
   color: #3b2412;
-
   font-size: 0.78rem;
-
   font-weight: 700;
-
   letter-spacing: 0.8px;
-
   text-transform: uppercase;
-
-  text-shadow:
-    0 1px 0 rgba(255, 240, 200, 0.4);
+  text-shadow: 0 1px 0 rgba(255, 240, 200, 0.4);
 
   @media (max-width: 900px) {
     font-size: 0.68rem;
@@ -762,11 +671,8 @@ export const SideMenuLabel = styled.span`
 
 export const SideMenuDivider = styled.div`
   width: calc(100% - 16px);
-
   height: 1px;
-
   margin: 8px auto;
-
   background:
     linear-gradient(
       90deg,

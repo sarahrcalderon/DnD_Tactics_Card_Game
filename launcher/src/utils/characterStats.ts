@@ -1,10 +1,16 @@
 import { Attributes, DerivedStats } from '../types/character.types';
+import { CLASS_BASE_ATTRIBUTES } from '../data/classes';
 
 const getModifier = (value: number): number => {
   return Math.floor((value - 10) / 2);
 };
 
-export const calculateDerivedStats = (attributes: Attributes): DerivedStats => {
+const MAGIC_CLASSES = new Set(['mago', 'bruxo', 'clerigo']);
+
+export const calculateDerivedStats = (
+  attributes: Attributes,
+  classId = 'paladino',
+): DerivedStats => {
   const strMod = getModifier(attributes.str);
   const dexMod = getModifier(attributes.dex);
   const conMod = getModifier(attributes.con);
@@ -20,8 +26,13 @@ export const calculateDerivedStats = (attributes: Attributes): DerivedStats => {
   const baseActionPoints = 3 + Math.floor(chaMod / 2);
   const baseCriticalSeverity = 150 + (strMod * 5);
   const baseInitiative = dexMod;
-  const baseMaxHP = 10 + (conMod * 5) + (attributes.con > 14 ? 5 : 0);
+  const classBaseAttributes =
+    CLASS_BASE_ATTRIBUTES[classId] || CLASS_BASE_ATTRIBUTES.paladino;
+  const baseMaxHP = MAGIC_CLASSES.has(classId) ? 15 : 20;
+  const maxHP =
+    baseMaxHP + Math.max(0, attributes.con - classBaseAttributes.con) * 2;
   const baseSpeed = 9 + Math.floor(dexMod / 2);
+  const baseMaxMana = MAGIC_CLASSES.has(classId) ? 15 : 5;
 
   return {
     defense: baseDefense,
@@ -32,8 +43,11 @@ export const calculateDerivedStats = (attributes: Attributes): DerivedStats => {
     actionPoints: baseActionPoints,
     criticalSeverity: baseCriticalSeverity,
     initiative: baseInitiative,
-    maxHP: baseMaxHP,
+    maxHP,
     speed: baseSpeed,
+    maxMana: baseMaxMana + Math.max(0, intMod) * 2,
+    manaRegen: Math.max(0, 1 + Math.floor(wisMod / 2)),
+    manaPower: Math.max(1, 5 + chaMod),
   };
 };
 

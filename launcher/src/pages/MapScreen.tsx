@@ -7,7 +7,6 @@ import EnemyMenu from '../components/EnemyMenu';
 import {
   Container,
   MapContainer,
-  MapBackground,
   MapContent,
   TopMenu,
   MenuLeft,
@@ -32,6 +31,7 @@ import {
 
 import { LoadingScreen } from './LoadingScreen';
 import { RouteCoordinate, CampaignPoint } from '../types/mapScreen.types';
+import { awardBattleGold } from '../utils/goldUtils';
 
 const CAMPAIGN_STORAGE_KEY = 'blackmoorCampaignProgress';
 
@@ -486,6 +486,16 @@ export const MapScreen = () => {
 
     const currentPoint = CAMPAIGN_POINTS[currentStep];
 
+    if (completedSteps.includes(currentPoint.id)) {
+      toast('Este local já foi conquistado.');
+      return;
+    }
+
+    const reward = awardBattleGold();
+    toast.success(
+      `💰 +${100 + reward.bonus} ouro${reward.bonus ? ' (bônus!)' : ''}`,
+    );
+
     // ========================================================
     // CASTELO
     // ========================================================
@@ -661,8 +671,6 @@ export const MapScreen = () => {
         {/* ================================================ */}
         {/* MAPA */}
         {/* ================================================ */}
-
-        <MapBackground />
 
         <MapContent>
           {/* ============================================== */}

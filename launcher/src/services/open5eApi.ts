@@ -57,7 +57,6 @@ class Open5eApiService {
   }
 
   async getItemImage(itemName: string): Promise<string | null> {
-    // Verificar cache
     if (this.cache.has(itemName)) {
       return this.cache.get(itemName) || null;
     }
@@ -66,7 +65,6 @@ class Open5eApiService {
       // Buscar itens na API
       const items = await this.searchItems(itemName);
       
-      // Encontrar o item mais relevante
       const item = items.find(
         (i) => i.name.toLowerCase().includes(itemName.toLowerCase())
       );
@@ -77,7 +75,6 @@ class Open5eApiService {
         return imageUrl;
       }
 
-      // Fallback: buscar imagem genérica baseada no tipo
       const genericImage = this.getGenericImage(itemName);
       this.cache.set(itemName, genericImage);
       return genericImage;
@@ -108,7 +105,6 @@ class Open5eApiService {
   private getGenericImage(itemName: string): string {
     const lowerName = itemName.toLowerCase();
     
-    // Mapeamento de palavras-chave para imagens genéricas
     if (lowerName.includes('sword') || lowerName.includes('espada') || lowerName.includes('blade')) {
       return '/assets/images/icons/sword.svg';
     }
@@ -137,7 +133,6 @@ class Open5eApiService {
       return '/assets/images/icons/star.svg';
     }
     
-    // Ícone padrão
     return '/assets/images/icons/star.svg';
   }
 }

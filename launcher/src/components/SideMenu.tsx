@@ -1,5 +1,3 @@
-// src/components/SideMenu.tsx
-
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
@@ -12,17 +10,13 @@ import {
   SideMenuDivider,
 } from '../styles/mapStyles';
 
-// ============================================================
-// MAPEAMENTO DE ÍCONES PARA SVGs
-// ============================================================
-
 const ICON_PATHS: Record<string, string> = {
   deck: '/assets/images/icons/deck.svg',
   bag: '/assets/images/icons/bag.svg',
   equipment: '/assets/images/icons/equipamentos.svg',
   character: '/assets/images/icons/ficha.svg',
   bestiary: '/assets/images/icons/monstruario.svg',
-  ranking: '/assets/images/icons/mapa.svg', // fallback (não há ícone específico)
+  ranking: '/assets/images/icons/ranking.svg',
   maps: '/assets/images/icons/mapa.svg',
 };
 
@@ -48,9 +42,7 @@ const SideMenu: React.FC = () => {
           });
           return;
         }
-      } catch {
-        // ignore
-      }
+      } catch {}
     }
     toast('Nenhum deck encontrado');
     navigate('/deck-select');
@@ -68,17 +60,11 @@ const SideMenu: React.FC = () => {
     navigate('/character-sheet');
   };
 
-  const handleBestiary = () => {
-    toast('📖 Bestiário em desenvolvimento', { duration: 2000 });
-  };
+  const handleBestiary = () => {};
 
-  const handleRanking = () => {
-    toast('🏆 Ranking em desenvolvimento', { duration: 2000 });
-  };
+  const handleRanking = () => {};
 
-  const handleMaps = () => {
-    toast('🗺️ Mapas em desenvolvimento', { duration: 2000 });
-  };
+  const handleMaps = () => {};
 
   return (
     <SideMenuContainer>

@@ -1,4 +1,3 @@
-// launcher/src/components/character/CharacterAttributes.tsx
 import React from 'react';
 import {
   AttributesSection,
