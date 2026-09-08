@@ -48,13 +48,22 @@ import {
   BottomActionButton,
   TutorialModal,
   TutorialContent,
+  TutorialHeader,
   TutorialTitle,
   TutorialSubtitle,
+  TutorialLayout,
+  TutorialSidebar,
+  TutorialNavItem,
+  TutorialBody,
+  TutorialSectionTitle,
   TutorialGrid,
   TutorialItem,
+  TutorialItemIcon,
+  TutorialItemContent,
   TutorialItemTitle,
   TutorialItemDesc,
   TutorialItemFormula,
+  TutorialFooter,
   TutorialCloseButton,
 } from '../styles/attributeDistStyles';
 
@@ -516,7 +525,7 @@ export const AttributeDistPage = () => {
                       Defesa
                     </StatLabel>
                     <StatValue>{derivedStats.defense}</StatValue>
-                    <StatModifier>Base 10 + DEX</StatModifier>
+                    <StatModifier></StatModifier>
                   </StatItem>
                   <StatItem>
                     <StatLabel>
@@ -534,7 +543,7 @@ export const AttributeDistPage = () => {
                       Awareness
                     </StatLabel>
                     <StatValue>{derivedStats.awareness}</StatValue>
-                    <StatModifier>Base 10 + WIS</StatModifier>
+                    <StatModifier></StatModifier>
                   </StatItem>
                   <StatItem>
                     <StatLabel>
@@ -552,7 +561,7 @@ export const AttributeDistPage = () => {
                       Crítico
                     </StatLabel>
                     <StatValue>{derivedStats.critical}%</StatValue>
-                    <StatModifier>5 + DEX / 2</StatModifier>
+                    <StatModifier></StatModifier>
                   </StatItem>
                   <StatItem>
                     <StatLabel>
@@ -570,7 +579,7 @@ export const AttributeDistPage = () => {
                       Avoidance
                     </StatLabel>
                     <StatValue>{derivedStats.avoidance}%</StatValue>
-                    <StatModifier>5 + DEX</StatModifier>
+                    <StatModifier></StatModifier>
                   </StatItem>
                   <StatItem>
                     <StatLabel>
@@ -588,7 +597,7 @@ export const AttributeDistPage = () => {
                       Deflect
                     </StatLabel>
                     <StatValue>{derivedStats.deflect}%</StatValue>
-                    <StatModifier>5 + STR</StatModifier>
+                    <StatModifier></StatModifier>
                   </StatItem>
                   <StatItem>
                     <StatLabel>
@@ -606,7 +615,7 @@ export const AttributeDistPage = () => {
                       Action Points
                     </StatLabel>
                     <StatValue>{derivedStats.actionPoints}</StatValue>
-                    <StatModifier>3 + CHA / 2</StatModifier>
+                    <StatModifier></StatModifier>
                   </StatItem>
                   <StatItem>
                     <StatLabel>
@@ -624,7 +633,7 @@ export const AttributeDistPage = () => {
                       Severidade Crítica
                     </StatLabel>
                     <StatValue>{derivedStats.criticalSeverity}%</StatValue>
-                    <StatModifier>150% + STR × 5</StatModifier>
+                    <StatModifier></StatModifier>
                   </StatItem>
                   <StatItem>
                     <StatLabel>
@@ -642,7 +651,7 @@ export const AttributeDistPage = () => {
                       Iniciativa
                     </StatLabel>
                     <StatValue>{derivedStats.initiative}</StatValue>
-                    <StatModifier>DEX</StatModifier>
+                    <StatModifier></StatModifier>
                   </StatItem>
                   <StatItem>
                     <StatLabel>
@@ -660,7 +669,7 @@ export const AttributeDistPage = () => {
                       HP Máximo
                     </StatLabel>
                     <StatValue>{derivedStats.maxHP}</StatValue>
-                    <StatModifier>10 + CON × 5</StatModifier>
+                    <StatModifier></StatModifier>
                   </StatItem>
                   <StatItem>
                     <StatLabel>
@@ -678,7 +687,7 @@ export const AttributeDistPage = () => {
                       Velocidade
                     </StatLabel>
                     <StatValue>{derivedStats.speed}m</StatValue>
-                    <StatModifier>9 + DEX / 2</StatModifier>
+                    <StatModifier></StatModifier>
                   </StatItem>
                 </>
               )}
@@ -813,23 +822,67 @@ export const AttributeDistPage = () => {
 
       {showTutorial && (
         <TutorialModal onClick={handleCloseTutorial}>
-          <TutorialContent onClick={handleTutorialContentClick}>
-            <TutorialTitle>Guia de Atributos</TutorialTitle>
-            <TutorialSubtitle>
-              Entenda como cada atributo afeta seu personagem
-            </TutorialSubtitle>
-            <TutorialGrid>
-              {TUTORIAL_DATA.map((item) => (
-                <TutorialItem key={item.title}>
-                  <TutorialItemTitle>{item.title}</TutorialItemTitle>
-                  <TutorialItemDesc>{item.description}</TutorialItemDesc>
-                  <TutorialItemFormula>{item.formula}</TutorialItemFormula>
-                </TutorialItem>
-              ))}
-            </TutorialGrid>
-            <TutorialCloseButton type="button" onClick={handleCloseTutorial}>
-              Entendi!
-            </TutorialCloseButton>
+          <TutorialContent
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="tutorial-title"
+            onClick={handleTutorialContentClick}
+          >
+            <TutorialHeader>
+              <TutorialTitle id="tutorial-title">
+                Guia do Aventureiro
+              </TutorialTitle>
+              <TutorialSubtitle>
+                Consulte os atributos antes de distribuir seus pontos.
+              </TutorialSubtitle>
+            </TutorialHeader>
+            <TutorialLayout>
+              <TutorialSidebar aria-label="Seções do tutorial">
+                <TutorialNavItem type="button" $active>
+                  <span>⚔</span>
+                  Atributos
+                  <small>6 guias</small>
+                </TutorialNavItem>
+                <TutorialNavItem type="button" disabled>
+                  <span>✦</span>
+                  Combate
+                  <small>Em breve</small>
+                </TutorialNavItem>
+                <TutorialNavItem type="button" disabled>
+                  <span>▣</span>
+                  Equipamento
+                  <small>Em breve</small>
+                </TutorialNavItem>
+              </TutorialSidebar>
+              <TutorialBody>
+                <TutorialSectionTitle>Atributos primários</TutorialSectionTitle>
+                <TutorialGrid>
+                  {TUTORIAL_DATA.map((item, index) => (
+                    <TutorialItem key={item.title}>
+                      <TutorialItemIcon>
+                        {['⚔', '✦', '♥', '✧', '◉', '♛'][index]}
+                      </TutorialItemIcon>
+                      <TutorialItemContent>
+                        <TutorialItemTitle>{item.title}</TutorialItemTitle>
+                        <TutorialItemDesc>{item.description}</TutorialItemDesc>
+                        <TutorialItemFormula>
+                          {item.formula}
+                        </TutorialItemFormula>
+                      </TutorialItemContent>
+                    </TutorialItem>
+                  ))}
+                </TutorialGrid>
+              </TutorialBody>
+            </TutorialLayout>
+            <TutorialFooter>
+              <span>
+                Dica: passe o cursor sobre os atributos para revisar seus
+                modificadores.
+              </span>
+              <TutorialCloseButton type="button" onClick={handleCloseTutorial}>
+                Entendi
+              </TutorialCloseButton>
+            </TutorialFooter>
           </TutorialContent>
         </TutorialModal>
       )}

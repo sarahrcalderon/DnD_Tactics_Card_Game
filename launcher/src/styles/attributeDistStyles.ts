@@ -1456,23 +1456,24 @@ export const TutorialModal = styled.div`
 export const TutorialContent = styled.div`
   width: 100%;
 
-  max-width: 800px;
+  max-width: 940px;
 
-  max-height: 85vh;
+  height: min(720px, 88vh);
 
-  overflow-y: auto;
+  overflow: hidden;
 
-  padding: 32px;
+  display: flex;
+  flex-direction: column;
 
-  border-radius: 20px;
+  border-radius: 4px;
 
   position: relative;
 
   background:
     linear-gradient(
       145deg,
-      #211a38 0%,
-      #0d0a16 100%
+      #1a1c24 0%,
+      #090b11 100%
     );
 
   border:
@@ -1520,22 +1521,30 @@ export const TutorialContent = styled.div`
   }
 
   @media (max-width: 600px) {
-    max-height: 90vh;
+    height: 90vh;
 
-    padding: 22px 16px;
-
-    border-radius: 16px;
+    border-radius: 3px;
   }
 `;
 
+export const TutorialHeader = styled.header`
+  padding: 22px 28px 18px;
+
+  text-align: center;
+
+  background: linear-gradient(180deg, rgba(78, 58, 28, 0.46), rgba(16, 18, 25, 0.15));
+
+  border-bottom: 1px solid rgba(198, 151, 68, 0.35);
+`;
+
 export const TutorialTitle = styled.h2`
-  margin: 0 0 8px;
+  margin: 0 0 6px;
 
   color: #ffd700;
 
   font-family: 'Cinzel', serif;
 
-  font-size: clamp(1.4rem, 4vw, 1.8rem);
+  font-size: clamp(1.25rem, 4vw, 1.7rem);
 
   text-align: center;
 
@@ -1544,7 +1553,7 @@ export const TutorialTitle = styled.h2`
 `;
 
 export const TutorialSubtitle = styled.p`
-  margin: 0 0 24px;
+  margin: 0;
 
   color: #aaa5b7;
 
@@ -1555,23 +1564,87 @@ export const TutorialSubtitle = styled.p`
   line-height: 1.5;
 `;
 
-export const TutorialGrid = styled.div`
+export const TutorialLayout = styled.div`
   display: grid;
+  grid-template-columns: 190px minmax(0, 1fr);
+  flex: 1;
+  min-height: 0;
 
-  grid-template-columns:
-    repeat(2, minmax(0, 1fr));
-
-  gap: 16px;
-
-  @media (max-width: 600px) {
+  @media (max-width: 620px) {
     grid-template-columns: 1fr;
   }
 `;
 
-export const TutorialItem = styled.div`
-  padding: 16px;
+export const TutorialSidebar = styled.nav`
+  padding: 14px 10px;
+  background: rgba(0, 0, 0, 0.28);
+  border-right: 1px solid rgba(255, 255, 255, 0.07);
 
-  border-radius: 12px;
+  @media (max-width: 620px) {
+    display: flex;
+    gap: 7px;
+    overflow-x: auto;
+    border-right: 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  }
+`;
+
+export const TutorialNavItem = styled.button<{ $active?: boolean }>`
+  width: 100%;
+  display: grid;
+  grid-template-columns: 22px 1fr;
+  gap: 3px 8px;
+  align-items: center;
+  padding: 11px 10px;
+  color: ${({ $active }) => ($active ? '#f4d88f' : '#777987')};
+  font: 600 0.78rem 'Cinzel', serif;
+  text-align: left;
+  background: ${({ $active }) =>
+    $active ? 'linear-gradient(90deg, rgba(180, 132, 49, 0.3), rgba(180, 132, 49, 0.04))' : 'transparent'};
+  border: 1px solid ${({ $active }) => ($active ? 'rgba(216, 176, 98, 0.46)' : 'transparent')};
+  border-radius: 2px;
+  cursor: ${({ disabled }) => (disabled ? 'not-allowed' : 'pointer')};
+  opacity: ${({ disabled }) => (disabled ? 0.5 : 1)};
+
+  span { grid-row: span 2; color: ${({ $active }) => ($active ? '#ffd700' : '#8b8d9b')}; font-size: 1rem; }
+  small { grid-column: 2; color: #8b8d9b; font: 0.62rem system-ui, sans-serif; }
+
+  &:not(:disabled):hover { border-color: rgba(216, 176, 98, 0.55); background: rgba(180, 132, 49, 0.14); }
+
+  @media (max-width: 620px) { min-width: 145px; }
+`;
+
+export const TutorialBody = styled.section`
+  min-width: 0;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 22px 24px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 215, 0, 0.3) transparent;
+
+  @media (max-width: 620px) { padding: 18px 14px; }
+`;
+
+export const TutorialSectionTitle = styled.h3`
+  margin: 0 0 13px;
+  color: #e8c875;
+  font: 700 0.88rem 'Cinzel', serif;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+`;
+
+export const TutorialGrid = styled.div`
+  display: grid;
+  gap: 8px;
+`;
+
+export const TutorialItem = styled.div`
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px;
+
+  border-radius: 2px;
 
   background:
     linear-gradient(
@@ -1589,7 +1662,7 @@ export const TutorialItem = styled.div`
     background 0.2s ease;
 
   &:hover {
-    transform: translateY(-2px);
+    transform: translateX(3px);
 
     background:
       rgba(255, 215, 0, 0.045);
@@ -1597,6 +1670,24 @@ export const TutorialItem = styled.div`
     border-color:
       rgba(255, 215, 0, 0.18);
   }
+`;
+
+export const TutorialItemIcon = styled.div`
+  flex: 0 0 34px;
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  color: #f2cf7d;
+  font-size: 1.05rem;
+  background: rgba(151, 108, 37, 0.16);
+  border: 1px solid rgba(216, 176, 98, 0.35);
+  border-radius: 2px;
+`;
+
+export const TutorialItemContent = styled.div`
+  min-width: 0;
+  flex: 1;
 `;
 
 export const TutorialItemTitle = styled.h4`
@@ -1643,15 +1734,11 @@ export const TutorialItemFormula = styled.div`
 `;
 
 export const TutorialCloseButton = styled.button`
-  display: block;
-
-  margin: 24px auto 0;
-
-  padding: 12px 40px;
+  padding: 9px 26px;
 
   border: none;
 
-  border-radius: 10px;
+  border-radius: 2px;
 
   background:
     linear-gradient(
@@ -1685,6 +1772,25 @@ export const TutorialCloseButton = styled.button`
   &:active {
     transform:
       translateY(0) scale(0.98);
+  }
+`;
+
+export const TutorialFooter = styled.footer`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 13px 22px;
+  color: #9b9daa;
+  font-size: 0.72rem;
+  background: rgba(0, 0, 0, 0.3);
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+
+  @media (max-width: 620px) {
+    align-items: stretch;
+    flex-direction: column;
+    padding: 12px 14px;
+    text-align: center;
   }
 `;
 
