@@ -1,4 +1,4 @@
-# D&D Tactics Card Game
+# Dungeon Tactics Card Game
 
 > Um jogo tático de cartas ambientado em fantasia medieval, que combina a construção estratégica de decks de *Magic: The Gathering* com o posicionamento e a tomada de decisão de RPGs táticos como *Final Fantasy Tactics*.
 
