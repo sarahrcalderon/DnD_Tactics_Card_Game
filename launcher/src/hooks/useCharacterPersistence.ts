@@ -12,9 +12,12 @@ interface UseCharacterPersistenceParams {
   derivedStats: DerivedStats;
   className: string;
   classId: string;
+  raceId?: string;
   raceName?: string;
   raceImage?: string;
   raceIcon?: string;
+  deityId?: string;
+  deityName?: string;
   deckId: string;
   pointsRemaining: number;
   onLoadAttributes: (attributes: Attributes, pointsRemaining: number) => void;
@@ -25,9 +28,12 @@ export const useCharacterPersistence = ({
   derivedStats,
   className,
   classId,
+  raceId,
   raceName,
   raceImage,
   raceIcon,
+  deityId,
+  deityName,
   deckId,
   pointsRemaining,
   onLoadAttributes,
@@ -114,9 +120,12 @@ export const useCharacterPersistence = ({
       characterName: currentName,
       className,
       classId,
+      raceId: raceId || '',
       raceName: raceName || '',
       raceImage: raceImage || '',
       raceIcon: raceIcon || '',
+      deityId: deityId || '',
+      deityName: deityName || '',
       level: 1,
       attributes,
       derivedStats,
@@ -137,8 +146,11 @@ export const useCharacterPersistence = ({
     raceName,
     className,
     classId,
+    raceId,
     raceImage,
     raceIcon,
+    deityId,
+    deityName,
     attributes,
     derivedStats,
     deckId,
@@ -166,9 +178,12 @@ export const useCharacterPersistence = ({
         characterName: characterName || 'Herói',
         className,
         classId,
+        raceId: raceId || '',
         raceName: raceName || '',
         raceImage: raceImage || '',
         raceIcon: raceIcon || '',
+        deityId: deityId || '',
+        deityName: deityName || '',
         level: 1,
         attributes,
         derivedStats,
@@ -208,9 +223,12 @@ export const useCharacterPersistence = ({
       characterName,
       className,
       classId,
+      raceId,
       raceName,
       raceImage,
       raceIcon,
+      deityId,
+      deityName,
       attributes,
       derivedStats,
       deckId,

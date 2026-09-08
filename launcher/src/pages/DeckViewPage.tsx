@@ -116,6 +116,7 @@ export const DeckViewPage = () => {
   const className = routeState.className ?? '';
   const raceName = routeState.raceName ?? '';
   const raceImage = routeState.raceImage ?? '';
+  const isFromMap = routeState.fromMap === true;
 
   useEffect(() => {
     const deckId = routeState.deckId;
@@ -172,6 +173,11 @@ export const DeckViewPage = () => {
   }, []);
 
   const handleBack = useCallback(() => {
+    if (isFromMap) {
+      navigate('/map');
+      return;
+    }
+
     navigate('/deck-select', {
       state: {
         classId: className.toLowerCase(),
@@ -179,7 +185,7 @@ export const DeckViewPage = () => {
         raceImage,
       },
     });
-  }, [className, navigate, raceImage, raceName]);
+  }, [className, isFromMap, navigate, raceImage, raceName]);
 
   const handleConfirm = useCallback(() => {
     if (!deck) return;
@@ -227,7 +233,7 @@ export const DeckViewPage = () => {
 
           <Actions>
             <BackButton type="button" onClick={handleBack}>
-              Voltar
+              {isFromMap ? '← Voltar ao Mapa' : 'Voltar'}
             </BackButton>
           </Actions>
         </ContentWrapper>
@@ -354,7 +360,7 @@ export const DeckViewPage = () => {
 
         <Actions>
           <BackButton type="button" onClick={handleBack}>
-            Voltar
+            {isFromMap ? '← Voltar ao Mapa' : 'Voltar'}
           </BackButton>
 
           <ConfirmButton type="button" onClick={handleConfirm}>

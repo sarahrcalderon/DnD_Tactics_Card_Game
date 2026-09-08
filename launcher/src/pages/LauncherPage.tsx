@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import toast from 'react-hot-toast';
 import { saveService } from '../services/saveService';
+import { characterStorageService } from '../services/characterStorageService';
 import { SavedGame } from '../types/save.types';
 
 declare global {
@@ -387,6 +388,20 @@ interface LauncherOption {
   icon: string;
 }
 
+const restoreSavedCharacter = (save: SavedGame): SavedGame => {
+  const storedCharacter = characterStorageService.load();
+  if (storedCharacter?.saveId !== save.id) return save;
+
+  return {
+    ...save,
+    raceId: save.raceId || storedCharacter.raceId,
+    raceImage: save.raceImage || storedCharacter.raceImage,
+    raceIcon: save.raceIcon || storedCharacter.raceIcon,
+    deityId: save.deityId || storedCharacter.deityId,
+    deityName: save.deityName || storedCharacter.deityName,
+  };
+};
+
 export const LauncherPage = () => {
   const navigate = useNavigate();
   const [selectedIndex, setSelectedIndex] = useState<number>(0);
@@ -502,19 +517,25 @@ export const LauncherPage = () => {
 
   const handleLoadSave = useCallback(
     (save: SavedGame) => {
+      const restoredSave = restoreSavedCharacter(save);
       setShowLoadModal(false);
       toast.loading('Carregando jogo...', { duration: 800 });
       setTimeout(() => {
         navigate('/attribute-dist', {
           state: {
-            classId: save.className.toLowerCase(),
-            raceName: save.raceName || '',
-            characterName: save.characterName,
-            attributes: save.attributes,
-            derivedStats: save.derivedStats,
-            deckId: save.deckId,
-            deckName: save.deckName,
-            saveId: save.id,
+            classId: restoredSave.className.toLowerCase(),
+            raceId: restoredSave.raceId,
+            raceName: restoredSave.raceName || '',
+            raceImage: restoredSave.raceImage,
+            raceIcon: restoredSave.raceIcon,
+            deityId: restoredSave.deityId,
+            deityName: restoredSave.deityName,
+            characterName: restoredSave.characterName,
+            attributes: restoredSave.attributes,
+            derivedStats: restoredSave.derivedStats,
+            deckId: restoredSave.deckId,
+            deckName: restoredSave.deckName,
+            saveId: restoredSave.id,
             isSaved: true,
           },
         });
@@ -545,18 +566,24 @@ export const LauncherPage = () => {
         case 'continuar': {
           const latestSave = saveService.getLatestSave();
           if (latestSave) {
+            const restoredSave = restoreSavedCharacter(latestSave);
             toast.loading('Carregando jogo...', { duration: 1000 });
             setTimeout(() => {
               navigate('/attribute-dist', {
                 state: {
-                  classId: latestSave.className.toLowerCase(),
-                  raceName: latestSave.raceName || '',
-                  characterName: latestSave.characterName,
-                  attributes: latestSave.attributes,
-                  derivedStats: latestSave.derivedStats,
-                  deckId: latestSave.deckId,
-                  deckName: latestSave.deckName,
-                  saveId: latestSave.id,
+                  classId: restoredSave.className.toLowerCase(),
+                  raceId: restoredSave.raceId,
+                  raceName: restoredSave.raceName || '',
+                  raceImage: restoredSave.raceImage,
+                  raceIcon: restoredSave.raceIcon,
+                  deityId: restoredSave.deityId,
+                  deityName: restoredSave.deityName,
+                  characterName: restoredSave.characterName,
+                  attributes: restoredSave.attributes,
+                  derivedStats: restoredSave.derivedStats,
+                  deckId: restoredSave.deckId,
+                  deckName: restoredSave.deckName,
+                  saveId: restoredSave.id,
                   isSaved: true,
                 },
               });

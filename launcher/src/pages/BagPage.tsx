@@ -290,6 +290,7 @@ const MOCK_BAG_ITEMS: Omit<Equipment, 'image'>[] = [
 ];
 
 interface LocationState {
+  fromMap?: boolean;
   gold?: number;
   equipment?: Record<EquipmentSlot, Equipment | null>;
   inventory?: Equipment[];
@@ -345,6 +346,12 @@ export const BagPage = () => {
   }, [location]);
 
   const handleBack = useCallback((): void => {
+    const state = location.state as LocationState | null;
+    if (state?.fromMap) {
+      navigate('/map');
+      return;
+    }
+
     navigate('/equipment', {
       state: location.state,
     });
@@ -474,7 +481,11 @@ export const BagPage = () => {
         </BagGrid>
 
         <Actions>
-          <BackButton onClick={handleBack}>← Voltar</BackButton>
+          <BackButton onClick={handleBack}>
+            {(location.state as LocationState | null)?.fromMap
+              ? '← Voltar ao Mapa'
+              : '← Voltar'}
+          </BackButton>
         </Actions>
       </ContentWrapper>
     </Container>

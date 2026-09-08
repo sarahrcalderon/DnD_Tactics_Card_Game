@@ -38,6 +38,7 @@ const SideMenu: React.FC = () => {
               raceName: parsed.raceName || '',
               raceImage: parsed.raceImage || '',
               raceIcon: parsed.raceIcon || '',
+              fromMap: true,
             },
           });
           return;
@@ -53,11 +54,92 @@ const SideMenu: React.FC = () => {
   };
 
   const handleEquipment = () => {
-    navigate('/equipment');
+    const savedData = localStorage.getItem('characterData');
+    if (!savedData) {
+      toast.error('Nenhum personagem salvo encontrado');
+      return;
+    }
+
+    try {
+      const parsed = JSON.parse(savedData);
+      const classId = parsed.classId || parsed.className?.toLowerCase();
+      if (!classId || !parsed.attributes) {
+        toast.error('Dados do personagem est\u00e3o incompletos');
+        return;
+      }
+
+      navigate('/equipment', {
+        state: {
+          name: parsed.name || parsed.characterName || '',
+          characterName: parsed.name || parsed.characterName || '',
+          classId,
+          className: parsed.className || '',
+          raceId: parsed.raceId || '',
+          raceName: parsed.raceName || '',
+          raceImage: parsed.raceImage || '',
+          raceIcon: parsed.raceIcon || '',
+          deityId: parsed.deityId || '',
+          deityName: parsed.deityName || '',
+          level: parsed.level || 1,
+          attributes: parsed.attributes,
+          derivedStats: parsed.derivedStats,
+          equipment: parsed.equipment || {},
+          deckId: parsed.deckId || '',
+          deckName: parsed.deckName || '',
+          pointsRemaining: parsed.pointsRemaining ?? 0,
+          totalPoints: parsed.totalPoints ?? 5,
+          isSaved: parsed.isSaved || parsed.isFinalized || false,
+          isFinalized: parsed.isFinalized || false,
+          saveId: parsed.saveId || null,
+          progress: parsed.progress || 0,
+          location: parsed.location || 'Acampamento Inicial',
+          createdAt: parsed.createdAt,
+          fromMap: true,
+        },
+      });
+    } catch {
+      toast.error('N\u00e3o foi poss\u00edvel carregar o personagem');
+    }
   };
 
   const handleCharacterSheet = () => {
-    navigate('/character-sheet');
+    const savedData = localStorage.getItem('characterData');
+    if (!savedData) {
+      toast.error('Nenhum personagem salvo encontrado');
+      return;
+    }
+
+    try {
+      const parsed = JSON.parse(savedData);
+      const classId = parsed.classId || parsed.className?.toLowerCase();
+      if (!classId || !parsed.attributes) {
+        toast.error('Dados do personagem est\u00e3o incompletos');
+        return;
+      }
+
+      navigate('/attribute-dist', {
+        state: {
+          classId,
+          raceId: parsed.raceId || '',
+          raceName: parsed.raceName || '',
+          raceImage: parsed.raceImage || '',
+          raceIcon: parsed.raceIcon || '',
+          deityId: parsed.deityId || '',
+          deityName: parsed.deityName || '',
+          characterName: parsed.name || parsed.characterName || '',
+          attributes: parsed.attributes,
+          derivedStats: parsed.derivedStats,
+          deckId: parsed.deckId || '',
+          deckName: parsed.deckName || '',
+          saveId: parsed.saveId || '',
+          isSaved: parsed.isSaved || parsed.isFinalized || false,
+          pointsRemaining: parsed.pointsRemaining ?? 0,
+          fromMap: true,
+        },
+      });
+    } catch {
+      toast.error('N\u00e3o foi poss\u00edvel carregar o personagem');
+    }
   };
 
   const handleBestiary = () => {};

@@ -4,6 +4,7 @@ export interface RouteState {
   raceName?: string;
   raceImage?: string;
   raceIcon?: string;
+  fromMap?: boolean;
 }
 
 export interface Card {

@@ -120,6 +120,7 @@ const defaultDerivedStats: DerivedStats = {
 };
 
 type EquipmentRouteState = Partial<CharacterData> & {
+  fromMap?: boolean;
   inventory?: Equipment[];
 };
 
@@ -387,7 +388,11 @@ export const EquipmentPage = () => {
   };
 
   const handleBack = (): void => {
-    const state = location.state as Partial<CharacterData> | null;
+    const state = location.state as EquipmentRouteState | null;
+    if (state?.fromMap) {
+      navigate('/map');
+      return;
+    }
 
     navigate('/attribute-dist', {
       state: {
@@ -807,7 +812,11 @@ export const EquipmentPage = () => {
         )}
 
         <Actions>
-          <BackButton onClick={handleBack}>Voltar a Ficha</BackButton>
+          <BackButton onClick={handleBack}>
+            {(location.state as EquipmentRouteState | null)?.fromMap
+              ? '← Voltar ao Mapa'
+              : 'Voltar a Ficha'}
+          </BackButton>
         </Actions>
       </ContentWrapper>
     </Container>

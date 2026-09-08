@@ -159,9 +159,12 @@ export const AttributeDistPage = () => {
     derivedStats,
     className,
     classId: normalizedClassId,
+    raceId,
     raceName,
     raceImage,
     raceIcon,
+    deityId,
+    deityName,
     deckId: deckId || DEFAULT_DECK_ID,
     pointsRemaining,
     onLoadAttributes: loadAttributes,
@@ -175,10 +178,11 @@ export const AttributeDistPage = () => {
   const { deckCards } = useDeckGeneration(normalizedClassId, currentDeckId);
 
   const avatarImageSrc = useMemo(
-    () => raceImage ?? `/assets/images/races/${raceId ?? 'default'}.png`,
+    () => raceImage || `/assets/images/races/${raceId ?? 'default'}.png`,
     [raceImage, raceId],
   );
-  const avatarIcon = raceIcon ?? '🧙';
+  const avatarIcon = raceIcon || '🧙';
+  const isFromMap = routeState.fromMap === true;
   const displayName = characterName || raceName || 'Herói';
   const characterInfo = `${className}${raceName ? ` • ${raceName}` : ''}${
     deityName ? ` • ${deityName}` : ''
@@ -269,6 +273,7 @@ export const AttributeDistPage = () => {
         deckName: currentDeckName,
         pointsRemaining,
         isFinalized: isCharacterSaved,
+        fromMap: isFromMap,
       },
     });
   }, [
@@ -286,6 +291,7 @@ export const AttributeDistPage = () => {
     isCharacterSaved,
     saveId,
     pointsRemaining,
+    isFromMap,
     persistCurrentCharacter,
   ]);
 
@@ -298,6 +304,7 @@ export const AttributeDistPage = () => {
         raceName,
         raceImage,
         raceIcon,
+        fromMap: isFromMap,
       },
     });
   }, [
@@ -307,6 +314,7 @@ export const AttributeDistPage = () => {
     raceName,
     raceImage,
     raceIcon,
+    isFromMap,
     persistCurrentCharacter,
   ]);
 
@@ -781,7 +789,7 @@ export const AttributeDistPage = () => {
                 disabled={false}
                 onClick={handleStartMatch}
               >
-                Iniciar Partida
+                {isFromMap ? '← Voltar ao Mapa' : 'Iniciar Partida'}
               </ConfirmButton>
               <DeleteButton type="button" onClick={handleDeleteCharacter}>
                 Deletar Personagem

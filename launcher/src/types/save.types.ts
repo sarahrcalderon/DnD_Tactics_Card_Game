@@ -2,7 +2,12 @@ export interface SavedGame {
   id: string;
   characterName: string;
   className: string;
+  raceId?: string;
   raceName: string;
+  raceImage?: string;
+  raceIcon?: string;
+  deityId?: string;
+  deityName?: string;
   level: number;
   timestamp: string;
   date: string;
