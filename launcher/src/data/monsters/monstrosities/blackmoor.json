@@ -1,0 +1,278 @@
+[
+  {
+    "id": "spider",
+    "slug": "spider",
+    "name": "Aranha",
+    "englishName": "Spider",
+    "description": "Aranhas encontradas nas florestas, cavernas e ruínas de Blackmoor. Embora sejam pequenas e relativamente frágeis, seus ataques venenosos podem enfraquecer aventureiros desprevenidos.",
+    "category": "Monstrosity",
+    "subcategory": "Spider",
+    "role": "Controller",
+    "region": "Blackmoor",
+    "deck": "Forest",
+    "isBoss": false,
+    "isElite": false,
+    "dnd": {
+      "size": "Small",
+      "type": "Monstrosity",
+      "alignment": "Unaligned",
+      "hitPoints": 20,
+      "abilities": {
+        "strength": 6,
+        "dexterity": 14,
+        "constitution": 10,
+        "intelligence": 2,
+        "wisdom": 10,
+        "charisma": 4
+      },
+      "traits": [
+        {
+          "name": "Escalada de Aranha",
+          "description": "A aranha pode escalar superfícies difíceis, incluindo paredes e tetos, sem precisar realizar testes para isso."
+        },
+        {
+          "name": "Teia",
+          "description": "A aranha utiliza teias para dificultar o movimento de suas presas e preparar emboscadas."
+        },
+        {
+          "name": "Veneno",
+          "description": "Sua mordida injeta uma toxina capaz de enfraquecer suas vítimas."
+        }
+      ],
+      "actions": [
+        {
+          "name": "Mordida",
+          "description": "A aranha morde uma criatura e injeta veneno.",
+          "type": "Melee",
+          "attackBonus": 4,
+          "damage": [
+            {
+              "dice": "1d6+2",
+              "average": 5,
+              "damageType": "Piercing"
+            },
+            {
+              "dice": "1d4",
+              "average": 2,
+              "damageType": "Poison"
+            }
+          ]
+        },
+        {
+          "name": "Teia",
+          "description": "Dispara uma teia contra uma criatura ou área, dificultando seu movimento.",
+          "type": "Ranged",
+          "range": "30/60 ft"
+        }
+      ]
+    },
+    "card": {
+      "cardType": "Creature",
+      "rarity": "Common",
+      "manaCost": 2,
+      "power": 6,
+      "cardHealth": 20
+    },
+    "image": {
+      "url": "/assets/images/bestiario/blackmoor/aranha_blackmoor.jfif",
+      "alt": "Aranha de Blackmoor"
+    },
+    "tags": [
+      "blackmoor",
+      "monstrosity",
+      "spider",
+      "poison",
+      "web",
+      "forest",
+      "ruins"
+    ]
+  },
+  {
+    "id": "giant_spider",
+    "slug": "giant-spider",
+    "name": "Aranha Gigante",
+    "englishName": "Giant Spider",
+    "description": "Uma monstruosa aranha que habita cavernas, florestas e ruínas de Blackmoor. Seu veneno é extremamente perigoso e suas teias permitem capturar e imobilizar presas muito maiores.",
+    "category": "Monstrosity",
+    "subcategory": "Spider",
+    "role": "Controller",
+    "region": "Blackmoor",
+    "deck": "Forest",
+    "isBoss": false,
+    "isElite": true,
+    "dnd": {
+      "size": "Large",
+      "type": "Monstrosity",
+      "alignment": "Unaligned",
+      "hitPoints": 50,
+      "abilities": {
+        "strength": 14,
+        "dexterity": 16,
+        "constitution": 12,
+        "intelligence": 2,
+        "wisdom": 11,
+        "charisma": 4
+      },
+      "traits": [
+        {
+          "name": "Escalada de Aranha",
+          "description": "A aranha gigante pode escalar superfícies difíceis, incluindo paredes e tetos, sem precisar realizar testes para isso."
+        },
+        {
+          "name": "Teia Pegajosa",
+          "description": "Suas teias podem prender criaturas e limitar severamente sua movimentação."
+        },
+        {
+          "name": "Veneno Forte",
+          "description": "A mordida da aranha gigante injeta um veneno muito mais potente que o de aranhas comuns."
+        },
+        {
+          "name": "Predadora de Emboscada",
+          "description": "A aranha gigante prefere atacar suas presas quando elas não percebem sua presença."
+        }
+      ],
+      "actions": [
+        {
+          "name": "Mordida Venenosa",
+          "description": "A aranha gigante morde uma criatura e injeta uma dose concentrada de veneno.",
+          "type": "Melee",
+          "attackBonus": 6,
+          "damage": [
+            {
+              "dice": "2d8+3",
+              "average": 12,
+              "damageType": "Piercing"
+            },
+            {
+              "dice": "2d6",
+              "average": 7,
+              "damageType": "Poison"
+            }
+          ]
+        },
+        {
+          "name": "Teia Pegajosa",
+          "description": "Dispara uma grande quantidade de teia contra uma criatura, tentando prendê-la.",
+          "type": "Ranged",
+          "range": "60/120 ft"
+        }
+      ]
+    },
+    "card": {
+      "cardType": "Elite",
+      "rarity": "Rare",
+      "manaCost": 5,
+      "power": 12,
+      "cardHealth": 50
+    },
+    "image": {
+      "url": "/assets/images/bestiario/blackmoor/aranhaElite_blackmoor.jfif",
+      "alt": "Aranha Gigante de Blackmoor"
+    },
+    "tags": [
+      "blackmoor",
+      "monstrosity",
+      "spider",
+      "giant-spider",
+      "poison",
+      "web",
+      "elite",
+      "forest",
+      "ruins"
+    ]
+  },
+  {
+    "id": "swamp_experiment",
+    "slug": "swamp-experiment",
+    "name": "Experimento do Pântano",
+    "englishName": "Swamp Experiment",
+    "description": "Uma criatura criada por meio de experimentos envolvendo magia e tecnologia antiga de Blackmoor. Seu corpo mistura características de sapo, crocodilo e humanoide, apresentando mutações instáveis e habilidades imprevisíveis.",
+    "category": "Monstrosity",
+    "subcategory": "Other",
+    "role": "Controller",
+    "region": "TempleOfTheFrog",
+    "deck": "TempleOfTheFrog",
+    "isBoss": false,
+    "isElite": false,
+    "dnd": {
+      "size": "Large",
+      "type": "Monstrosity",
+      "alignment": "Unaligned",
+      "hitPoints": 40,
+      "abilities": {
+        "strength": 16,
+        "dexterity": 12,
+        "constitution": 16,
+        "intelligence": 6,
+        "wisdom": 8,
+        "charisma": 5
+      },
+      "traits": [
+        {
+          "name": "Mutação Instável",
+          "description": "As alterações provocadas pelos experimentos antigos fizeram com que a criatura desenvolvesse capacidades físicas imprevisíveis."
+        },
+        {
+          "name": "Fisiologia Anfíbia",
+          "description": "A criatura consegue sobreviver tanto em terra quanto na água."
+        },
+        {
+          "name": "Instinto Predatório",
+          "description": "Combina força física e movimentos rápidos para atacar suas vítimas."
+        }
+      ],
+      "actions": [
+        {
+          "name": "Garras",
+          "description": "Ataca uma criatura próxima com suas garras deformadas.",
+          "type": "Melee",
+          "attackBonus": 5,
+          "damage": [
+            {
+              "dice": "1d8+3",
+              "average": 7,
+              "damageType": "Slashing"
+            }
+          ]
+        },
+        {
+          "name": "Mordida Mutante",
+          "description": "Utiliza sua mandíbula semelhante à de um crocodilo para morder o alvo.",
+          "type": "Melee",
+          "attackBonus": 5,
+          "damage": [
+            {
+              "dice": "1d10+3",
+              "average": 8,
+              "damageType": "Piercing"
+            }
+          ]
+        },
+        {
+          "name": "Mutação Instável",
+          "description": "Libera uma habilidade especial determinada pelas mutações presentes em seu corpo.",
+          "type": "Special"
+        }
+      ]
+    },
+    "card": {
+      "cardType": "Creature",
+      "rarity": "Rare",
+      "manaCost": 4,
+      "power": 10,
+      "cardHealth": 40
+    },
+    "image": {
+      "url": "/assets/images/bestiario/blackmoor/experimentoDoPantano_blackmoor.jfif",
+      "alt": "Experimento do Pântano de Blackmoor"
+    },
+    "tags": [
+      "blackmoor",
+      "monstrosity",
+      "swamp",
+      "experiment",
+      "mutation",
+      "temple-of-the-frog"
+    ]
+  }
+]

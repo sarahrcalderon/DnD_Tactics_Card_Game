@@ -142,7 +142,9 @@ const SideMenu: React.FC = () => {
     }
   };
 
-  const handleBestiary = () => {};
+  const handleBestiary = () => {
+    navigate('/bestiary');
+  };
 
   const handleRanking = () => {};
 
@@ -196,7 +198,7 @@ const SideMenu: React.FC = () => {
 
       <SideMenuDivider />
 
-      <SideMenuItem onClick={handleBestiary} disabled>
+      <SideMenuItem onClick={handleBestiary}>
         <SideMenuIcon>
           <img
             src={ICON_PATHS.bestiary}

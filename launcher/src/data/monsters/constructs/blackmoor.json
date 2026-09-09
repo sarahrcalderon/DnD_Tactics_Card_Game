@@ -1,0 +1,100 @@
+[
+  {
+    "id": "temple_guardian",
+    "slug": "temple-guardian",
+    "name": "Guardião do Templo",
+    "englishName": "Temple Guardian",
+    "description": "Uma poderosa criatura artificial criada para proteger os segredos do Templo do Sapo. Construído utilizando magia e tecnologia ancestral de Blackmoor, o Guardião permanece imóvel até detectar uma ameaça ao templo ou ao seu mestre.",
+    "category": "Construct",
+    "subcategory": "Other",
+    "role": "Tank",
+    "region": "TempleOfTheFrog",
+    "deck": "TempleOfTheFrog",
+    "isBoss": false,
+    "isElite": true,
+    "dnd": {
+      "size": "Large",
+      "type": "Construct",
+      "alignment": "Unaligned",
+      "hitPoints": 70,
+      "abilities": {
+        "strength": 18,
+        "dexterity": 8,
+        "constitution": 18,
+        "intelligence": 6,
+        "wisdom": 10,
+        "charisma": 3
+      },
+      "traits": [
+        {
+          "name": "Corpo Artificial",
+          "description": "O Guardião não possui um corpo biológico comum. Sua estrutura é formada por materiais reforçados e componentes criados pela antiga tecnologia de Blackmoor."
+        },
+        {
+          "name": "Defensor do Templo",
+          "description": "O Guardião prioriza criaturas que ameaçam o templo ou seu mestre."
+        },
+        {
+          "name": "Resistência Estrutural",
+          "description": "Sua estrutura extremamente resistente permite suportar grandes quantidades de dano físico."
+        },
+        {
+          "name": "Sentinela Incansável",
+          "description": "O Guardião não precisa descansar e pode permanecer imóvel durante longos períodos aguardando um intruso."
+        }
+      ],
+      "actions": [
+        {
+          "name": "Golpe Pesado",
+          "description": "O Guardião desfere um poderoso golpe utilizando sua estrutura reforçada.",
+          "type": "Melee",
+          "attackBonus": 7,
+          "damage": [
+            {
+              "dice": "2d8+4",
+              "average": 13,
+              "damageType": "Bludgeoning"
+            }
+          ]
+        },
+        {
+          "name": "Impacto do Guardião",
+          "description": "O Guardião golpeia o solo, causando um impacto que pode atingir criaturas próximas.",
+          "type": "Special",
+          "damage": [
+            {
+              "dice": "2d6+4",
+              "average": 11,
+              "damageType": "Bludgeoning"
+            }
+          ]
+        },
+        {
+          "name": "Proteção do Templo",
+          "description": "O Guardião assume uma postura defensiva para proteger uma criatura aliada importante.",
+          "type": "Special"
+        }
+      ]
+    },
+    "card": {
+      "cardType": "Elite",
+      "rarity": "Rare",
+      "manaCost": 6,
+      "power": 8,
+      "cardHealth": 70
+    },
+    "image": {
+      "url": "/assets/images/bestiario/blackmoor/guardaDoTemploElite_blackmoor.jfif",
+      "alt": "Guardião do Templo de Blackmoor"
+    },
+    "tags": [
+      "blackmoor",
+      "construct",
+      "temple-guardian",
+      "temple-of-the-frog",
+      "ancient-technology",
+      "elite",
+      "tank"
+    ]
+  }
+]

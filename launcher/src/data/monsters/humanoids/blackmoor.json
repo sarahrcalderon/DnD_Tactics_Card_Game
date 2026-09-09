@@ -1,0 +1,761 @@
+[
+  {
+    "id": "bandit",
+    "slug": "bandit",
+    "name": "Bandido",
+    "englishName": "Bandit",
+    "description": "Criminosos, saqueadores e mercenários que atacam viajantes nas estradas de Blackmoor. Normalmente aparecem em pequenos grupos e utilizam equipamentos simples.",
+    "category": "Humanoid",
+    "subcategory": "Bandit",
+    "role": "Damage",
+    "region": "Blackmoor",
+    "deck": "Bandits",
+    "isBoss": false,
+    "isElite": false,
+    "dnd": {
+      "size": "Medium",
+      "type": "Humanoid",
+      "alignment": "Neutral",
+      "hitPoints": 30,
+      "abilities": {
+        "strength": 12,
+        "dexterity": 12,
+        "constitution": 12,
+        "intelligence": 10,
+        "wisdom": 10,
+        "charisma": 10
+      },
+      "traits": [
+        {
+          "name": "Trabalho em Grupo",
+          "description": "Bandits são mais perigosos quando lutam em grupo, coordenando seus ataques contra o mesmo alvo."
+        }
+      ],
+      "actions": [
+        {
+          "name": "Ataque Físico",
+          "description": "Realiza um ataque corpo a corpo utilizando sua arma.",
+          "type": "Melee",
+          "attackBonus": 4,
+          "damage": [
+            {
+              "dice": "1d8+2",
+              "average": 6,
+              "damageType": "Slashing"
+            }
+          ]
+        }
+      ]
+    },
+    "card": {
+      "cardType": "Creature",
+      "rarity": "Common",
+      "manaCost": 2,
+      "power": 8,
+      "cardHealth": 30
+    },
+    "image": {
+      "url": "/assets/images/bestiario/blackmoor/bandido_blackmoor.jfif",
+      "alt": "Bandido de Blackmoor"
+    },
+    "tags": [
+      "blackmoor",
+      "humanoid",
+      "bandit"
+    ]
+  },
+  {
+    "id": "guard",
+    "slug": "guard",
+    "name": "Guarda",
+    "englishName": "Guard",
+    "description": "Soldados e guardas responsáveis por proteger fortalezas, cidades, pontes e postos importantes de Blackmoor. Alguns podem se tornar hostis dependendo da situação da campanha.",
+    "category": "Humanoid",
+    "subcategory": "Guard",
+    "role": "Tank",
+    "region": "Blackmoor",
+    "deck": "Guards",
+    "isBoss": false,
+    "isElite": false,
+    "dnd": {
+      "size": "Medium",
+      "type": "Humanoid",
+      "alignment": "Lawful Neutral",
+      "hitPoints": 45,
+      "abilities": {
+        "strength": 14,
+        "dexterity": 10,
+        "constitution": 14,
+        "intelligence": 10,
+        "wisdom": 12,
+        "charisma": 10
+      },
+      "traits": [
+        {
+          "name": "Defesa com Escudo",
+          "description": "O guarda utiliza seu escudo para reduzir o impacto de ataques recebidos."
+        },
+        {
+          "name": "Proteção de Aliados",
+          "description": "Pode proteger aliados próximos de ataques inimigos."
+        }
+      ],
+      "actions": [
+        {
+          "name": "Ataque com Arma",
+          "description": "Realiza um ataque corpo a corpo utilizando sua arma.",
+          "type": "Melee",
+          "attackBonus": 4,
+          "damage": [
+            {
+              "dice": "1d8+2",
+              "average": 6,
+              "damageType": "Slashing"
+            }
+          ]
+        }
+      ]
+    },
+    "card": {
+      "cardType": "Creature",
+      "rarity": "Common",
+      "manaCost": 3,
+      "power": 6,
+      "cardHealth": 45
+    },
+    "image": {
+      "url": "/assets/images/bestiario/blackmoor/guarda_blackmoor.jfif",
+      "alt": "Guarda de Blackmoor"
+    },
+    "tags": [
+      "blackmoor",
+      "humanoid",
+      "guard"
+    ]
+  },
+  {
+    "id": "archer",
+    "slug": "archer",
+    "name": "Arqueiro",
+    "englishName": "Archer",
+    "description": "Combatentes especializados em ataques à distância. São perigosos quando posicionados atrás de outras unidades.",
+    "category": "Humanoid",
+    "subcategory": "Archer",
+    "role": "Ranged",
+    "region": "Blackmoor",
+    "deck": "Guards",
+    "isBoss": false,
+    "isElite": false,
+    "dnd": {
+      "size": "Medium",
+      "type": "Humanoid",
+      "alignment": "Neutral",
+      "hitPoints": 25,
+      "abilities": {
+        "strength": 10,
+        "dexterity": 16,
+        "constitution": 10,
+        "intelligence": 10,
+        "wisdom": 12,
+        "charisma": 10
+      },
+      "traits": [
+        {
+          "name": "Combatente à Distância",
+          "description": "O arqueiro prefere atacar de longe, evitando o combate corpo a corpo."
+        }
+      ],
+      "actions": [
+        {
+          "name": "Disparo",
+          "description": "Dispara uma flecha contra um alvo à distância.",
+          "type": "Ranged",
+          "attackBonus": 5,
+          "range": "80/320 ft",
+          "damage": [
+            {
+              "dice": "1d8+3",
+              "average": 7,
+              "damageType": "Piercing"
+            }
+          ]
+        }
+      ]
+    },
+    "card": {
+      "cardType": "Creature",
+      "rarity": "Common",
+      "manaCost": 2,
+      "power": 10,
+      "cardHealth": 25
+    },
+    "image": {
+      "url": "/assets/images/bestiario/blackmoor/arqueiro_blackmoor.jfif",
+      "alt": "Arqueiro de Blackmoor"
+    },
+    "tags": [
+      "blackmoor",
+      "humanoid",
+      "archer"
+    ]
+  },
+  {
+    "id": "swordsman",
+    "slug": "swordsman",
+    "name": "Espadachim",
+    "englishName": "Swordsman",
+    "description": "Guerreiros treinados especializados em combate corpo a corpo. São mais habilidosos e perigosos do que os bandidos comuns.",
+    "category": "Humanoid",
+    "subcategory": "Warrior",
+    "role": "Damage",
+    "region": "Blackmoor",
+    "deck": "Guards",
+    "isBoss": false,
+    "isElite": false,
+    "dnd": {
+      "size": "Medium",
+      "type": "Humanoid",
+      "alignment": "Neutral",
+      "hitPoints": 40,
+      "abilities": {
+        "strength": 16,
+        "dexterity": 14,
+        "constitution": 14,
+        "intelligence": 10,
+        "wisdom": 10,
+        "charisma": 10
+      },
+      "traits": [
+        {
+          "name": "Combate Direto",
+          "description": "O espadachim é especializado em confrontos corpo a corpo."
+        },
+        {
+          "name": "Contra-Ataque",
+          "description": "Pode responder rapidamente após bloquear ou evitar um ataque."
+        }
+      ],
+      "actions": [
+        {
+          "name": "Golpe de Espada",
+          "description": "Ataca o inimigo com sua espada.",
+          "type": "Melee",
+          "attackBonus": 5,
+          "damage": [
+            {
+              "dice": "1d8+3",
+              "average": 7,
+              "damageType": "Slashing"
+            }
+          ]
+        }
+      ]
+    },
+    "card": {
+      "cardType": "Creature",
+      "rarity": "Uncommon",
+      "manaCost": 3,
+      "power": 12,
+      "cardHealth": 40
+    },
+    "image": {
+      "url": "/assets/images/bestiario/blackmoor/espadachim_blackmoor.jfif",
+      "alt": "Espadachim de Blackmoor"
+    },
+    "tags": [
+      "blackmoor",
+      "humanoid",
+      "warrior"
+    ]
+  },
+  {
+    "id": "bandit_leader",
+    "slug": "bandit-leader",
+    "name": "Líder Bandido",
+    "englishName": "Bandit Leader",
+    "description": "Líder experiente de um grupo de bandidos. Possui maior força, resistência e conhecimento tático, sendo capaz de coordenar seus subordinados.",
+    "category": "Humanoid",
+    "subcategory": "Bandit",
+    "role": "Support",
+    "region": "Blackmoor",
+    "deck": "Bandits",
+    "isBoss": false,
+    "isElite": true,
+    "dnd": {
+      "size": "Medium",
+      "type": "Humanoid",
+      "alignment": "Chaotic Neutral",
+      "hitPoints": 55,
+      "abilities": {
+        "strength": 16,
+        "dexterity": 14,
+        "constitution": 14,
+        "intelligence": 12,
+        "wisdom": 12,
+        "charisma": 15
+      },
+      "traits": [
+        {
+          "name": "Comandante dos Bandidos",
+          "description": "Fortalece bandidos aliados próximos e melhora sua capacidade de combate."
+        },
+        {
+          "name": "Liderança",
+          "description": "Coordena seus aliados para atacar o mesmo alvo."
+        }
+      ],
+      "actions": [
+        {
+          "name": "Ataque Poderoso",
+          "description": "Realiza um poderoso ataque corpo a corpo.",
+          "type": "Melee",
+          "attackBonus": 6,
+          "damage": [
+            {
+              "dice": "1d10+3",
+              "average": 8,
+              "damageType": "Slashing"
+            }
+          ]
+        }
+      ]
+    },
+    "card": {
+      "cardType": "Elite",
+      "rarity": "Rare",
+      "manaCost": 5,
+      "power": 15,
+      "cardHealth": 55
+    },
+    "image": {
+      "url": "/assets/images/bestiario/blackmoor/bandidoElite_blackmoor.jfif",
+      "alt": "Líder Bandido de Blackmoor"
+    },
+    "tags": [
+      "blackmoor",
+      "humanoid",
+      "bandit",
+      "elite",
+      "leader"
+    ]
+  },
+  {
+    "id": "goblin",
+    "slug": "goblin",
+    "name": "Goblin",
+    "englishName": "Goblin",
+    "description": "Pequenas criaturas humanoides agressivas encontradas em cavernas, florestas e ruínas de Blackmoor. Individualmente são frágeis, mas tornam-se perigosos quando lutam em grupos.",
+    "category": "Humanoid",
+    "subcategory": "Goblin",
+    "role": "Swarm",
+    "region": "Blackmoor",
+    "deck": "Goblins",
+    "isBoss": false,
+    "isElite": false,
+    "dnd": {
+      "size": "Small",
+      "type": "Humanoid",
+      "alignment": "Neutral Evil",
+      "hitPoints": 15,
+      "abilities": {
+        "strength": 8,
+        "dexterity": 14,
+        "constitution": 10,
+        "intelligence": 10,
+        "wisdom": 8,
+        "charisma": 8
+      },
+      "traits": [
+        {
+          "name": "Táticas de Enxame",
+          "description": "Goblins tornam-se mais perigosos quando vários combatem juntos."
+        }
+      ],
+      "actions": [
+        {
+          "name": "Ataque Rápido",
+          "description": "Ataca rapidamente com uma arma simples.",
+          "type": "Melee",
+          "attackBonus": 3,
+          "damage": [
+            {
+              "dice": "1d6+1",
+              "average": 4,
+              "damageType": "Slashing"
+            }
+          ]
+        }
+      ]
+    },
+    "card": {
+      "cardType": "Creature",
+      "rarity": "Common",
+      "manaCost": 1,
+      "power": 4,
+      "cardHealth": 15
+    },
+    "image": {
+      "url": "/assets/images/bestiario/blackmoor/goblin_blackmoor.jfif",
+      "alt": "Goblin de Blackmoor"
+    },
+    "tags": [
+      "blackmoor",
+      "humanoid",
+      "goblin",
+      "swarm"
+    ]
+  },
+  {
+    "id": "goblin_archer",
+    "slug": "goblin-archer",
+    "name": "Goblin Arqueiro",
+    "englishName": "Goblin Archer",
+    "description": "Goblins especializados em ataques à distância. Normalmente permanecem atrás de outros goblins enquanto disparam contra seus inimigos.",
+    "category": "Humanoid",
+    "subcategory": "Goblin",
+    "role": "Ranged",
+    "region": "Blackmoor",
+    "deck": "Goblins",
+    "isBoss": false,
+    "isElite": false,
+    "dnd": {
+      "size": "Small",
+      "type": "Humanoid",
+      "alignment": "Neutral Evil",
+      "hitPoints": 18,
+      "abilities": {
+        "strength": 8,
+        "dexterity": 16,
+        "constitution": 10,
+        "intelligence": 10,
+        "wisdom": 8,
+        "charisma": 8
+      },
+      "traits": [
+        {
+          "name": "Atirador Goblin",
+          "description": "Prefere atacar de longe enquanto outros goblins mantêm os inimigos ocupados."
+        }
+      ],
+      "actions": [
+        {
+          "name": "Disparo Goblin",
+          "description": "Dispara uma flecha contra um inimigo distante.",
+          "type": "Ranged",
+          "attackBonus": 5,
+          "range": "80/320 ft",
+          "damage": [
+            {
+              "dice": "1d6+3",
+              "average": 6,
+              "damageType": "Piercing"
+            }
+          ]
+        }
+      ]
+    },
+    "card": {
+      "cardType": "Creature",
+      "rarity": "Common",
+      "manaCost": 2,
+      "power": 7,
+      "cardHealth": 18
+    },
+    "image": {
+      "url": "/assets/images/bestiario/blackmoor/goblinArqueiro_blackmoor.jfif",
+      "alt": "Goblin Arqueiro de Blackmoor"
+    },
+    "tags": [
+      "blackmoor",
+      "humanoid",
+      "goblin",
+      "ranged"
+    ]
+  },
+  {
+    "id": "frog_man",
+    "slug": "frog-man",
+    "name": "Homem-Sapo",
+    "englishName": "Frog Man",
+    "description": "Humanoides anfíbios que servem ao Culto do Sapo. Formam a principal força militar do templo e dominam o combate em ambientes pantanosos.",
+    "category": "Humanoid",
+    "subcategory": "Cultist",
+    "role": "Damage",
+    "region": "TempleOfTheFrog",
+    "deck": "TempleOfTheFrog",
+    "isBoss": false,
+    "isElite": false,
+    "dnd": {
+      "size": "Medium",
+      "type": "Humanoid",
+      "alignment": "Lawful Evil",
+      "hitPoints": 35,
+      "abilities": {
+        "strength": 14,
+        "dexterity": 12,
+        "constitution": 14,
+        "intelligence": 8,
+        "wisdom": 10,
+        "charisma": 8
+      },
+      "traits": [
+        {
+          "name": "Guerreiro do Pântano",
+          "description": "O Homem-Sapo possui treinamento para lutar em terrenos pantanosos."
+        }
+      ],
+      "actions": [
+        {
+          "name": "Ataque com Arma",
+          "description": "Ataca o inimigo utilizando uma arma de combate.",
+          "type": "Melee",
+          "attackBonus": 4,
+          "damage": [
+            {
+              "dice": "1d8+2",
+              "average": 6,
+              "damageType": "Slashing"
+            }
+          ]
+        }
+      ]
+    },
+    "card": {
+      "cardType": "Creature",
+      "rarity": "Uncommon",
+      "manaCost": 3,
+      "power": 10,
+      "cardHealth": 35
+    },
+    "image": {
+      "url": "/assets/images/bestiario/blackmoor/homemRa_blackmoor.jfif",
+      "alt": "Homem-Sapo do Templo do Sapo"
+    },
+    "tags": [
+      "blackmoor",
+      "humanoid",
+      "frog",
+      "cultist",
+      "temple-of-the-frog"
+    ]
+  },
+  {
+    "id": "frog_priest",
+    "slug": "frog-priest",
+    "name": "Sacerdote do Sapo",
+    "englishName": "Frog Priest",
+    "description": "Sacerdotes que praticam rituais ligados ao antigo Templo do Sapo. Utilizam magia para fortalecer e curar seus aliados e invocar poderes do pântano.",
+    "category": "Humanoid",
+    "subcategory": "Mage",
+    "role": "Support",
+    "region": "TempleOfTheFrog",
+    "deck": "TempleOfTheFrog",
+    "isBoss": false,
+    "isElite": false,
+    "dnd": {
+      "size": "Medium",
+      "type": "Humanoid",
+      "alignment": "Lawful Evil",
+      "hitPoints": 22,
+      "abilities": {
+        "strength": 8,
+        "dexterity": 10,
+        "constitution": 10,
+        "intelligence": 14,
+        "wisdom": 16,
+        "charisma": 12
+      },
+      "traits": [
+        {
+          "name": "Bênção do Pântano",
+          "description": "Pode fortalecer aliados utilizando magia ritualística."
+        }
+      ],
+      "actions": [
+        {
+          "name": "Magia do Sapo",
+          "description": "Lança uma magia relacionada ao culto e aos poderes do pântano.",
+          "type": "Magic",
+          "attackBonus": 5,
+          "damage": [
+            {
+              "dice": "1d8",
+              "average": 4,
+              "damageType": "Necrotic"
+            }
+          ]
+        }
+      ]
+    },
+    "card": {
+      "cardType": "Creature",
+      "rarity": "Rare",
+      "manaCost": 4,
+      "power": 4,
+      "cardHealth": 22
+    },
+    "image": {
+      "url": "/assets/images/bestiario/blackmoor/sapoSacerdote_blackmoor.jfif",
+      "alt": "Sacerdote do Sapo"
+    },
+    "tags": [
+      "blackmoor",
+      "humanoid",
+      "cultist",
+      "mage",
+      "temple-of-the-frog"
+    ]
+  },
+  {
+    "id": "frog_monk",
+    "slug": "frog-monk",
+    "name": "Monge do Sapo",
+    "englishName": "Frog Monk",
+    "description": "Membros disciplinados do culto que dominaram técnicas de combate corpo a corpo. São rápidos, ágeis e difíceis de atingir.",
+    "category": "Humanoid",
+    "subcategory": "Monk",
+    "role": "Assassin",
+    "region": "TempleOfTheFrog",
+    "deck": "TempleOfTheFrog",
+    "isBoss": false,
+    "isElite": false,
+    "dnd": {
+      "size": "Medium",
+      "type": "Humanoid",
+      "alignment": "Lawful Evil",
+      "hitPoints": 32,
+      "abilities": {
+        "strength": 12,
+        "dexterity": 16,
+        "constitution": 12,
+        "intelligence": 10,
+        "wisdom": 14,
+        "charisma": 10
+      },
+      "traits": [
+        {
+          "name": "Ataques Rápidos",
+          "description": "Pode realizar ataques rápidos utilizando técnicas de combate desarmado."
+        },
+        {
+          "name": "Esquiva",
+          "description": "Sua agilidade permite evitar ataques com maior facilidade."
+        }
+      ],
+      "actions": [
+        {
+          "name": "Golpe Marcial",
+          "description": "Realiza um ataque rápido utilizando técnicas marciais.",
+          "type": "Melee",
+          "attackBonus": 5,
+          "damage": [
+            {
+              "dice": "1d6+3",
+              "average": 6,
+              "damageType": "Bludgeoning"
+            }
+          ]
+        }
+      ]
+    },
+    "card": {
+      "cardType": "Creature",
+      "rarity": "Uncommon",
+      "manaCost": 3,
+      "power": 12,
+      "cardHealth": 32
+    },
+    "image": {
+      "url": "/assets/images/bestiario/blackmoor/sapoMonge_blackmoor.jfif",
+      "alt": "Monge do Sapo"
+    },
+    "tags": [
+      "blackmoor",
+      "humanoid",
+      "cultist",
+      "monk",
+      "temple-of-the-frog"
+    ]
+  },
+  {
+    "id": "stephen",
+    "slug": "stephen-the-rock",
+    "name": "Stephen the Rock",
+    "englishName": "Stephen the Rock",
+    "description": "Lorde do Templo do Sapo e poderoso sacerdote ligado aos antigos segredos de Blackmoor. Stephen descobriu tecnologias esquecidas sob o templo e utiliza seus conhecimentos para controlar criaturas do pântano e transformar seus seguidores.",
+    "category": "Humanoid",
+    "subcategory": "Cultist",
+    "role": "Boss",
+    "region": "TempleOfTheFrog",
+    "deck": "Bosses",
+    "isBoss": true,
+    "isElite": false,
+    "dnd": {
+      "size": "Medium",
+      "type": "Humanoid",
+      "alignment": "Lawful Evil",
+      "hitPoints": 120,
+      "abilities": {
+        "strength": 16,
+        "dexterity": 12,
+        "constitution": 16,
+        "intelligence": 18,
+        "wisdom": 18,
+        "charisma": 16
+      },
+      "traits": [
+        {
+          "name": "Poder Divino",
+          "description": "Stephen canaliza poderes ritualísticos do Culto do Sapo."
+        },
+        {
+          "name": "Chamado do Sapo",
+          "description": "Pode convocar criaturas ligadas ao culto para ajudá-lo durante o combate."
+        },
+        {
+          "name": "Relíquia de Blackmoor",
+          "description": "Utiliza uma antiga relíquia tecnológica encontrada sob o Templo do Sapo."
+        }
+      ],
+      "actions": [
+        {
+          "name": "Golpe Devastador",
+          "description": "Stephen desfere um poderoso ataque contra seu inimigo.",
+          "type": "Melee",
+          "attackBonus": 8,
+          "damage": [
+            {
+              "dice": "2d8+5",
+              "average": 14,
+              "damageType": "Bludgeoning"
+            }
+          ]
+        },
+        {
+          "name": "Chamado do Sapo",
+          "description": "Invoca criaturas do culto para auxiliar Stephen no combate.",
+          "type": "Magic"
+        }
+      ]
+    },
+    "card": {
+      "cardType": "Boss",
+      "rarity": "Legendary",
+      "manaCost": 10,
+      "power": 25,
+      "cardHealth": 120
+    },
+    "image": {
+      "url": "/assets/images/bestiario/blackmoor/stephenTheRockBoss_blackmoor.jfif",
+      "alt": "Stephen the Rock, chefe do Templo do Sapo"
+    },
+    "tags": [
+      "blackmoor",
+      "humanoid",
+      "cultist",
+      "boss",
+      "stephen-the-rock",
+      "temple-of-the-frog"
+    ]
+  }
+]

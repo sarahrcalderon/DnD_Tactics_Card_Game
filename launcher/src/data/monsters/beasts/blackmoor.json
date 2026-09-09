@@ -1,0 +1,705 @@
+[
+  {
+    "id": "wolf",
+    "slug": "wolf",
+    "name": "Lobo",
+    "englishName": "Wolf",
+    "description": "Predadores comuns das florestas e regiões selvagens de Blackmoor. Lobos são rápidos e perigosos quando caçam em alcateia.",
+    "category": "Beast",
+    "subcategory": "Wolf",
+    "role": "Damage",
+    "region": "Blackmoor",
+    "deck": "Wolves",
+    "isBoss": false,
+    "isElite": false,
+    "dnd": {
+      "size": "Medium",
+      "type": "Beast",
+      "alignment": "Unaligned",
+      "hitPoints": 28,
+      "abilities": {
+        "strength": 12,
+        "dexterity": 15,
+        "constitution": 12,
+        "intelligence": 3,
+        "wisdom": 12,
+        "charisma": 6
+      },
+      "traits": [
+        {
+          "name": "Táticas de Alcateia",
+          "description": "O lobo é mais perigoso quando luta próximo de outros lobos."
+        },
+        {
+          "name": "Faro Aguçado",
+          "description": "O lobo possui um olfato extremamente desenvolvido."
+        }
+      ],
+      "actions": [
+        {
+          "name": "Mordida",
+          "description": "O lobo morde um inimigo com suas presas.",
+          "type": "Melee",
+          "attackBonus": 4,
+          "damage": [
+            {
+              "dice": "2d4+2",
+              "average": 7,
+              "damageType": "Piercing"
+            }
+          ]
+        }
+      ]
+    },
+    "card": {
+      "cardType": "Creature",
+      "rarity": "Common",
+      "manaCost": 2,
+      "power": 9,
+      "cardHealth": 28
+    },
+    "image": {
+      "url": "/assets/images/bestiario/blackmoor/lobo_blackmoor.jfif",
+      "alt": "Lobo de Blackmoor"
+    },
+    "tags": [
+      "blackmoor",
+      "beast",
+      "wolf",
+      "pack"
+    ]
+  },
+  {
+    "id": "bear",
+    "slug": "bear",
+    "name": "Urso",
+    "englishName": "Bear",
+    "description": "Grandes animais selvagens encontrados nas regiões afastadas de Blackmoor. Possuem enorme força física e são capazes de suportar ataques que derrubariam criaturas menores.",
+    "category": "Beast",
+    "subcategory": "Bear",
+    "role": "Tank",
+    "region": "Blackmoor",
+    "deck": "Forest",
+    "isBoss": false,
+    "isElite": false,
+    "dnd": {
+      "size": "Large",
+      "type": "Beast",
+      "alignment": "Unaligned",
+      "hitPoints": 60,
+      "abilities": {
+        "strength": 19,
+        "dexterity": 10,
+        "constitution": 16,
+        "intelligence": 2,
+        "wisdom": 13,
+        "charisma": 7
+      },
+      "traits": [
+        {
+          "name": "Resistência Natural",
+          "description": "O corpo robusto do urso permite suportar grandes quantidades de dano."
+        },
+        {
+          "name": "Predador Selvagem",
+          "description": "O urso utiliza sua força bruta para dominar adversários próximos."
+        }
+      ],
+      "actions": [
+        {
+          "name": "Mordida",
+          "description": "O urso morde um inimigo.",
+          "type": "Melee",
+          "attackBonus": 6,
+          "damage": [
+            {
+              "dice": "1d8+4",
+              "average": 8,
+              "damageType": "Piercing"
+            }
+          ]
+        },
+        {
+          "name": "Garras",
+          "description": "O urso desfere um poderoso golpe com suas garras.",
+          "type": "Melee",
+          "attackBonus": 6,
+          "damage": [
+            {
+              "dice": "2d6+4",
+              "average": 11,
+              "damageType": "Slashing"
+            }
+          ]
+        }
+      ]
+    },
+    "card": {
+      "cardType": "Creature",
+      "rarity": "Uncommon",
+      "manaCost": 4,
+      "power": 14,
+      "cardHealth": 60
+    },
+    "image": {
+      "url": "/assets/images/bestiario/blackmoor/urso_blackmoor.jfif",
+      "alt": "Urso de Blackmoor"
+    },
+    "tags": [
+      "blackmoor",
+      "beast",
+      "bear",
+      "forest",
+      "tank"
+    ]
+  },
+  {
+    "id": "frog",
+    "slug": "frog",
+    "name": "Sapo",
+    "englishName": "Frog",
+    "description": "Pequenos sapos encontrados nos pântanos de Blackmoor. Individualmente são quase inofensivos, mas grandes quantidades podem se tornar uma ameaça.",
+    "category": "Beast",
+    "subcategory": "Frog",
+    "role": "Swarm",
+    "region": "TempleOfTheFrog",
+    "deck": "TempleOfTheFrog",
+    "isBoss": false,
+    "isElite": false,
+    "dnd": {
+      "size": "Tiny",
+      "type": "Beast",
+      "alignment": "Unaligned",
+      "hitPoints": 12,
+      "abilities": {
+        "strength": 1,
+        "dexterity": 13,
+        "constitution": 8,
+        "intelligence": 1,
+        "wisdom": 8,
+        "charisma": 3
+      },
+      "traits": [
+        {
+          "name": "Anfíbio",
+          "description": "O sapo pode respirar normalmente tanto na água quanto em terra."
+        },
+        {
+          "name": "Salto",
+          "description": "O sapo consegue realizar grandes saltos em relação ao seu tamanho."
+        }
+      ],
+      "actions": [
+        {
+          "name": "Mordida",
+          "description": "O sapo realiza uma pequena mordida.",
+          "type": "Melee",
+          "attackBonus": 2,
+          "damage": [
+            {
+              "dice": "1d4-1",
+              "average": 1,
+              "damageType": "Piercing"
+            }
+          ]
+        }
+      ]
+    },
+    "card": {
+      "cardType": "Creature",
+      "rarity": "Common",
+      "manaCost": 1,
+      "power": 3,
+      "cardHealth": 12
+    },
+    "image": {
+      "url": "/assets/images/bestiario/blackmoor/sapo_blackmoor.jfif",
+      "alt": "Sapo de Blackmoor"
+    },
+    "tags": [
+      "blackmoor",
+      "beast",
+      "frog",
+      "swamp",
+      "swarm",
+      "temple-of-the-frog"
+    ]
+  },
+  {
+    "id": "giant_frog",
+    "slug": "giant-frog",
+    "name": "Sapo Gigante",
+    "englishName": "Giant Frog",
+    "description": "Uma versão muito maior e agressiva dos sapos encontrados nos pântanos de Blackmoor. Sua longa língua permite agarrar e arrastar criaturas para perto.",
+    "category": "Beast",
+    "subcategory": "Frog",
+    "role": "Damage",
+    "region": "TempleOfTheFrog",
+    "deck": "TempleOfTheFrog",
+    "isBoss": false,
+    "isElite": false,
+    "dnd": {
+      "size": "Large",
+      "type": "Beast",
+      "alignment": "Unaligned",
+      "hitPoints": 40,
+      "abilities": {
+        "strength": 12,
+        "dexterity": 13,
+        "constitution": 11,
+        "intelligence": 2,
+        "wisdom": 10,
+        "charisma": 3
+      },
+      "traits": [
+        {
+          "name": "Anfíbio",
+          "description": "O sapo gigante pode respirar tanto na água quanto em terra."
+        },
+        {
+          "name": "Língua Longa",
+          "description": "Pode utilizar sua língua para alcançar criaturas à distância e puxá-las para perto."
+        }
+      ],
+      "actions": [
+        {
+          "name": "Mordida",
+          "description": "O sapo gigante morde uma criatura próxima.",
+          "type": "Melee",
+          "attackBonus": 4,
+          "damage": [
+            {
+              "dice": "2d6+2",
+              "average": 9,
+              "damageType": "Piercing"
+            }
+          ]
+        },
+        {
+          "name": "Língua",
+          "description": "A língua do sapo alcança um alvo e pode puxá-lo para perto.",
+          "type": "Ranged",
+          "range": "15 ft"
+        }
+      ]
+    },
+    "card": {
+      "cardType": "Creature",
+      "rarity": "Uncommon",
+      "manaCost": 3,
+      "power": 13,
+      "cardHealth": 40
+    },
+    "image": {
+      "url": "/assets/images/bestiario/blackmoor/sapoGigante_blackmoor.jfif",
+      "alt": "Sapo Gigante de Blackmoor"
+    },
+    "tags": [
+      "blackmoor",
+      "beast",
+      "frog",
+      "giant-frog",
+      "swamp",
+      "temple-of-the-frog"
+    ]
+  },
+  {
+    "id": "giant_toad",
+    "slug": "giant-toad",
+    "name": "Rã Gigante",
+    "englishName": "Giant Toad",
+    "description": "Uma grande rã predadora dos pântanos de Blackmoor. É mais ágil que o Sapo Gigante e utiliza saltos para surpreender suas presas.",
+    "category": "Beast",
+    "subcategory": "Frog",
+    "role": "Damage",
+    "region": "TempleOfTheFrog",
+    "deck": "TempleOfTheFrog",
+    "isBoss": false,
+    "isElite": false,
+    "dnd": {
+      "size": "Large",
+      "type": "Beast",
+      "alignment": "Unaligned",
+      "hitPoints": 35,
+      "abilities": {
+        "strength": 15,
+        "dexterity": 13,
+        "constitution": 13,
+        "intelligence": 2,
+        "wisdom": 10,
+        "charisma": 3
+      },
+      "traits": [
+        {
+          "name": "Anfíbio",
+          "description": "A rã gigante pode respirar tanto na água quanto em terra."
+        },
+        {
+          "name": "Salto do Pântano",
+          "description": "Pode saltar grandes distâncias para surpreender ou alcançar inimigos."
+        }
+      ],
+      "actions": [
+        {
+          "name": "Mordida",
+          "description": "A rã gigante morde uma criatura próxima.",
+          "type": "Melee",
+          "attackBonus": 4,
+          "damage": [
+            {
+              "dice": "2d6+2",
+              "average": 9,
+              "damageType": "Piercing"
+            }
+          ]
+        }
+      ]
+    },
+    "card": {
+      "cardType": "Creature",
+      "rarity": "Uncommon",
+      "manaCost": 3,
+      "power": 11,
+      "cardHealth": 35
+    },
+    "image": {
+      "url": "/assets/images/bestiario/blackmoor/raGigante_blackmoor.jfif",
+      "alt": "Rã Gigante de Blackmoor"
+    },
+    "tags": [
+      "blackmoor",
+      "beast",
+      "frog",
+      "giant-toad",
+      "swamp",
+      "temple-of-the-frog"
+    ]
+  },
+  {
+    "id": "crocodile",
+    "slug": "crocodile",
+    "name": "Crocodilo",
+    "englishName": "Crocodile",
+    "description": "Predadores poderosos encontrados nos rios e pântanos de Blackmoor. Possuem uma mandíbula extremamente poderosa e um corpo resistente.",
+    "category": "Beast",
+    "subcategory": "Crocodile",
+    "role": "Tank",
+    "region": "TempleOfTheFrog",
+    "deck": "TempleOfTheFrog",
+    "isBoss": false,
+    "isElite": false,
+    "dnd": {
+      "size": "Large",
+      "type": "Beast",
+      "alignment": "Unaligned",
+      "hitPoints": 55,
+      "abilities": {
+        "strength": 15,
+        "dexterity": 10,
+        "constitution": 13,
+        "intelligence": 2,
+        "wisdom": 10,
+        "charisma": 5
+      },
+      "traits": [
+        {
+          "name": "Emboscada Aquática",
+          "description": "O crocodilo pode permanecer oculto na água antes de atacar sua presa."
+        }
+      ],
+      "actions": [
+        {
+          "name": "Mordida",
+          "description": "O crocodilo desfere uma poderosa mordida.",
+          "type": "Melee",
+          "attackBonus": 5,
+          "damage": [
+            {
+              "dice": "1d10+3",
+              "average": 8,
+              "damageType": "Piercing"
+            }
+          ]
+        },
+        {
+          "name": "Cauda",
+          "description": "O crocodilo golpeia inimigos próximos com sua cauda.",
+          "type": "Melee",
+          "attackBonus": 4,
+          "damage": [
+            {
+              "dice": "1d8+3",
+              "average": 7,
+              "damageType": "Bludgeoning"
+            }
+          ]
+        }
+      ]
+    },
+    "card": {
+      "cardType": "Creature",
+      "rarity": "Uncommon",
+      "manaCost": 4,
+      "power": 14,
+      "cardHealth": 55
+    },
+    "image": {
+      "url": "/assets/images/bestiario/blackmoor/crocodilo_blackmoor.jfif",
+      "alt": "Crocodilo de Blackmoor"
+    },
+    "tags": [
+      "blackmoor",
+      "beast",
+      "crocodile",
+      "swamp",
+      "tank",
+      "temple-of-the-frog"
+    ]
+  },
+  {
+    "id": "giant_leech",
+    "slug": "giant-leech",
+    "name": "Sanguessuga Gigante",
+    "englishName": "Giant Leech",
+    "description": "Parasitas enormes que habitam as águas e regiões pantanosas de Blackmoor. Alimentam-se do sangue de outras criaturas e conseguem recuperar parte de sua vitalidade durante o ataque.",
+    "category": "Beast",
+    "subcategory": "Other",
+    "role": "Controller",
+    "region": "TempleOfTheFrog",
+    "deck": "TempleOfTheFrog",
+    "isBoss": false,
+    "isElite": false,
+    "dnd": {
+      "size": "Medium",
+      "type": "Beast",
+      "alignment": "Unaligned",
+      "hitPoints": 30,
+      "abilities": {
+        "strength": 10,
+        "dexterity": 12,
+        "constitution": 12,
+        "intelligence": 1,
+        "wisdom": 8,
+        "charisma": 2
+      },
+      "traits": [
+        {
+          "name": "Drenar Sangue",
+          "description": "Ao causar dano, a sanguessuga pode recuperar parte de seus pontos de vida."
+        },
+        {
+          "name": "Parasita Aquático",
+          "description": "É capaz de permanecer escondida em águas rasas e áreas pantanosas."
+        }
+      ],
+      "actions": [
+        {
+          "name": "Drenar Sangue",
+          "description": "A sanguessuga se prende ao alvo e drena seu sangue.",
+          "type": "Melee",
+          "attackBonus": 4,
+          "damage": [
+            {
+              "dice": "1d6+1",
+              "average": 4,
+              "damageType": "Piercing"
+            }
+          ]
+        }
+      ]
+    },
+    "card": {
+      "cardType": "Creature",
+      "rarity": "Uncommon",
+      "manaCost": 2,
+      "power": 5,
+      "cardHealth": 30
+    },
+    "image": {
+      "url": "/assets/images/bestiario/blackmoor/sanguessugaGigante_blackmoor.jfif",
+      "alt": "Sanguessuga Gigante de Blackmoor"
+    },
+    "tags": [
+      "blackmoor",
+      "beast",
+      "leech",
+      "swamp",
+      "drain",
+      "temple-of-the-frog"
+    ]
+  },
+  {
+    "id": "eel",
+    "slug": "eel",
+    "name": "Enguia",
+    "englishName": "Eel",
+    "description": "Criaturas aquáticas rápidas e perigosas encontradas nas águas de Blackmoor. Utilizam a escuridão e a água para realizar ataques surpresa.",
+    "category": "Beast",
+    "subcategory": "Other",
+    "role": "Assassin",
+    "region": "TempleOfTheFrog",
+    "deck": "TempleOfTheFrog",
+    "isBoss": false,
+    "isElite": false,
+    "dnd": {
+      "size": "Medium",
+      "type": "Beast",
+      "alignment": "Unaligned",
+      "hitPoints": 28,
+      "abilities": {
+        "strength": 10,
+        "dexterity": 16,
+        "constitution": 10,
+        "intelligence": 2,
+        "wisdom": 10,
+        "charisma": 3
+      },
+      "traits": [
+        {
+          "name": "Emboscada Aquática",
+          "description": "A enguia pode permanecer escondida na água antes de atacar."
+        },
+        {
+          "name": "Choque Elétrico",
+          "description": "A enguia pode liberar uma descarga elétrica contra uma criatura próxima."
+        }
+      ],
+      "actions": [
+        {
+          "name": "Mordida",
+          "description": "A enguia realiza uma mordida rápida contra o alvo.",
+          "type": "Melee",
+          "attackBonus": 5,
+          "damage": [
+            {
+              "dice": "1d8+3",
+              "average": 7,
+              "damageType": "Piercing"
+            }
+          ]
+        },
+        {
+          "name": "Choque Elétrico",
+          "description": "Libera uma descarga elétrica contra uma criatura próxima.",
+          "type": "Special",
+          "damage": [
+            {
+              "dice": "1d8",
+              "average": 4,
+              "damageType": "Lightning"
+            }
+          ]
+        }
+      ]
+    },
+    "card": {
+      "cardType": "Creature",
+      "rarity": "Uncommon",
+      "manaCost": 3,
+      "power": 10,
+      "cardHealth": 28
+    },
+    "image": {
+      "url": "/assets/images/bestiario/blackmoor/enguia_blackmoor.jfif",
+      "alt": "Enguia de Blackmoor"
+    },
+    "tags": [
+      "blackmoor",
+      "beast",
+      "eel",
+      "aquatic",
+      "ambush",
+      "temple-of-the-frog"
+    ]
+  },
+  {
+    "id": "giant_crocodile",
+    "slug": "giant-crocodile",
+    "name": "Crocodilo Gigante",
+    "englishName": "Giant Crocodile",
+    "description": "Um dos maiores predadores dos pântanos de Blackmoor. Seu tamanho e força tornam-no uma ameaça extrema mesmo para aventureiros experientes.",
+    "category": "Beast",
+    "subcategory": "Crocodile",
+    "role": "Tank",
+    "region": "TempleOfTheFrog",
+    "deck": "TempleOfTheFrog",
+    "isBoss": false,
+    "isElite": true,
+    "dnd": {
+      "size": "Huge",
+      "type": "Beast",
+      "alignment": "Unaligned",
+      "hitPoints": 80,
+      "abilities": {
+        "strength": 21,
+        "dexterity": 9,
+        "constitution": 17,
+        "intelligence": 2,
+        "wisdom": 10,
+        "charisma": 7
+      },
+      "traits": [
+        {
+          "name": "Predador Colossal",
+          "description": "Seu tamanho e força permitem dominar criaturas menores no combate."
+        },
+        {
+          "name": "Devorar",
+          "description": "Pode utilizar sua enorme mandíbula para agarrar e tentar devorar uma criatura."
+        },
+        {
+          "name": "Emboscada do Pântano",
+          "description": "Pode permanecer escondido na água e atacar suas presas de surpresa."
+        }
+      ],
+      "actions": [
+        {
+          "name": "Mordida Devastadora",
+          "description": "O crocodilo gigante desfere uma mordida capaz de causar enorme quantidade de dano.",
+          "type": "Melee",
+          "attackBonus": 8,
+          "damage": [
+            {
+              "dice": "2d10+5",
+              "average": 16,
+              "damageType": "Piercing"
+            }
+          ]
+        },
+        {
+          "name": "Cauda Esmagadora",
+          "description": "Golpeia uma criatura próxima utilizando sua enorme cauda.",
+          "type": "Melee",
+          "attackBonus": 7,
+          "damage": [
+            {
+              "dice": "2d8+5",
+              "average": 14,
+              "damageType": "Bludgeoning"
+            }
+          ]
+        }
+      ]
+    },
+    "card": {
+      "cardType": "Elite",
+      "rarity": "Rare",
+      "manaCost": 6,
+      "power": 18,
+      "cardHealth": 80
+    },
+    "image": {
+      "url": "/assets/images/bestiario/blackmoor/crocodilo_blackmoor.jfif",
+      "alt": "Crocodilo Gigante de Blackmoor"
+    },
+    "tags": [
+      "blackmoor",
+      "beast",
+      "crocodile",
+      "giant",
+      "elite",
+      "swamp",
+      "temple-of-the-frog"
+    ]
+  }
+]
