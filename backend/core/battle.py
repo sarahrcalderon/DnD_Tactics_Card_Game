@@ -1,9 +1,10 @@
-# backend/core/battle.py
-from typing import Dict, List, Optional, Any
+from typing import List, Optional, Any
+
+from core.card_engine import execute_attack_card
+
 
 class Battle:
-    """Sistema de batalha"""
-    
+
     def __init__(self, player1, player2):
         self.player1 = player1
         self.player2 = player2
@@ -38,24 +39,66 @@ class Battle:
         return {"success": True, "message": f"Turno {self.turn} iniciado"}
     
     def _play_card(self, card_index: int, target: Optional[str] = None) -> dict:
-        hand = getattr(self.current_player, 'hand', [])
-        if card_index >= len(hand):
+        hand = getattr(self.current_player, "hand", [])
+
+        if card_index < 0 or card_index >= len(hand):
             return {"success": False, "message": "Carta não encontrada"}
         
         card = hand[card_index]
         opponent = self.player2 if self.current_player == self.player1 else self.player1
-        result = card.use(opponent)
-        self.log.append(f"{self.current_player.name} jogou {card.name}")
-        
-        if result.get('damage', 0) > 0:
-            opponent.hp -= result['damage']
+
+        if card.card_type == "ataque":
+            result = execute_attack_card(
+            card_id=card.id,
+            base_damage=card.attack
+        )
+
+            damage = result["damage"]["final"]
+
+            opponent.hp -= damage
+
+            self.log.append(
+                f"{self.current_player.name} jogou {card.name}"
+            )
+
+            self.log.append(
+                f"{self.current_player.name} causou {damage} de dano"
+            )
+
             if opponent.hp <= 0:
                 opponent.hp = 0
                 self.is_active = False
                 self.winner = self.current_player
-                self.log.append(f"🏆 {self.current_player.name} venceu!")
-        
-        return {"success": True, "result": result}
+                self.log.append(
+                    f"🏆 {self.current_player.name} venceu!"
+                )
+
+            return {
+                "success": True,
+                "result": result
+            }
+
+        result = card.use(opponent)
+
+        self.log.append(
+            f"{self.current_player.name} jogou {card.name}"
+        )
+
+        if result.get("damage", 0) > 0:
+            opponent.hp -= result["damage"]
+
+            if opponent.hp <= 0:
+                opponent.hp = 0
+                self.is_active = False
+                self.winner = self.current_player
+                self.log.append(
+                    f"🏆 {self.current_player.name} venceu!"
+                )
+
+        return {
+            "success": True,
+            "result": result
+        }
     
     def _attack(self, target: Optional[str] = None) -> dict:
         damage = self.current_player.get_total_attack()
@@ -79,14 +122,14 @@ class Battle:
     def get_state(self) -> dict:
         return {
             "turn": self.turn,
-            "current_player": self.current_player.name if hasattr(self.current_player, 'name') else "Jogador",
+            "current_player": self.current_player.name if hasattr(self.current_player, "name") else "Jogador",
             "player1": {
-                "name": self.player1.name if hasattr(self.player1, 'name') else "Jogador 1",
+                "name": self.player1.name if hasattr(self.player1, "name") else "Jogador 1",
                 "hp": self.player1.hp,
                 "mana": self.player1.mana
             },
             "player2": {
-                "name": self.player2.name if hasattr(self.player2, 'name') else "Jogador 2",
+                "name": self.player2.name if hasattr(self.player2, "name") else "Jogador 2",
                 "hp": self.player2.hp,
                 "mana": self.player2.mana
             },
