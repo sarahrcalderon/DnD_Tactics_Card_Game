@@ -1,4 +1,11 @@
-import React, { useMemo, useCallback, useState, type MouseEvent } from 'react';
+import React, {
+  useMemo,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type MouseEvent,
+} from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 
@@ -160,6 +167,7 @@ export const AttributeDistPage = () => {
     deckName,
     loading,
     isDeleting,
+    isPersistenceLoaded,
     persistCurrentCharacter,
     saveCharacter,
     deleteCharacter,
@@ -198,6 +206,24 @@ export const AttributeDistPage = () => {
   }`;
 
   const [showTutorial, setShowTutorial] = useState(false);
+  const hasShownAttributeReminder = useRef(false);
+
+  useEffect(() => {
+    if (
+      !isPersistenceLoaded ||
+      isCharacterSaved ||
+      routeState.isSaved ||
+      hasShownAttributeReminder.current
+    ) {
+      return;
+    }
+
+    hasShownAttributeReminder.current = true;
+    toast('Distribua seus atributos antes de finalizar o personagem!', {
+      icon: '',
+      duration: 4000,
+    });
+  }, [isCharacterSaved, isPersistenceLoaded, routeState.isSaved]);
 
   const handleBack = useCallback(() => {
     if (isCharacterSaved && pointsRemaining === 0) {
@@ -404,11 +430,12 @@ export const AttributeDistPage = () => {
         }}
       >
         <Header>
-          <Title>Distribua seus Atributos</Title>
+          <Title>Bem-vindo, {displayName.toUpperCase()}!</Title>
           <Subtitle>
-            Você tem{' '}
+            Sua jornada começa agora
+            {/* Você tem{' '}
             <strong style={{ color: '#ffd700' }}>{TOTAL_POINTS} pontos</strong>{' '}
-            para distribuir entre seus atributos
+            para distribuir entre seus atributos */}
           </Subtitle>
         </Header>
 

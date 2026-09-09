@@ -49,6 +49,7 @@ export const useCharacterPersistence = ({
   const [deckName, setDeckName] = useState(''); // <-- AGORA DECLARADO
   const [loading, setLoading] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isPersistenceLoaded, setIsPersistenceLoaded] = useState(false);
 
   // Carregar dados ao montar / quando location.state mudar
   useEffect(() => {
@@ -74,6 +75,7 @@ export const useCharacterPersistence = ({
         onLoadAttributes(state.attributes, state.pointsRemaining ?? 0);
       }
       toast.success('Personagem carregado!', { duration: 1500 });
+      setIsPersistenceLoaded(true);
       return;
     }
 
@@ -108,6 +110,7 @@ export const useCharacterPersistence = ({
     if (state?.deckId) {
       setStoredDeckId(state.deckId);
     }
+    setIsPersistenceLoaded(true);
   }, [location.state, onLoadAttributes]);
 
   // Persistir personagem atual (salvar progresso)
@@ -290,6 +293,7 @@ export const useCharacterPersistence = ({
     setDeckName, // exposto para sincronizar com o deck gerado
     loading,
     isDeleting,
+    isPersistenceLoaded,
     persistCurrentCharacter,
     saveCharacter,
     deleteCharacter,

@@ -41,7 +41,7 @@ export const useAttributeDistribution = ({
         return;
       }
 
-      // delta < 0 (remover)
+
       if (currentValue <= baseValue) {
         return;
       }
