@@ -8,7 +8,7 @@
 ![Licença](https://img.shields.io/badge/licença-não%20definida-lightgrey?style=flat-square)
 
 <p align="center">
-  <img src="./assets/mapa" alt="Banner do projeto" width="900">
+  <img src="./launcher/public/assets/images/mapa.png" alt="Mapa de Blackmoor" width="900">
 </p>
 
 ## Índice
