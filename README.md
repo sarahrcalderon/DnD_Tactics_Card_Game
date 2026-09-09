@@ -1,11 +1,15 @@
 # Dungeon Tactics Card Game
 
-> Um jogo tático de cartas ambientado em fantasia medieval, que combina a construção estratégica de decks de *Magic: The Gathering* com o posicionamento e a tomada de decisão de RPGs táticos como *Final Fantasy Tactics*.
+> Um jogo tático de cartas ambientado em fantasia medieval, que combina a construção estratégica de decks de _Magic: The Gathering_ com o posicionamento e a tomada de decisão de RPGs táticos como _Final Fantasy Tactics_.
 
 ![Status](https://img.shields.io/badge/status-em%20desenvolvimento-f0ad4e?style=flat-square)
 ![Frontend](https://img.shields.io/badge/frontend-React%20%2B%20TypeScript-61dafb?style=flat-square)
 ![Backend](https://img.shields.io/badge/backend-FastAPI-009688?style=flat-square)
 ![Licença](https://img.shields.io/badge/licença-não%20definida-lightgrey?style=flat-square)
+
+<p align="center">
+  <img src="./assets/mapa" alt="Banner do projeto" width="900">
+</p>
 
 ## Índice
 
@@ -33,11 +37,11 @@ O projeto está em desenvolvimento ativo. O launcher já concentra a criação d
 
 ### Modos previstos
 
-| Modo | Proposta |
-| --- | --- |
+| Modo                   | Proposta                                                                                               |
+| ---------------------- | ------------------------------------------------------------------------------------------------------ |
 | **Cooperativo online** | Um grupo de até cinco jogadores enfrenta uma pessoa que controla o deck inimigo da campanha escolhida. |
-| **Solo** | O jogador enfrenta campanhas e desafios controlados pelo jogo. |
-| **Campanhas por mapa** | Cada local possui identidade, inimigos, recompensas e um deck adversário próprios. |
+| **Solo**               | O jogador enfrenta campanhas e desafios controlados pelo jogo.                                         |
+| **Campanhas por mapa** | Cada local possui identidade, inimigos, recompensas e um deck adversário próprios.                     |
 
 ### Ciclo principal
 
@@ -69,16 +73,16 @@ Além das recompensas de campanha, será possível negociar com o **Mercador**:
 
 ### Hierarquia de equipamentos
 
-| Rank | Tier | Identidade |
-| ---: | --- | --- |
-| 1 | Inicial | Equipamento comum de aventureiro. |
-| 1 | Básico | Primeiro passo de especialização. |
-| 5 | Útil | Ainda fraco, mas com identidade própria. |
-| 10 | Mediano | Equipamento funcional para composições consistentes. |
-| 15 | Bom | Equipamento de elite. |
-| 20 | Bom +1 | Equipamento excepcional. |
-| 20 | Muito bom +2 | Equipamento de alto nível. |
-| 20 | Lendário +3 | Equipamento lendário. |
+| Rank | Tier         | Identidade                                           |
+| ---: | ------------ | ---------------------------------------------------- |
+|    1 | Inicial      | Equipamento comum de aventureiro.                    |
+|    1 | Básico       | Primeiro passo de especialização.                    |
+|    5 | Útil         | Ainda fraco, mas com identidade própria.             |
+|   10 | Mediano      | Equipamento funcional para composições consistentes. |
+|   15 | Bom          | Equipamento de elite.                                |
+|   20 | Bom +1       | Equipamento excepcional.                             |
+|   20 | Muito bom +2 | Equipamento de alto nível.                           |
+|   20 | Lendário +3  | Equipamento lendário.                                |
 
 > Os nomes, valores de balanceamento e critérios de obtenção podem evoluir durante o desenvolvimento.
 
@@ -110,15 +114,14 @@ Além das recompensas de campanha, será possível negociar com o **Mercador**:
 
 ## Tecnologias
 
-| Camada | Tecnologias |
-| --- | --- |
-| Interface | React 18, TypeScript, Vite, React Router, Styled Components |
-| Experiência visual | Framer Motion, React Hot Toast |
-| Comunicação HTTP | Axios |
-| API | Python, FastAPI, Uvicorn, Pydantic |
-| Tempo real | WebSockets |
-| Aplicação desktop alternativa | Pygame e PyWebView |
-
+| Camada                        | Tecnologias                                                 |
+| ----------------------------- | ----------------------------------------------------------- |
+| Interface                     | React 18, TypeScript, Vite, React Router, Styled Components |
+| Experiência visual            | Framer Motion, React Hot Toast                              |
+| Comunicação HTTP              | Axios                                                       |
+| API                           | Python, FastAPI, Uvicorn, Pydantic                          |
+| Tempo real                    | WebSockets                                                  |
+| Aplicação desktop alternativa | Pygame e PyWebView                                          |
 
 ## Roteiro de desenvolvimento
 
@@ -129,9 +132,6 @@ Além das recompensas de campanha, será possível negociar com o **Mercador**:
 5. Adicionar autenticação, persistência remota e infraestrutura multiplayer escalável.
 6. Ampliar a cobertura de testes, observabilidade e preparação para lançamento.
 
-
-
 ## Aviso de propriedade intelectual
 
-Este é um projeto de fã e independente, sem afiliação oficial com a Wizards of the Coast, Dungeons & Dragons, *Magic: The Gathering* ou *Final Fantasy Tactics*. Todos os nomes, marcas e universos citados pertencem aos seus respectivos proprietários e são mencionados apenas como referência criativa.
-
+Este é um projeto de fã e independente, sem afiliação oficial com a Wizards of the Coast, Dungeons & Dragons, _Magic: The Gathering_ ou _Final Fantasy Tactics_. Todos os nomes, marcas e universos citados pertencem aos seus respectivos proprietários e são mencionados apenas como referência criativa.

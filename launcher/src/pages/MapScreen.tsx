@@ -35,6 +35,19 @@ import { awardBattleGold } from '../utils/goldUtils';
 
 const CAMPAIGN_STORAGE_KEY = 'blackmoorCampaignProgress';
 
+const getCampaignStorageKey = () => {
+  try {
+    const characterData = localStorage.getItem('characterData');
+    const saveId = characterData ? JSON.parse(characterData).saveId : null;
+
+    return saveId
+      ? `${CAMPAIGN_STORAGE_KEY}:${saveId}`
+      : `${CAMPAIGN_STORAGE_KEY}:new-character`;
+  } catch {
+    return `${CAMPAIGN_STORAGE_KEY}:new-character`;
+  }
+};
+
 const ROUTE_PATH: RouteCoordinate[] = [
   // Vilarejo → Bosque
   { x: 18.47, y: 70.97 },
@@ -85,17 +98,6 @@ const ROUTE_PATH: RouteCoordinate[] = [
   // Guardas → Castelo
   { x: 81.02, y: 10.79 }, // Castelo
 ];
-
-// ============================================================
-// LOCAIS DA CAMPANHA
-// ============================================================
-//
-// Cada local aponta para um ponto dentro de ROUTE_PATH.
-//
-// O jogador percorre todos os pontos intermediários
-// até chegar ao próximo local.
-//
-// ============================================================
 
 const CAMPAIGN_POINTS: CampaignPoint[] = [
   {
@@ -156,10 +158,6 @@ const CAMPAIGN_POINTS: CampaignPoint[] = [
   },
 ];
 
-// ============================================================
-// GERAR PATH SVG
-// ============================================================
-
 const createSvgPath = (points: RouteCoordinate[]) => {
   return points
     .map((point, index) => {
@@ -172,12 +170,9 @@ const createSvgPath = (points: RouteCoordinate[]) => {
     .join(' ');
 };
 
-// ============================================================
-// COMPONENTE
-// ============================================================
-
 export const MapScreen = () => {
   const navigate = useNavigate();
+  const campaignStorageKey = getCampaignStorageKey();
 
   const animationFrameRef = useRef<number | null>(null);
 
@@ -185,7 +180,7 @@ export const MapScreen = () => {
 
   const [currentStep, setCurrentStep] = useState(() => {
     try {
-      const savedProgress = localStorage.getItem(CAMPAIGN_STORAGE_KEY);
+      const savedProgress = localStorage.getItem(campaignStorageKey);
 
       if (!savedProgress) {
         return 0;
@@ -209,7 +204,7 @@ export const MapScreen = () => {
 
   const [completedSteps, setCompletedSteps] = useState<number[]>(() => {
     try {
-      const savedProgress = localStorage.getItem(CAMPAIGN_STORAGE_KEY);
+      const savedProgress = localStorage.getItem(campaignStorageKey);
 
       if (!savedProgress) {
         return [];
@@ -227,13 +222,9 @@ export const MapScreen = () => {
     }
   });
 
-  // ==========================================================
-  // CAMPANHA COMPLETA
-  // ==========================================================
-
   const [campaignCompleted, setCampaignCompleted] = useState(() => {
     try {
-      const savedProgress = localStorage.getItem(CAMPAIGN_STORAGE_KEY);
+      const savedProgress = localStorage.getItem(campaignStorageKey);
 
       if (!savedProgress) {
         return false;
@@ -247,19 +238,10 @@ export const MapScreen = () => {
     }
   });
 
-  // ==========================================================
-  // ANIMAÇÃO
-  // ==========================================================
-
   const [isMoving, setIsMoving] = useState(false);
-
-  // ==========================================================
-  // POSIÇÃO DO JOGADOR
-  // ==========================================================
-
   const [playerPosition, setPlayerPosition] = useState<RouteCoordinate>(() => {
     try {
-      const savedProgress = localStorage.getItem(CAMPAIGN_STORAGE_KEY);
+      const savedProgress = localStorage.getItem(campaignStorageKey);
 
       if (savedProgress) {
         const parsed = JSON.parse(savedProgress);
@@ -284,42 +266,21 @@ export const MapScreen = () => {
     };
   });
 
-  // ==========================================================
-  // PATH SVG COMPLETO
-  // ==========================================================
-
   const fullPath = createSvgPath(ROUTE_PATH);
-
-  // ==========================================================
-  // PATH COMPLETADO
-  // ==========================================================
-  //
-  // O caminho concluído vai até a posição atual do jogador.
-  //
-  // ==========================================================
-
   const completedPath = createSvgPath(
     ROUTE_PATH.slice(0, CAMPAIGN_POINTS[currentStep].pathIndex + 1),
   );
 
-  // ==========================================================
-  // SALVAR PROGRESSO
-  // ==========================================================
-
   useEffect(() => {
     localStorage.setItem(
-      CAMPAIGN_STORAGE_KEY,
+      campaignStorageKey,
       JSON.stringify({
         currentStep,
         completedSteps,
         campaignCompleted,
       }),
     );
-  }, [currentStep, completedSteps, campaignCompleted]);
-
-  // ==========================================================
-  // LIMPAR ANIMAÇÃO
-  // ==========================================================
+  }, [campaignStorageKey, currentStep, completedSteps, campaignCompleted]);
 
   useEffect(() => {
     return () => {
@@ -329,17 +290,9 @@ export const MapScreen = () => {
     };
   }, []);
 
-  // ==========================================================
-  // LOADING COMPLETO
-  // ==========================================================
-
   const handleLoadingComplete = () => {
     setIsLoading(false);
   };
-
-  // ==========================================================
-  // DISTÂNCIA ENTRE DOIS PONTOS
-  // ==========================================================
 
   const getDistance = (pointA: RouteCoordinate, pointB: RouteCoordinate) => {
     const deltaX = pointB.x - pointA.x;
@@ -347,14 +300,6 @@ export const MapScreen = () => {
 
     return Math.sqrt(deltaX * deltaX + deltaY * deltaY);
   };
-
-  // ==========================================================
-  // ANIMAR MOVIMENTO
-  // ==========================================================
-  //
-  // O jogador percorre cada segmento do caminho.
-  //
-  // ==========================================================
 
   const animatePlayerAlongRoute = useCallback(
     (startPathIndex: number, endPathIndex: number): Promise<void> => {
@@ -365,10 +310,6 @@ export const MapScreen = () => {
           resolve();
           return;
         }
-
-        // ======================================================
-        // CALCULAR DISTÂNCIA TOTAL
-        // ======================================================
 
         const segmentLengths: number[] = [];
 
@@ -434,10 +375,6 @@ export const MapScreen = () => {
             accumulatedDistance += segmentLength;
           }
 
-          // ====================================================
-          // FINAL
-          // ====================================================
-
           if (progress < 1) {
             animationFrameRef.current = requestAnimationFrame(animate);
 
@@ -462,24 +399,13 @@ export const MapScreen = () => {
     [],
   );
 
-  // ==========================================================
-  // VITÓRIA EM BATALHA
-  // ==========================================================
-  //
-  // Por enquanto o botão "Vitória" chama esta função.
-  //
-  // Depois, o resultado real da batalha deverá chamar
-  // esta mesma função.
-  //
-  // ==========================================================
-
   const handleBattleWin = async () => {
     if (isMoving) {
       return;
     }
 
     if (campaignCompleted) {
-      toast('🏆 A campanha de Blackmoor já foi concluída!');
+      toast(' A campanha de Blackmoor já foi concluída!');
 
       return;
     }
@@ -496,15 +422,6 @@ export const MapScreen = () => {
       `💰 +${100 + reward.bonus} ouro${reward.bonus ? ' (bônus!)' : ''}`,
     );
 
-    // ========================================================
-    // CASTELO
-    // ========================================================
-    //
-    // Se o jogador está no Castelo e vence,
-    // a campanha termina.
-    //
-    // ========================================================
-
     if (currentPoint.isBoss) {
       setCompletedSteps((previousSteps) => {
         if (previousSteps.includes(currentPoint.id)) {
@@ -516,16 +433,12 @@ export const MapScreen = () => {
 
       setCampaignCompleted(true);
 
-      toast.success('🏆 Você conquistou o Castelo de Blackmoor!', {
+      toast.success(' Você conquistou o Castelo de Blackmoor!', {
         duration: 5000,
       });
 
       return;
     }
-
-    // ========================================================
-    // PRÓXIMO PONTO
-    // ========================================================
 
     const nextStep = currentStep + 1;
 
@@ -535,23 +448,11 @@ export const MapScreen = () => {
       return;
     }
 
-    // ========================================================
-    // INICIAR MOVIMENTO
-    // ========================================================
-
     setIsMoving(true);
 
-    toast.success(`⚔️ ${currentPoint.name} conquistado!`);
-
-    // ========================================================
-    // PERCORRER A ROTA
-    // ========================================================
+    toast.success(` ${currentPoint.name} conquistado!`);
 
     await animatePlayerAlongRoute(currentPoint.pathIndex, nextPoint.pathIndex);
-
-    // ========================================================
-    // MARCAR LOCAL COMO CONCLUÍDO
-    // ========================================================
 
     setCompletedSteps((previousSteps) => {
       if (previousSteps.includes(currentPoint.id)) {
@@ -561,21 +462,13 @@ export const MapScreen = () => {
       return [...previousSteps, currentPoint.id];
     });
 
-    // ========================================================
-    // ATUALIZAR LOCAL ATUAL
-    // ========================================================
-
     setCurrentStep(nextStep);
 
     setIsMoving(false);
 
-    // ========================================================
-    // PRÓXIMA LOCALIZAÇÃO
-    // ========================================================
-
     if (nextPoint.isBoss) {
       toast.success(
-        '🏰 Você chegou ao Castelo! Prepare-se para a batalha final.',
+        ' Você chegou ao Castelo! Prepare-se para a batalha final.',
         {
           duration: 5000,
         },
@@ -584,12 +477,8 @@ export const MapScreen = () => {
       return;
     }
 
-    toast.success(`📍 Você chegou a ${nextPoint.name}!`);
+    toast.success(` Você chegou a ${nextPoint.name}!`);
   };
-
-  // ==========================================================
-  // ABRIR BOLSA
-  // ==========================================================
 
   const handleOpenBag = () => {
     navigate('/bag', {
@@ -598,10 +487,6 @@ export const MapScreen = () => {
       },
     });
   };
-
-  // ==========================================================
-  // ABRIR DECK
-  // ==========================================================
 
   const handleOpenDeck = () => {
     const savedData = localStorage.getItem('characterData');
@@ -627,9 +512,7 @@ export const MapScreen = () => {
 
           return;
         }
-      } catch {
-        // Ignora erro de leitura.
-      }
+      } catch {}
     }
 
     toast('Nenhum deck encontrado');
@@ -637,49 +520,23 @@ export const MapScreen = () => {
     navigate('/deck-select');
   };
 
-  // ==========================================================
-  // BESTIÁRIO
-  // ==========================================================
-
   const handleOpenBestiary = () => {
-    toast('Bestiário em desenvolvimento', {
-      duration: 2000,
-    });
+    navigate('/bestiary');
   };
-
-  // ==========================================================
-  // RENDERIZAR LOADING
-  // ==========================================================
 
   if (isLoading) {
     return <LoadingScreen onComplete={handleLoadingComplete} />;
   }
 
-  // ==========================================================
-  // LOCAL ATUAL
-  // ==========================================================
-
   const currentPoint = CAMPAIGN_POINTS[currentStep];
-
-  // ==========================================================
-  // RENDER
-  // ==========================================================
 
   return (
     <Container>
       <MapContainer>
-        {/* ================================================ */}
-        {/* MAPA */}
-        {/* ================================================ */}
-
         <MapContent>
-          {/* ============================================== */}
-          {/* MENU */}
-          {/* ============================================== */}
-
           <TopMenu>
             <MenuLeft>
-              <MenuTitle>⚔️ Blackmoor</MenuTitle>
+              <MenuTitle> Blackmoor</MenuTitle>
             </MenuLeft>
             <MenuRight>
               <MenuButton onClick={handleBattleWin} disabled={isMoving} $active>
@@ -687,35 +544,13 @@ export const MapScreen = () => {
               </MenuButton>
             </MenuRight>
           </TopMenu>
-
-          {/* ============================================== */}
-          {/* MAPA */}
-          {/* ============================================== */}
-
           <Battlefield>
             <SideMenu />
             <RouteContainer>
-              {/* ============================================ */}
-              {/* SVG */}
-              {/* ============================================ */}
-
               <RouteSVG viewBox="0 0 100 100" preserveAspectRatio="none">
-                {/* ======================================== */}
-                {/* CAMINHO COMPLETO */}
-                {/* ======================================== */}
-
                 <RouteLine d={fullPath} />
-
-                {/* ======================================== */}
-                {/* CAMINHO COMPLETADO */}
-                {/* ======================================== */}
-
                 <RouteLineCompleted d={completedPath} />
               </RouteSVG>
-
-              {/* ============================================ */}
-              {/* LOCAIS DA CAMPANHA */}
-              {/* ============================================ */}
 
               {CAMPAIGN_POINTS.map((point, index) => {
                 const isCurrent = index === currentStep;
@@ -751,10 +586,6 @@ export const MapScreen = () => {
                 );
               })}
 
-              {/* ============================================ */}
-              {/* JOGADOR */}
-              {/* ============================================ */}
-
               <PlayerMarker
                 $x={playerPosition.x}
                 $y={playerPosition.y}
@@ -768,13 +599,9 @@ export const MapScreen = () => {
             <EnemyMenu />
           </Battlefield>
 
-          {/* ============================================== */}
-          {/* STATUS */}
-          {/* ============================================== */}
-
           <CampaignStatus>
             <CampaignStatusTitle>
-              {campaignCompleted ? '🏆 Campanha Concluída' : '📍 Local Atual'}
+              {campaignCompleted ? ' Campanha Concluída' : ' Local Atual'}
             </CampaignStatusTitle>
 
             <CampaignStatusText>
