@@ -1,9 +1,8 @@
-# backend/models/player.py
 from dataclasses import dataclass
 from typing import Optional, List
 
 from models.card import Card
-from models.deck import Deck
+from backend.deck.deck import Deck
 
 @dataclass
 class Player:

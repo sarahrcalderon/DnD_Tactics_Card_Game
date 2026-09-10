@@ -1,8 +1,7 @@
-# backend/core/game.py
 from typing import Optional, Dict, Any
 from models.character import Character
 from models.player import Player
-from models.deck import Deck
+from deck.deck import Deck
 
 
 class Game:
