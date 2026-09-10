@@ -1,4 +1,3 @@
-# backend/core/state.py
 from enum import Enum
 
 class GameState(Enum):
