@@ -45,6 +45,9 @@ class Battle:
         }
 
     def _end_turn(self) -> dict:
+        self.player1.status.process_turn()
+        self.player2.status.process_turn()
+
         self.turn += 1
 
         self.current_player = (

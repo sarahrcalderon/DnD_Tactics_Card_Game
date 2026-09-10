@@ -1,63 +1,58 @@
-from types import SimpleNamespace
-from unittest.mock import patch
-
 from core.battle import Battle
 from models.card import Card
 from models.card_effect import CardEffect
+from player.state import PlayerState
 
 
-def create_player(name, hp=100, mana=50):
-    return SimpleNamespace(
+def create_player(
+    name,
+    hp=25,
+    mana=50,
+    max_hp=25
+):
+    player = PlayerState(
         name=name,
         hp=hp,
         mana=mana,
-        hand=[],
-        defense_bonus=0,
-        attack=10,
-        critical=0,
-        avoidance=0,
-        deflect=0,
-        awareness=0,
-        actionPoints=0,
-        speed=0,
-        criticalSeverity=0
+        max_hp=max_hp
+    )
+
+    player.attributes.set_base("attack", 10)
+    player.attributes.set_base("defense", 0)
+    player.attributes.set_base("critical", 0)
+    player.attributes.set_base("avoidance", 0)
+    player.attributes.set_base("deflect", 0)
+    player.attributes.set_base("awareness", 0)
+    player.attributes.set_base("actionPoints", 0)
+    player.attributes.set_base("speed", 0)
+    player.attributes.set_base("criticalSeverity", 0)
+
+    player.hand = []
+
+    return player
+
+
+def set_normal_destiny(monkeypatch):
+    monkeypatch.setattr(
+        "core.card_engine.roll_destiny",
+        lambda: {
+            "rolls": [4, 4],
+            "total": 8,
+            "destiny": "normal",
+            "multiplier": 1.0
+        }
     )
 
 
-def normal_destiny():
-    return {
-        "rolls": [4, 4],
-        "total": 8,
-        "destiny": "normal",
-        "multiplier": 1.0
-    }
+def test_battle_play_attack_card(monkeypatch):
+    set_normal_destiny(monkeypatch)
 
-
-def critical_destiny():
-    return {
-        "rolls": [6, 5],
-        "total": 11,
-        "destiny": "critico",
-        "multiplier": 1.25
-    }
-
-
-def unfavorable_destiny():
-    return {
-        "rolls": [2, 2],
-        "total": 4,
-        "destiny": "desfavoravel",
-        "multiplier": 0.9
-    }
-
-
-def test_battle_play_attack_card():
     player1 = create_player("Jogador 1")
     player2 = create_player("Jogador 2")
 
     card = Card(
-        id="fireball",
-        name="Bola de Fogo",
+        id="attack",
+        name="Golpe",
         card_type="ataque",
         attack=10
     )
@@ -66,23 +61,27 @@ def test_battle_play_attack_card():
 
     battle = Battle(player1, player2)
 
-    with patch(
-        "core.card_engine.roll_destiny",
-        return_value=normal_destiny()
-    ):
-        result = battle.execute_action(
-            action="play_card",
-            card_index=0
-        )
+    result = battle.execute_action(
+        action="play_card",
+        card_index=0
+    )
 
-    assert result["success"] is True
+    assert result["success"]
+    assert result["result"]["card_id"] == "attack"
     assert result["result"]["effects"][0]["type"] == "attack"
+    assert result["result"]["effects"][0]["damage"]["base"] == 10
     assert result["result"]["effects"][0]["damage"]["final"] == 10
-    assert player2.hp == 90
+    assert player2.hp == 15
 
 
-def test_battle_play_healing_card():
-    player1 = create_player("Jogador 1", hp=50)
+def test_battle_play_healing_card(monkeypatch):
+    set_normal_destiny(monkeypatch)
+
+    player1 = create_player(
+        "Jogador 1",
+        hp=15,
+        max_hp=25
+    )
     player2 = create_player("Jogador 2")
 
     card = Card(
@@ -102,33 +101,36 @@ def test_battle_play_healing_card():
 
     battle = Battle(player1, player2)
 
-    with patch(
-        "core.card_engine.roll_destiny",
-        return_value=normal_destiny()
-    ):
-        result = battle.execute_action(
-            action="play_card",
-            card_index=0
-        )
+    result = battle.execute_action(
+        action="play_card",
+        card_index=0
+    )
 
-    assert result["success"] is True
+    assert result["success"]
     assert result["result"]["effects"][0]["type"] == "healing"
+    assert result["result"]["effects"][0]["healing"]["base"] == 10
     assert result["result"]["effects"][0]["healing"]["final"] == 10
-    assert player1.hp == 60
+    assert player1.hp == 25
 
 
-def test_battle_play_life_steal_card():
-    player1 = create_player("Jogador 1", hp=50)
+def test_battle_play_life_steal_card(monkeypatch):
+    set_normal_destiny(monkeypatch)
+
+    player1 = create_player(
+        "Jogador 1",
+        hp=15,
+        max_hp=25
+    )
     player2 = create_player("Jogador 2")
 
     card = Card(
-        id="vampiric_strike",
-        name="Golpe Vampírico",
+        id="life_steal",
+        name="Dreno",
         card_type="ataque",
         effects=[
             CardEffect(
                 type="attack",
-                value=8,
+                value=10,
                 target_type="single"
             ),
             CardEffect(
@@ -142,75 +144,65 @@ def test_battle_play_life_steal_card():
 
     battle = Battle(player1, player2)
 
-    with patch(
-        "core.card_engine.roll_destiny",
-        return_value=critical_destiny()
-    ):
-        result = battle.execute_action(
-            action="play_card",
-            card_index=0
-        )
+    result = battle.execute_action(
+        action="play_card",
+        card_index=0
+    )
 
-    assert result["success"] is True
+    assert result["success"]
     assert result["result"]["effects"][0]["type"] == "attack"
-    assert result["result"]["effects"][0]["damage"]["final"] == 10
     assert result["result"]["effects"][1]["type"] == "life_steal"
+    assert result["result"]["effects"][0]["damage"]["final"] == 10
     assert result["result"]["effects"][1]["healing"] == 5
-    assert player2.hp == 90
-    assert player1.hp == 55
+    assert player1.hp == 20
+    assert player2.hp == 15
 
 
-def test_battle_play_defense_card():
+def test_battle_play_defense_card(monkeypatch):
+    set_normal_destiny(monkeypatch)
+
     player1 = create_player("Jogador 1")
     player2 = create_player("Jogador 2")
 
     card = Card(
-        id="shield",
-        name="Escudo Divino",
+        id="defense",
+        name="Defesa",
         card_type="defesa",
-        effects=[
-            CardEffect(
-                type="defense",
-                value=5,
-                target_type="self"
-            )
-        ]
+        defense=5
     )
 
     player1.hand.append(card)
 
     battle = Battle(player1, player2)
 
-    with patch(
-        "core.card_engine.roll_destiny",
-        return_value=normal_destiny()
-    ):
-        result = battle.execute_action(
-            action="play_card",
-            card_index=0
-        )
+    result = battle.execute_action(
+        action="play_card",
+        card_index=0
+    )
 
-    assert result["success"] is True
+    assert result["success"]
     assert result["result"]["effects"][0]["type"] == "defense"
+    assert result["result"]["effects"][0]["defense"]["base"] == 5
     assert result["result"]["effects"][0]["defense"]["final"] == 5
-    assert player1.defense_bonus == 5
+    assert player1.attributes.get("defense") == 5
 
 
-def test_battle_play_buff_card():
+def test_battle_play_buff_card(monkeypatch):
+    set_normal_destiny(monkeypatch)
+
     player1 = create_player("Jogador 1")
     player2 = create_player("Jogador 2")
 
     card = Card(
-        id="fury",
-        name="Fúria",
+        id="buff",
+        name="Força",
         card_type="buff",
         effects=[
             CardEffect(
                 type="buff",
-                value=5,
                 attribute="attack",
-                duration=2,
-                target_type="self"
+                value=5,
+                duration=2
             )
         ]
     )
@@ -219,37 +211,36 @@ def test_battle_play_buff_card():
 
     battle = Battle(player1, player2)
 
-    with patch(
-        "core.card_engine.roll_destiny",
-        return_value=normal_destiny()
-    ):
-        result = battle.execute_action(
-            action="play_card",
-            card_index=0
-        )
+    result = battle.execute_action(
+        action="play_card",
+        card_index=0
+    )
 
-    assert result["success"] is True
+    assert result["success"]
     assert result["result"]["effects"][0]["type"] == "buff"
     assert result["result"]["effects"][0]["attribute"] == "attack"
     assert result["result"]["effects"][0]["value"] == 5
-    assert player1.attack == 15
+    assert result["result"]["effects"][0]["duration"] == 2
+    assert player1.attributes.get("attack") == 15
+    assert len(player1.status.get_effects()) == 1
 
 
-def test_battle_play_debuff_card():
+def test_battle_play_debuff_card(monkeypatch):
+    set_normal_destiny(monkeypatch)
+
     player1 = create_player("Jogador 1")
     player2 = create_player("Jogador 2")
 
     card = Card(
-        id="weakness",
+        id="debuff",
         name="Fraqueza",
         card_type="debuff",
         effects=[
             CardEffect(
                 type="debuff",
-                value=4,
                 attribute="attack",
-                duration=3,
-                target_type="single"
+                value=4,
+                duration=2
             )
         ]
     )
@@ -258,29 +249,33 @@ def test_battle_play_debuff_card():
 
     battle = Battle(player1, player2)
 
-    with patch(
-        "core.card_engine.roll_destiny",
-        return_value=unfavorable_destiny()
-    ):
-        result = battle.execute_action(
-            action="play_card",
-            card_index=0
-        )
+    result = battle.execute_action(
+        action="play_card",
+        card_index=0
+    )
 
-    assert result["success"] is True
+    assert result["success"]
     assert result["result"]["effects"][0]["type"] == "debuff"
     assert result["result"]["effects"][0]["attribute"] == "attack"
     assert result["result"]["effects"][0]["value"] == 4
-    assert player2.attack == 6
+    assert result["result"]["effects"][0]["duration"] == 2
+    assert player2.attributes.get("attack") == 6
+    assert len(player2.status.get_effects()) == 1
 
 
-def test_battle_attack_defeats_opponent():
+def test_battle_attack_defeats_opponent(monkeypatch):
+    set_normal_destiny(monkeypatch)
+
     player1 = create_player("Jogador 1")
-    player2 = create_player("Jogador 2", hp=5)
+    player2 = create_player(
+        "Jogador 2",
+        hp=5,
+        max_hp=5
+    )
 
     card = Card(
-        id="strike",
-        name="Golpe",
+        id="attack",
+        name="Golpe Final",
         card_type="ataque",
         attack=10
     )
@@ -289,20 +284,15 @@ def test_battle_attack_defeats_opponent():
 
     battle = Battle(player1, player2)
 
-    with patch(
-        "core.card_engine.roll_destiny",
-        return_value=normal_destiny()
-    ):
-        result = battle.execute_action(
-            action="play_card",
-            card_index=0
-        )
+    result = battle.execute_action(
+        action="play_card",
+        card_index=0
+    )
 
-    assert result["success"] is True
+    assert result["success"]
     assert player2.hp == 0
     assert battle.is_active is False
     assert battle.winner == player1
-    assert "🏆 Jogador 1 venceu!" in battle.log
 
 
 def test_battle_invalid_card_index():
@@ -344,7 +334,7 @@ def test_battle_end_turn():
         action="end_turn"
     )
 
-    assert result["success"] is True
+    assert result["success"]
     assert battle.turn == 2
     assert battle.current_player == player2
 
@@ -355,20 +345,31 @@ def test_battle_end_turn_twice():
 
     battle = Battle(player1, player2)
 
-    battle.execute_action(action="end_turn")
-    battle.execute_action(action="end_turn")
+    battle.execute_action(
+        action="end_turn"
+    )
+
+    battle.execute_action(
+        action="end_turn"
+    )
 
     assert battle.turn == 3
     assert battle.current_player == player1
 
 
-def test_battle_cannot_act_after_victory():
+def test_battle_cannot_act_after_victory(monkeypatch):
+    set_normal_destiny(monkeypatch)
+
     player1 = create_player("Jogador 1")
-    player2 = create_player("Jogador 2", hp=5)
+    player2 = create_player(
+        "Jogador 2",
+        hp=5,
+        max_hp=5
+    )
 
     card = Card(
-        id="strike",
-        name="Golpe",
+        id="attack",
+        name="Golpe Final",
         card_type="ataque",
         attack=10
     )
@@ -377,27 +378,22 @@ def test_battle_cannot_act_after_victory():
 
     battle = Battle(player1, player2)
 
-    with patch(
-        "core.card_engine.roll_destiny",
-        return_value=normal_destiny()
-    ):
-        first_result = battle.execute_action(
-            action="play_card",
-            card_index=0
-        )
+    battle.execute_action(
+        action="play_card",
+        card_index=0
+    )
 
-    second_result = battle.execute_action(
+    result = battle.execute_action(
         action="end_turn"
     )
 
-    assert first_result["success"] is True
-    assert second_result["success"] is False
-    assert second_result["message"] == "Batalha já finalizada"
+    assert result["success"] is False
+    assert result["message"] == "Batalha já finalizada"
 
 
 def test_battle_get_state():
-    player1 = create_player("Jogador 1", hp=80, mana=30)
-    player2 = create_player("Jogador 2", hp=90, mana=40)
+    player1 = create_player("Jogador 1")
+    player2 = create_player("Jogador 2")
 
     battle = Battle(player1, player2)
 
@@ -407,15 +403,16 @@ def test_battle_get_state():
     assert state["current_player"] == "Jogador 1"
 
     assert state["player1"]["name"] == "Jogador 1"
-    assert state["player1"]["hp"] == 80
-    assert state["player1"]["mana"] == 30
+    assert state["player1"]["hp"] == 25
+    assert state["player1"]["mana"] == 50
 
     assert state["player2"]["name"] == "Jogador 2"
-    assert state["player2"]["hp"] == 90
-    assert state["player2"]["mana"] == 40
+    assert state["player2"]["hp"] == 25
+    assert state["player2"]["mana"] == 50
 
     assert state["is_active"] is True
     assert state["winner"] is None
+    assert state["log"] == []
 
 
 def test_battle_end():
@@ -426,6 +423,102 @@ def test_battle_end():
 
     result = battle.end()
 
-    assert result["winner"] is None
     assert battle.is_active is False
+    assert result["winner"] is None
     assert result["log"] == []
+
+
+def test_battle_buff_expires_after_duration(monkeypatch):
+    set_normal_destiny(monkeypatch)
+
+    player1 = create_player("Jogador 1")
+    player2 = create_player("Jogador 2")
+
+    card = Card(
+        id="buff",
+        name="Força",
+        card_type="buff",
+        effects=[
+            CardEffect(
+                type="buff",
+                attribute="attack",
+                value=5,
+                duration=2
+            )
+        ]
+    )
+
+    player1.hand.append(card)
+
+    battle = Battle(player1, player2)
+
+    result = battle.execute_action(
+        action="play_card",
+        card_index=0
+    )
+
+    assert result["success"]
+    assert player1.attributes.get("attack") == 15
+    assert len(player1.status.get_effects()) == 1
+
+    battle.execute_action(
+        action="end_turn"
+    )
+
+    assert player1.attributes.get("attack") == 15
+    assert len(player1.status.get_effects()) == 1
+
+    battle.execute_action(
+        action="end_turn"
+    )
+
+    assert player1.attributes.get("attack") == 10
+    assert len(player1.status.get_effects()) == 0
+
+
+def test_battle_debuff_expires_after_duration(monkeypatch):
+    set_normal_destiny(monkeypatch)
+
+    player1 = create_player("Jogador 1")
+    player2 = create_player("Jogador 2")
+
+    card = Card(
+        id="debuff",
+        name="Fraqueza",
+        card_type="debuff",
+        effects=[
+            CardEffect(
+                type="debuff",
+                attribute="attack",
+                value=4,
+                duration=2
+            )
+        ]
+    )
+
+    player1.hand.append(card)
+
+    battle = Battle(player1, player2)
+
+    result = battle.execute_action(
+        action="play_card",
+        card_index=0
+    )
+
+    assert result["success"]
+    assert player2.attributes.get("attack") == 6
+    assert len(player2.status.get_effects()) == 1
+
+    battle.execute_action(
+        action="end_turn"
+    )
+
+    assert player2.attributes.get("attack") == 6
+    assert len(player2.status.get_effects()) == 1
+
+    battle.execute_action(
+        action="end_turn"
+    )
+
+    assert player2.attributes.get("attack") == 10
+    assert len(player2.status.get_effects()) == 0

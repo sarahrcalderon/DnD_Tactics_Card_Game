@@ -1,6 +1,8 @@
 from types import SimpleNamespace
 
 from core.card_effects.applier import apply_effect, apply_effects
+from models.active_effect import ActiveEffect
+from player.state import PlayerState
 
 
 def create_players():
@@ -16,6 +18,22 @@ def create_players():
         hp=100,
         defense_bonus=0,
         attack=10
+    )
+
+    return player, opponent
+
+
+def create_state_players():
+    player = PlayerState(
+        name="Jogador",
+        hp=100,
+        mana=100
+    )
+
+    opponent = PlayerState(
+        name="Oponente",
+        hp=100,
+        mana=100
     )
 
     return player, opponent
@@ -172,3 +190,157 @@ def test_apply_multiple_effects():
     assert opponent.hp == 88
     assert player.hp == 56
     assert len(results) == 2
+
+
+def test_apply_buff_to_player_state():
+    player, opponent = create_state_players()
+
+    player.attributes.set_base(
+        "attack",
+        10
+    )
+
+    result = apply_effect(
+        {
+            "type": "buff",
+            "attribute": "attack",
+            "value": 5,
+            "duration": 2
+        },
+        player,
+        opponent
+    )
+
+    assert player.attributes.get("attack") == 15
+    assert player.attributes.get_modifier("attack") == 5
+    assert len(player.status.get_effects()) == 1
+    assert result["new_value"] == 15
+    assert result["duration"] == 2
+
+
+def test_apply_debuff_to_player_state():
+    player, opponent = create_state_players()
+
+    opponent.attributes.set_base(
+        "defense",
+        10
+    )
+
+    result = apply_effect(
+        {
+            "type": "debuff",
+            "attribute": "defense",
+            "value": 4,
+            "duration": 2
+        },
+        player,
+        opponent
+    )
+
+    assert opponent.attributes.get("defense") == 6
+    assert opponent.attributes.get_modifier("defense") == -4
+    assert len(opponent.status.get_effects()) == 1
+    assert result["new_value"] == 6
+
+
+def test_apply_buff_expires_from_player_state():
+    player, opponent = create_state_players()
+
+    player.attributes.set_base(
+        "attack",
+        10
+    )
+
+    apply_effect(
+        {
+            "type": "buff",
+            "attribute": "attack",
+            "value": 5,
+            "duration": 1
+        },
+        player,
+        opponent
+    )
+
+    assert player.attributes.get("attack") == 15
+
+    player.status.process_turn()
+
+    assert player.attributes.get("attack") == 10
+    assert player.attributes.get_modifier("attack") == 0
+    assert player.status.get_effects() == []
+
+
+def test_apply_debuff_expires_from_player_state():
+    player, opponent = create_state_players()
+
+    opponent.attributes.set_base(
+        "defense",
+        10
+    )
+
+    apply_effect(
+        {
+            "type": "debuff",
+            "attribute": "defense",
+            "value": 4,
+            "duration": 1
+        },
+        player,
+        opponent
+    )
+
+    assert opponent.attributes.get("defense") == 6
+
+    opponent.status.process_turn()
+
+    assert opponent.attributes.get("defense") == 10
+    assert opponent.attributes.get_modifier("defense") == 0
+    assert opponent.status.get_effects() == []
+
+
+def test_apply_multiple_status_effects_to_player_state():
+    player, opponent = create_state_players()
+
+    player.attributes.set_base(
+        "attack",
+        10
+    )
+
+    apply_effect(
+        {
+            "type": "buff",
+            "attribute": "attack",
+            "value": 5,
+            "duration": 2
+        },
+        player,
+        opponent
+    )
+
+    apply_effect(
+        {
+            "type": "buff",
+            "attribute": "attack",
+            "value": 3,
+            "duration": 1
+        },
+        player,
+        opponent
+    )
+
+    assert player.attributes.get("attack") == 18
+    assert player.attributes.get_modifier("attack") == 8
+    assert len(player.status.get_effects()) == 2
+
+    player.status.process_turn()
+
+    assert player.attributes.get("attack") == 15
+    assert player.attributes.get_modifier("attack") == 5
+    assert len(player.status.get_effects()) == 1
+
+    player.status.process_turn()
+
+    assert player.attributes.get("attack") == 10
+    assert player.attributes.get_modifier("attack") == 0
+    assert player.status.get_effects() == []
