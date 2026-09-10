@@ -1,44 +1,87 @@
-from core.combat import apply_destiny
+from core.card_effects.attack import execute_attack
+from core.card_effects.buff import execute_buff
+from core.card_effects.debuff import execute_debuff
+from core.card_effects.healing import execute_healing
+from core.card_effects.life_steal import execute_life_steal
+from core.card_effects.defense import execute_defense
 from core.destiny import roll_destiny
 
-
-def execute_attack_card(
-    card_id: str,
-    base_damage: int,
-    base_healing: int = 0
-) -> dict:
-    if base_damage < 0:
-        raise ValueError("O dano base não pode ser negativo.")
-
-    if base_healing < 0:
-        raise ValueError("A cura base não pode ser negativa.")
-
+def execute_card(card) -> dict:
     destiny = roll_destiny()
+    multiplier = destiny["multiplier"]
 
-    final_damage = apply_destiny(
-        base_damage,
-        destiny["multiplier"]
-    )
+    results = []
 
-    final_healing = apply_destiny(
-        base_healing,
-        destiny["multiplier"]
-    )
+    for effect in card.effects:
+        if effect.type == "attack":
+            result = execute_attack(
+                base_damage=effect.value,
+                multiplier=multiplier,
+                target_type=effect.target_type
+            )
+
+        elif effect.type == "defense":
+            result = execute_defense(
+                base_defense=effect.value,
+                multiplier=multiplier,
+                target_type=effect.target_type
+            )
+
+        elif effect.type == "healing":
+            result = execute_healing(
+                base_healing=effect.value,
+                multiplier=multiplier,
+                target_type=effect.target_type
+            )
+
+        elif effect.type == "buff":
+            result = execute_buff(
+                attribute=effect.attribute,
+                value=effect.value,
+                duration=effect.duration
+            )
+
+        elif effect.type == "debuff":
+            result = execute_debuff(
+                attribute=effect.attribute,
+                value=effect.value,
+                duration=effect.duration
+            )
+
+        elif effect.type == "life_steal":
+            attack_result = next(
+                (
+                    item
+                    for item in results
+                    if item["type"] == "attack"
+                ),
+                None
+            )
+
+            if attack_result is None:
+                raise ValueError(
+                    "Roubo de vida exige um efeito de ataque."
+                )
+
+            result = execute_life_steal(
+                final_damage=attack_result["damage"]["final"],
+                percentage=effect.percentage
+            )
+
+        else:
+            raise ValueError(
+                f"Tipo de efeito não suportado: {effect.type}"
+            )
+
+        results.append(result)
 
     return {
-        "card_id": card_id,
+        "card_id": card.id,
         "destiny": {
             "rolls": destiny["rolls"],
             "total": destiny["total"],
             "result": destiny["destiny"],
-            "multiplier": destiny["multiplier"]
+            "multiplier": multiplier
         },
-        "damage": {
-            "base": base_damage,
-            "final": final_damage
-        },
-        "healing": {
-            "base": base_healing,
-            "final": final_healing
-        }
+        "effects": results
     }

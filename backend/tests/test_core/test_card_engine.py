@@ -1,84 +1,168 @@
 from unittest.mock import patch
 
-from core.card_engine import execute_attack_card
+from core.card_engine import execute_card
+from models.card import Card
+from models.card_effect import CardEffect
 
 
 def test_execute_attack_card_normal():
-    with patch("core.card_engine.roll_destiny", return_value={
+    card = Card(
+        id="fireball",
+        name="Bola de Fogo",
+        card_type="ataque",
+        effects=[
+            CardEffect(
+                type="attack",
+                value=10,
+                target_type="single"
+            )
+        ]
+    )
+
+    destiny = {
         "rolls": [4, 4],
         "total": 8,
         "destiny": "normal",
-        "multiplier": 1.00
-    }):
-        result = execute_attack_card(
-            card_id="lanca_do_alvorecer",
-            base_damage=6,
-            base_healing=2
-        )
+        "multiplier": 1.0
+    }
 
-    assert result["card_id"] == "lanca_do_alvorecer"
-    assert result["destiny"]["total"] == 8
+    with patch(
+        "core.card_engine.roll_destiny",
+        return_value=destiny
+    ):
+        result = execute_card(card)
+
+    assert result["card_id"] == "fireball"
     assert result["destiny"]["result"] == "normal"
-    assert result["damage"]["base"] == 6
-    assert result["damage"]["final"] == 6
-    assert result["healing"]["base"] == 2
-    assert result["healing"]["final"] == 2
+    assert result["destiny"]["multiplier"] == 1.0
+    assert result["effects"][0]["type"] == "attack"
+    assert result["effects"][0]["damage"]["base"] == 10
+    assert result["effects"][0]["damage"]["final"] == 10
 
 
 def test_execute_attack_card_critico():
-    with patch("core.card_engine.roll_destiny", return_value={
-        "rolls": [5, 6],
+    card = Card(
+        id="critical_strike",
+        name="Golpe Crítico",
+        card_type="ataque",
+        effects=[
+            CardEffect(
+                type="attack",
+                value=10,
+                target_type="single"
+            )
+        ]
+    )
+
+    destiny = {
+        "rolls": [6, 5],
         "total": 11,
         "destiny": "critico",
         "multiplier": 1.25
-    }):
-        result = execute_attack_card(
-            card_id="lanca_do_alvorecer",
-            base_damage=6,
-            base_healing=2
-        )
+    }
 
-    assert result["damage"]["final"] == 8
-    assert result["healing"]["final"] == 3
+    with patch(
+        "core.card_engine.roll_destiny",
+        return_value=destiny
+    ):
+        result = execute_card(card)
+
+    assert result["destiny"]["result"] == "critico"
+    assert result["destiny"]["multiplier"] == 1.25
+    assert result["effects"][0]["damage"]["final"] == 13
 
 
 def test_execute_attack_card_azar():
-    with patch("core.card_engine.roll_destiny", return_value={
+    card = Card(
+        id="weak_strike",
+        name="Golpe Fraco",
+        card_type="ataque",
+        effects=[
+            CardEffect(
+                type="attack",
+                value=10,
+                target_type="single"
+            )
+        ]
+    )
+
+    destiny = {
         "rolls": [1, 2],
         "total": 3,
         "destiny": "azar",
         "multiplier": 0.75
-    }):
-        result = execute_attack_card(
-            card_id="lanca_do_alvorecer",
-            base_damage=6,
-            base_healing=2
-        )
+    }
 
-    assert result["damage"]["final"] == 5
-    assert result["healing"]["final"] == 2
+    with patch(
+        "core.card_engine.roll_destiny",
+        return_value=destiny
+    ):
+        result = execute_card(card)
+
+    assert result["destiny"]["result"] == "azar"
+    assert result["destiny"]["multiplier"] == 0.75
+    assert result["effects"][0]["damage"]["final"] == 8
 
 
-def test_execute_attack_card_rejects_negative_damage():
-    with patch("core.card_engine.roll_destiny"):
-        try:
-            execute_attack_card(
-                card_id="lanca_do_alvorecer",
-                base_damage=-1
+def test_execute_defense_card():
+    card = Card(
+        id="shield",
+        name="Escudo",
+        card_type="defesa",
+        effects=[
+            CardEffect(
+                type="defense",
+                value=10,
+                target_type="self"
             )
-            assert False
-        except ValueError:
-            assert True
+        ]
+    )
+
+    destiny = {
+        "rolls": [4, 4],
+        "total": 8,
+        "destiny": "normal",
+        "multiplier": 1.0
+    }
+
+    with patch(
+        "core.card_engine.roll_destiny",
+        return_value=destiny
+    ):
+        result = execute_card(card)
+
+    assert result["effects"][0]["type"] == "defense"
+    assert result["effects"][0]["defense"]["base"] == 10
+    assert result["effects"][0]["defense"]["final"] == 10
 
 
-def test_execute_attack_card_rejects_negative_healing():
-    with patch("core.card_engine.roll_destiny"):
-        try:
-            execute_attack_card(
-                card_id="lanca_do_alvorecer",
-                base_damage=6,
-                base_healing=-1
+def test_execute_healing_card():
+    card = Card(
+        id="heal",
+        name="Cura",
+        card_type="cura",
+        effects=[
+            CardEffect(
+                type="healing",
+                value=10,
+                target_type="self"
             )
-            assert False
-        except ValueError:
-            assert True
+        ]
+    )
+
+    destiny = {
+        "rolls": [5, 4],
+        "total": 9,
+        "destiny": "sorte",
+        "multiplier": 1.1
+    }
+
+    with patch(
+        "core.card_engine.roll_destiny",
+        return_value=destiny
+    ):
+        result = execute_card(card)
+
+    assert result["effects"][0]["type"] == "healing"
+    assert result["effects"][0]["healing"]["base"] == 10
+    assert result["effects"][0]["healing"]["final"] == 11

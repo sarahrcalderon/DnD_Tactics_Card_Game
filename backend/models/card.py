@@ -1,5 +1,8 @@
-from dataclasses import dataclass
-from typing import Optional, Dict, Any
+from dataclasses import dataclass, field
+from typing import Any, Dict, List
+
+from models.card_effect import CardEffect
+
 
 @dataclass
 class Card:
@@ -13,23 +16,8 @@ class Card:
     effect: str = ""
     rarity: str = "comum"
     image_path: str = ""
-    
-    def use(self, target) -> Dict[str, Any]:
-        result = {"success": False, "damage": 0, "heal": 0, "message": ""}
-        
-        if self.card_type == "ataque":
-            result["damage"] = self.attack
-            result["message"] = f"{self.name} causou {self.attack} de dano"
-            result["success"] = True
-            
-        elif self.card_type == "defesa":
-            if target:
-                target.defense_bonus += self.defense
-            result["message"] = f"{self.name} concedeu {self.defense} de defesa"
-            result["success"] = True
-        
-        return result
-    
+    effects: List[CardEffect] = field(default_factory=list)
+
     def to_dict(self) -> dict:
         return {
             "id": self.id,
@@ -40,11 +28,21 @@ class Card:
             "cost": self.cost,
             "level": self.level,
             "effect": self.effect,
-            "rarity": self.rarity
+            "rarity": self.rarity,
+            "image_path": self.image_path,
+            "effects": [
+                card_effect.to_dict()
+                for card_effect in self.effects
+            ]
         }
-    
+
     @classmethod
-    def from_dict(cls, data: dict) -> 'Card':
+    def from_dict(cls, data: dict) -> "Card":
+        effects = [
+            CardEffect.from_dict(effect)
+            for effect in data.get("effects", [])
+        ]
+
         return cls(
             id=data["id"],
             name=data["name"],
@@ -54,5 +52,7 @@ class Card:
             cost=data.get("cost", 0),
             level=data.get("level", 1),
             effect=data.get("effect", ""),
-            rarity=data.get("rarity", "comum")
+            rarity=data.get("rarity", "comum"),
+            image_path=data.get("image_path", ""),
+            effects=effects
         )
