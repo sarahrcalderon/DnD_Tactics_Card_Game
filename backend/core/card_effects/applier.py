@@ -76,11 +76,19 @@ def _apply_healing(
     target: Any
 ) -> Dict[str, Any]:
     healing = effect_result["healing"]["final"]
-
-    target.hp = min(
-        target.max_hp,
-        target.hp + healing
+    max_hp = getattr(
+        target,
+        "max_hp",
+        None
     )
+
+    if max_hp is None:
+        target.hp += healing
+    else:
+        target.hp = min(
+            max_hp,
+            target.hp + healing
+        )
 
     return {
         "type": "healing",
@@ -181,11 +189,19 @@ def _apply_life_steal(
     current_player: Any
 ) -> Dict[str, Any]:
     healing = effect_result["healing"]
-
-    current_player.hp = min(
-        current_player.max_hp,
-        current_player.hp + healing
+    max_hp = getattr(
+        current_player,
+        "max_hp",
+        None
     )
+
+    if max_hp is None:
+        current_player.hp += healing
+    else:
+        current_player.hp = min(
+            max_hp,
+            current_player.hp + healing
+        )
 
     return {
         "type": "life_steal",

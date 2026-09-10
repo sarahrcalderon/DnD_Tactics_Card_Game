@@ -1,5 +1,6 @@
 import pytest
 
+from models.active_effect import ActiveEffect
 from player.state import PlayerState
 
 
@@ -25,6 +26,8 @@ def test_player_state_default_values():
     assert player.hp == 25
     assert player.max_hp == 25
     assert player.mana == 100
+    assert player.action_points == 0
+    assert player.max_action_points == 0
 
 
 def test_player_state_creates_attributes():
@@ -63,7 +66,9 @@ def test_to_dict():
         name="Jogador",
         hp=20,
         mana=50,
-        max_hp=30
+        max_hp=30,
+        action_points=3,
+        max_action_points=5
     )
 
     player.attributes.set_base(
@@ -77,6 +82,8 @@ def test_to_dict():
     assert result["hp"] == 20
     assert result["max_hp"] == 30
     assert result["mana"] == 50
+    assert result["action_points"] == 3
+    assert result["max_action_points"] == 5
     assert result["attributes"]["attack"] == 10
     assert result["effects"] == []
 
@@ -152,10 +159,7 @@ def test_player_state_status_affects_attributes():
     )
 
     player.status.add_effect(
-        __import__(
-            "models.active_effect",
-            fromlist=["ActiveEffect"]
-        ).ActiveEffect(
+        ActiveEffect(
             type="buff",
             attribute="attack",
             value=5,
@@ -164,3 +168,136 @@ def test_player_state_status_affects_attributes():
     )
 
     assert player.get_attribute("attack") == 15
+
+
+def test_player_state_action_points():
+    player = PlayerState(
+        name="Jogador",
+        action_points=3,
+        max_action_points=5
+    )
+
+    assert player.action_points == 3
+    assert player.max_action_points == 5
+
+
+def test_player_state_spend_action_points():
+    player = PlayerState(
+        name="Jogador",
+        action_points=5,
+        max_action_points=5
+    )
+
+    player.spend_action_points(2)
+
+    assert player.action_points == 3
+
+
+def test_player_state_cannot_spend_more_action_points():
+    player = PlayerState(
+        name="Jogador",
+        action_points=2,
+        max_action_points=5
+    )
+
+    with pytest.raises(
+        ValueError,
+        match="Pontos de ação insuficientes."
+    ):
+        player.spend_action_points(3)
+
+
+def test_player_state_restore_action_points():
+    player = PlayerState(
+        name="Jogador",
+        action_points=2,
+        max_action_points=5
+    )
+
+    player.restore_action_points()
+
+    assert player.action_points == 5
+
+
+def test_player_state_add_action_points():
+    player = PlayerState(
+        name="Jogador",
+        action_points=2,
+        max_action_points=5
+    )
+
+    player.add_action_points(2)
+
+    assert player.action_points == 4
+
+
+def test_player_state_action_points_cannot_exceed_maximum():
+    player = PlayerState(
+        name="Jogador",
+        action_points=4,
+        max_action_points=5
+    )
+
+    player.add_action_points(3)
+
+    assert player.action_points == 5
+
+
+def test_player_state_action_points_in_to_dict():
+    player = PlayerState(
+        name="Jogador",
+        action_points=3,
+        max_action_points=5
+    )
+
+    state = player.to_dict()
+
+    assert state["action_points"] == 3
+    assert state["max_action_points"] == 5
+
+
+def test_player_state_negative_action_points():
+    with pytest.raises(ValueError):
+        PlayerState(
+            name="Jogador",
+            action_points=-1
+        )
+
+
+def test_player_state_negative_max_action_points():
+    with pytest.raises(ValueError):
+        PlayerState(
+            name="Jogador",
+            max_action_points=-1
+        )
+
+
+def test_player_state_action_points_cannot_exceed_maximum_on_creation():
+    with pytest.raises(ValueError):
+        PlayerState(
+            name="Jogador",
+            action_points=6,
+            max_action_points=5
+        )
+
+
+def test_player_state_cannot_spend_negative_action_points():
+    player = PlayerState(
+        name="Jogador",
+        action_points=5,
+        max_action_points=5
+    )
+
+    with pytest.raises(ValueError):
+        player.spend_action_points(-1)
+
+
+def test_player_state_cannot_add_negative_action_points():
+    player = PlayerState(
+        name="Jogador",
+        action_points=5,
+        max_action_points=5
+    )
+
+    with pytest.raises(ValueError):
+        player.add_action_points(-1)

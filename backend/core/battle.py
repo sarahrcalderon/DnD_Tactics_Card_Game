@@ -48,6 +48,8 @@ class Battle:
         }
 
     def _end_turn(self) -> dict:
+        self.current_player.restore_action_points()
+
         self.player1.status.process_turn()
         self.player2.status.process_turn()
 
@@ -86,8 +88,25 @@ class Battle:
             }
 
         card = hand[card_index]
+        cost = getattr(card, "cost", 0)
+
+        if cost < 0:
+            return {
+                "success": False,
+                "message": "O custo da carta não pode ser negativo."
+            }
+
+        if cost > self.current_player.action_points:
+            return {
+                "success": False,
+                "message": "Pontos de ação insuficientes."
+            }
 
         opponent = self._get_opponent()
+
+        self.current_player.spend_action_points(
+            cost
+        )
 
         self._prepare_legacy_card(card)
 
@@ -244,7 +263,9 @@ class Battle:
                     else "Jogador 1"
                 ),
                 "hp": self.player1.hp,
-                "mana": self.player1.mana
+                "mana": self.player1.mana,
+                "action_points": self.player1.action_points,
+                "max_action_points": self.player1.max_action_points
             },
             "player2": {
                 "name": (
@@ -253,7 +274,9 @@ class Battle:
                     else "Jogador 2"
                 ),
                 "hp": self.player2.hp,
-                "mana": self.player2.mana
+                "mana": self.player2.mana,
+                "action_points": self.player2.action_points,
+                "max_action_points": self.player2.max_action_points
             },
             "is_active": self.is_active,
             "winner": (
