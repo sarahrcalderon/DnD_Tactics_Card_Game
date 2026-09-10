@@ -522,3 +522,130 @@ def test_battle_debuff_expires_after_duration(monkeypatch):
 
     assert player2.attributes.get("attack") == 10
     assert len(player2.status.get_effects()) == 0
+
+
+def test_battle_direct_attack():
+    player1 = create_player("Jogador 1")
+    player2 = create_player("Jogador 2")
+
+    battle = Battle(player1, player2)
+
+    result = battle.execute_action(
+        action="attack"
+    )
+
+    assert result["success"] is True
+    assert result["damage"] == 10
+    assert player2.hp == 15
+
+
+def test_battle_direct_attack_defeats_opponent():
+    player1 = create_player("Jogador 1")
+    player2 = create_player(
+        "Jogador 2",
+        hp=5,
+        max_hp=5
+    )
+
+    battle = Battle(player1, player2)
+
+    result = battle.execute_action(
+        action="attack"
+    )
+
+    assert result["success"] is True
+    assert result["damage"] == 10
+    assert player2.hp == 0
+    assert battle.is_active is False
+    assert battle.winner == player1
+
+
+def test_battle_direct_defend():
+    player1 = create_player("Jogador 1")
+    player2 = create_player("Jogador 2")
+
+    battle = Battle(player1, player2)
+
+    result = battle.execute_action(
+        action="defend"
+    )
+
+    assert result["success"] is True
+    assert result["message"] == "Defesa aumentada em 3"
+    assert player1.attributes.get("defense") == 3
+
+
+def test_battle_turn_changes_current_player():
+    player1 = create_player("Jogador 1")
+    player2 = create_player("Jogador 2")
+
+    battle = Battle(player1, player2)
+
+    assert battle.current_player == player1
+
+    battle.execute_action(
+        action="end_turn"
+    )
+
+    assert battle.current_player == player2
+
+    battle.execute_action(
+        action="end_turn"
+    )
+
+    assert battle.current_player == player1
+
+
+def test_battle_log_records_card_play(monkeypatch):
+    set_normal_destiny(monkeypatch)
+
+    player1 = create_player("Jogador 1")
+    player2 = create_player("Jogador 2")
+
+    card = Card(
+        id="attack",
+        name="Golpe",
+        card_type="ataque",
+        attack=10
+    )
+
+    player1.hand.append(card)
+
+    battle = Battle(player1, player2)
+
+    battle.execute_action(
+        action="play_card",
+        card_index=0
+    )
+
+    assert "Jogador 1 jogou Golpe" in battle.log
+
+
+def test_battle_log_records_victory(monkeypatch):
+    set_normal_destiny(monkeypatch)
+
+    player1 = create_player("Jogador 1")
+    player2 = create_player(
+        "Jogador 2",
+        hp=5,
+        max_hp=5
+    )
+
+    card = Card(
+        id="attack",
+        name="Golpe Final",
+        card_type="ataque",
+        attack=10
+    )
+
+    player1.hand.append(card)
+
+    battle = Battle(player1, player2)
+
+    battle.execute_action(
+        action="play_card",
+        card_index=0
+    )
+
+    assert "Jogador 1 jogou Golpe Final" in battle.log
+    assert "Jogador 1 venceu!" in battle.log
