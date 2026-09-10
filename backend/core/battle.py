@@ -31,7 +31,10 @@ class Battle:
             return self._end_turn()
 
         if action == "play_card" and card_index is not None:
-            return self._play_card(card_index, target)
+            return self._play_card(
+                card_index,
+                target
+            )
 
         if action == "attack":
             return self._attack(target)
@@ -84,11 +87,7 @@ class Battle:
 
         card = hand[card_index]
 
-        opponent = (
-            self.player2
-            if self.current_player == self.player1
-            else self.player1
-        )
+        opponent = self._get_opponent()
 
         self._prepare_legacy_card(card)
 
@@ -114,7 +113,10 @@ class Battle:
             )
         }
 
-    def _prepare_legacy_card(self, card) -> None:
+    def _prepare_legacy_card(
+        self,
+        card
+    ) -> None:
         if card.effects:
             return
 
@@ -137,11 +139,7 @@ class Battle:
             ]
 
     def _check_victory(self) -> None:
-        opponent = (
-            self.player2
-            if self.current_player == self.player1
-            else self.player1
-        )
+        opponent = self._get_opponent()
 
         if opponent.hp <= 0:
             opponent.hp = 0
@@ -149,7 +147,7 @@ class Battle:
             self.winner = self.current_player
 
             self.log.append(
-                f"🏆 {self.current_player.name} venceu!"
+                f"{self.current_player.name} venceu!"
             )
 
     def _serialize_applied_effects(
@@ -177,28 +175,31 @@ class Battle:
 
         return serialized
 
-    def _attack(self, target: Optional[str] = None) -> dict:
-        damage = self.current_player.get_total_attack()
-
-        opponent = (
-            self.player2
-            if self.current_player == self.player1
-            else self.player1
+    def _attack(
+        self,
+        target: Optional[str] = None
+    ) -> dict:
+        damage = self.current_player.get_attribute(
+            "attack"
         )
 
-        opponent.hp -= damage
+        opponent = self._get_opponent()
+
+        opponent.hp = max(
+            0,
+            opponent.hp - damage
+        )
 
         self.log.append(
             f"{self.current_player.name} causou {damage} de dano"
         )
 
         if opponent.hp <= 0:
-            opponent.hp = 0
             self.is_active = False
             self.winner = self.current_player
 
             self.log.append(
-                f"🏆 {self.current_player.name} venceu!"
+                f"{self.current_player.name} venceu!"
             )
 
         return {
@@ -207,7 +208,10 @@ class Battle:
         }
 
     def _defend(self) -> dict:
-        self.current_player.defense_bonus += 3
+        self.current_player.attributes.add_modifier(
+            "defense",
+            3
+        )
 
         self.log.append(
             f"{self.current_player.name} se defendeu"
@@ -217,6 +221,13 @@ class Battle:
             "success": True,
             "message": "Defesa aumentada em 3"
         }
+
+    def _get_opponent(self):
+        return (
+            self.player2
+            if self.current_player == self.player1
+            else self.player1
+        )
 
     def get_state(self) -> dict:
         return {
