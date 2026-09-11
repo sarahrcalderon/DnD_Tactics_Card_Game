@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import Any, Dict, List
+from typing import List
 
 from models.card_effect import CardEffect
 
@@ -16,6 +16,7 @@ class Card:
     effect: str = ""
     rarity: str = "comum"
     image_path: str = ""
+    persistent: bool = False
     effects: List[CardEffect] = field(default_factory=list)
 
     def to_dict(self) -> dict:
@@ -30,6 +31,7 @@ class Card:
             "effect": self.effect,
             "rarity": self.rarity,
             "image_path": self.image_path,
+            "persistent": self.persistent,
             "effects": [
                 card_effect.to_dict()
                 for card_effect in self.effects
@@ -54,5 +56,6 @@ class Card:
             effect=data.get("effect", ""),
             rarity=data.get("rarity", "comum"),
             image_path=data.get("image_path", ""),
+            persistent=data.get("persistent", False),
             effects=effects
         )

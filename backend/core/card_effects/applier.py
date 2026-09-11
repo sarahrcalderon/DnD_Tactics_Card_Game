@@ -48,6 +48,11 @@ def apply_effect(
             current_player
         )
 
+    if effect_type == "destroy_active_card":
+        return _apply_destroy_active_card(
+            target
+        )
+
     raise ValueError(
         f"Tipo de efeito não suportado: {effect_type}"
     )
@@ -207,6 +212,52 @@ def _apply_life_steal(
         "type": "life_steal",
         "target": current_player,
         "value": healing
+    }
+
+
+def _apply_destroy_active_card(
+    target: Any
+) -> Dict[str, Any]:
+    deck_manager = getattr(
+        target,
+        "deck_manager",
+        None
+    )
+
+    if deck_manager is None:
+        return {
+            "type": "destroy_active_card",
+            "target": target,
+            "value": 0,
+            "destroyed": False,
+            "card": None
+        }
+
+    active_cards = deck_manager.get_active_cards()
+
+    if not active_cards:
+        return {
+            "type": "destroy_active_card",
+            "target": target,
+            "value": 0,
+            "destroyed": False,
+            "card": None
+        }
+
+    active_card = active_cards[0]
+
+    destroyed_card = deck_manager.destroy_active_card(
+        active_card.card_id
+    )
+
+    destroyed = destroyed_card is not None
+
+    return {
+        "type": "destroy_active_card",
+        "target": target,
+        "value": 1 if destroyed else 0,
+        "destroyed": destroyed,
+        "card": destroyed_card
     }
 
 

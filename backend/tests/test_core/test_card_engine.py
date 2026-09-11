@@ -166,3 +166,23 @@ def test_execute_healing_card():
     assert result["effects"][0]["type"] == "healing"
     assert result["effects"][0]["healing"]["base"] == 10
     assert result["effects"][0]["healing"]["final"] == 11
+
+def test_execute_card_destroy_active_card():
+    card = Card(
+        id="destroy_01",
+        name="Destruir Escudo",
+        card_type="debuff",
+        effects=[
+            CardEffect(
+                type="destroy_active_card",
+                target_type="single"
+            )
+        ]
+    )
+
+    result = execute_card(card)
+
+    assert result["card_id"] == "destroy_01"
+    assert len(result["effects"]) == 1
+    assert result["effects"][0]["type"] == "destroy_active_card"
+    assert result["effects"][0]["target_type"] == "single"

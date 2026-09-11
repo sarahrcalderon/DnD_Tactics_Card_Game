@@ -70,16 +70,33 @@ class Battle:
             "message": f"Turno {self.turn} iniciado"
         }
 
+    def _get_hand(self):
+        legacy_hand = getattr(
+            self.current_player,
+            "hand",
+            None
+        )
+
+        if legacy_hand:
+            return legacy_hand, "legacy"
+
+        deck_manager = getattr(
+            self.current_player,
+            "deck_manager",
+            None
+        )
+
+        if deck_manager is not None:
+            return deck_manager.get_hand(), "deck_manager"
+
+        return [], "legacy"
+
     def _play_card(
         self,
         card_index: int,
         target: Optional[str] = None
     ) -> dict:
-        hand = getattr(
-            self.current_player,
-            "hand",
-            []
-        )
+        hand, hand_source = self._get_hand()
 
         if card_index < 0 or card_index >= len(hand):
             return {
@@ -118,19 +135,70 @@ class Battle:
             opponent=opponent
         )
 
+        if card.persistent and hand_source == "deck_manager":
+            active_card = self.current_player.deck_manager.activate_card(
+                card.id,
+                self.current_player.name
+            )
+
+            if active_card is None:
+                return {
+                    "success": False,
+                    "message": "Não foi possível ativar a carta."
+                }
+
+        else:
+            self._discard_played_card(
+                card,
+                hand_source
+            )
+
+            active_card = None
+
         self._check_victory()
 
         self.log.append(
             f"{self.current_player.name} jogou {card.name}"
         )
 
-        return {
+        response = {
             "success": True,
             "result": result,
             "applied_effects": self._serialize_applied_effects(
                 applied_effects
             )
         }
+
+        if active_card is not None:
+            response["active_card"] = active_card.to_dict()
+
+        return response
+
+    def _discard_played_card(
+        self,
+        card,
+        hand_source: str
+    ) -> None:
+        if hand_source == "deck_manager":
+            deck_manager = getattr(
+                self.current_player,
+                "deck_manager",
+                None
+            )
+
+            if deck_manager is not None:
+                deck_manager.play_card(card.id)
+
+            return
+
+        hand = getattr(
+            self.current_player,
+            "hand",
+            None
+        )
+
+        if hand is not None and card in hand:
+            hand.remove(card)
 
     def _prepare_legacy_card(
         self,

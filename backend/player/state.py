@@ -1,5 +1,7 @@
 from typing import Any
 
+from deck.deck import Deck
+from deck.manager import DeckManager
 from player.attributes import PlayerAttributes
 from player.status import StatusManager
 
@@ -12,7 +14,8 @@ class PlayerState:
         mana: int = 100,
         max_hp: int | None = None,
         action_points: int = 0,
-        max_action_points: int | None = None
+        max_action_points: int | None = None,
+        deck_manager: DeckManager | None = None
     ):
         if not name:
             raise ValueError(
@@ -79,6 +82,13 @@ class PlayerState:
         self.status = StatusManager(
             self.attributes
         )
+        self.deck_manager = (
+            deck_manager
+            if deck_manager is not None
+            else DeckManager(
+                Deck()
+            )
+        )
 
     def get_attribute(self, attribute: str) -> Any:
         return self.attributes.get(attribute)
@@ -125,5 +135,6 @@ class PlayerState:
             "action_points": self.action_points,
             "max_action_points": self.max_action_points,
             "attributes": self.attributes.to_dict(),
-            "effects": self.status.to_dict()
+            "effects": self.status.to_dict(),
+            "deck": self.deck_manager.to_dict()
         }

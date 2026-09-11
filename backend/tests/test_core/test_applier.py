@@ -1,7 +1,10 @@
 from types import SimpleNamespace
 
 from core.card_effects.applier import apply_effect, apply_effects
+from deck.deck import Deck
+from deck.manager import DeckManager
 from models.active_effect import ActiveEffect
+from models.card import Card
 from player.state import PlayerState
 
 
@@ -344,3 +347,63 @@ def test_apply_multiple_status_effects_to_player_state():
     assert player.attributes.get("attack") == 10
     assert player.attributes.get_modifier("attack") == 0
     assert player.status.get_effects() == []
+
+def test_apply_destroy_active_card():
+    player, opponent = create_state_players()
+
+    from deck.deck import Deck
+    from deck.manager import DeckManager
+    from models.card import Card
+
+    card = Card(
+        id="shield_01",
+        name="Escudo de Escamas",
+        card_type="defesa",
+        defense=2,
+        cost=1,
+        persistent=True
+    )
+
+    opponent.deck_manager = DeckManager(
+        Deck(cards=[card])
+    )
+
+    opponent.deck_manager.draw_card()
+
+    opponent.deck_manager.activate_card(
+        card.id,
+        opponent.name
+    )
+
+    result = apply_effect(
+        {
+            "type": "destroy_active_card",
+            "target_type": "single"
+        },
+        player,
+        opponent
+    )
+
+    assert result["type"] == "destroy_active_card"
+    assert result["destroyed"] is True
+    assert result["card"] is card
+    assert opponent.deck_manager.get_active_card_count() == 0
+    assert opponent.deck_manager.get_discard_size() == 1
+    assert opponent.deck_manager.get_discard()[0] is card
+
+
+def test_apply_destroy_active_card_without_active_cards():
+    player, opponent = create_state_players()
+
+    result = apply_effect(
+        {
+            "type": "destroy_active_card",
+            "target_type": "single"
+        },
+        player,
+        opponent
+    )
+
+    assert result["type"] == "destroy_active_card"
+    assert result["destroyed"] is False
+    assert result["card"] is None

@@ -4,7 +4,11 @@ from core.card_effects.debuff import execute_debuff
 from core.card_effects.healing import execute_healing
 from core.card_effects.life_steal import execute_life_steal
 from core.card_effects.defense import execute_defense
+from core.card_effects.destroy_active_card import (
+    execute_destroy_active_card
+)
 from core.destiny import roll_destiny
+
 
 def execute_card(card) -> dict:
     destiny = roll_destiny()
@@ -66,6 +70,11 @@ def execute_card(card) -> dict:
             result = execute_life_steal(
                 final_damage=attack_result["damage"]["final"],
                 percentage=effect.percentage
+            )
+
+        elif effect.type == "destroy_active_card":
+            result = execute_destroy_active_card(
+                target_type=effect.target_type
             )
 
         else:
