@@ -1171,7 +1171,8 @@ def test_battle_destroy_opponent_active_card(monkeypatch):
 
     result = battle.execute_action(
         action="play_card",
-        card_index=0
+        card_index=0,
+        target="shield_scales"
     )
 
     assert result["success"] is True
@@ -1183,7 +1184,7 @@ def test_battle_destroy_opponent_active_card(monkeypatch):
     assert result["applied_effects"][0]["value"] == 1
 
 
-def test_battle_destroy_active_card_without_target(monkeypatch):
+def test_battle_destroy_active_card_requires_target(monkeypatch):
     set_normal_destiny(monkeypatch)
 
     destroy_card = Card(
@@ -1226,14 +1227,20 @@ def test_battle_destroy_active_card_without_target(monkeypatch):
         player2
     )
 
+    action_points_before = player1.action_points
+    hand_size_before = player1.deck_manager.get_hand_size()
+
     result = battle.execute_action(
         action="play_card",
         card_index=0
     )
 
-    assert result["success"] is True
-    assert result["applied_effects"][0]["type"] == "destroy_active_card"
-    assert result["applied_effects"][0]["value"] == 0
-    assert player1.deck_manager.get_discard_size() == 1
+    assert result["success"] is False
+    assert result["message"] == (
+        "Uma carta ativa deve ser selecionada como alvo."
+    )
+    assert player1.action_points == action_points_before
+    assert player1.deck_manager.get_hand_size() == hand_size_before
+    assert player1.deck_manager.get_discard_size() == 0
     assert player2.deck_manager.get_active_card_count() == 0
     assert player2.deck_manager.get_discard_size() == 0

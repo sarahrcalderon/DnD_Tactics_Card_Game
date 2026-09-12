@@ -153,13 +153,21 @@ def test_battle_destroy_nonexistent_active_card():
         defender
     )
 
+    action_points_before = attacker.action_points
+
     result = battle.execute_action(
         action="play_card",
         card_index=0,
         target="nonexistent_card"
     )
 
-    assert result["success"] is True
+    assert result["success"] is False
+    assert result["message"] == (
+        "A carta ativa selecionada não existe."
+    )
+    assert attacker.action_points == action_points_before
+    assert attacker.deck_manager.get_hand_size() == 1
+    assert attacker.deck_manager.get_discard_size() == 0
 
     active_card = defender.deck_manager.get_active_card(
         "shield_scales"

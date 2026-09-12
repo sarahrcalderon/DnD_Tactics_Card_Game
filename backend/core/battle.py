@@ -94,6 +94,58 @@ class Battle:
 
         return [], "legacy"
 
+    def _validate_card_target(
+        self,
+        card,
+        target: Optional[str],
+        opponent
+    ) -> Optional[str]:
+        requires_active_card_target = any(
+            effect.type == "destroy_active_card"
+            for effect in card.effects
+        )
+
+        if not requires_active_card_target:
+            return None
+
+        if target is None:
+            return "Uma carta ativa deve ser selecionada como alvo."
+
+        current_manager = getattr(
+            self.current_player,
+            "deck_manager",
+            None
+        )
+
+        if current_manager is not None:
+            own_card = current_manager.get_active_card(
+                target
+            )
+
+            if own_card is not None:
+                return (
+                    "A carta ativa selecionada não pertence "
+                    "ao adversário."
+                )
+
+        opponent_manager = getattr(
+            opponent,
+            "deck_manager",
+            None
+        )
+
+        if opponent_manager is None:
+            return "A carta ativa selecionada não existe."
+
+        opponent_card = opponent_manager.get_active_card(
+            target
+        )
+
+        if opponent_card is None:
+            return "A carta ativa selecionada não existe."
+
+        return None
+
     def _play_card(
         self,
         card_index: int,
@@ -122,13 +174,25 @@ class Battle:
                 "message": "Pontos de ação insuficientes."
             }
 
+        opponent = self._get_opponent()
+
+        target_error = self._validate_card_target(
+            card,
+            target,
+            opponent
+        )
+
+        if target_error is not None:
+            return {
+                "success": False,
+                "message": target_error
+            }
+
         if card.persistent and not self._has_board_space():
             return {
                 "success": False,
                 "message": "O tabuleiro está cheio."
             }
-
-        opponent = self._get_opponent()
 
         self.current_player.spend_action_points(
             cost
