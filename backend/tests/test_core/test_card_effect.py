@@ -67,3 +67,35 @@ def test_card_effect_from_dict():
     assert effect.type == "healing"
     assert effect.value == 10
     assert effect.target_type == "self"
+
+
+def test_card_effect_destroy_active_card():
+    effect = CardEffect(
+        type="destroy_active_card",
+        target_type="single",
+        target_active_card_id="shield_scales"
+    )
+
+    assert effect.type == "destroy_active_card"
+    assert effect.target_type == "single"
+    assert effect.target_active_card_id == "shield_scales"
+
+
+def test_card_effect_destroy_active_card_serialization():
+    effect = CardEffect(
+        type="destroy_active_card",
+        target_type="single",
+        target_active_card_id="shield_scales"
+    )
+
+    data = effect.to_dict()
+
+    assert data["type"] == "destroy_active_card"
+    assert data["target_type"] == "single"
+    assert data["target_active_card_id"] == "shield_scales"
+
+    restored = CardEffect.from_dict(data)
+
+    assert restored.type == "destroy_active_card"
+    assert restored.target_type == "single"
+    assert restored.target_active_card_id == "shield_scales"

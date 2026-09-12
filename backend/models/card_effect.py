@@ -10,6 +10,7 @@ class CardEffect:
     duration: int | None = None
     target_type: str = "single"
     percentage: float | None = None
+    target_active_card_id: str | None = None
 
     def to_dict(self) -> Dict[str, Any]:
         return {
@@ -18,7 +19,8 @@ class CardEffect:
             "attribute": self.attribute,
             "duration": self.duration,
             "target_type": self.target_type,
-            "percentage": self.percentage
+            "percentage": self.percentage,
+            "target_active_card_id": self.target_active_card_id
         }
 
     @classmethod
@@ -29,5 +31,8 @@ class CardEffect:
             attribute=data.get("attribute"),
             duration=data.get("duration"),
             target_type=data.get("target_type", "single"),
-            percentage=data.get("percentage")
+            percentage=data.get("percentage"),
+            target_active_card_id=data.get(
+                "target_active_card_id"
+            )
         )

@@ -10,7 +10,10 @@ from core.card_effects.destroy_active_card import (
 from core.destiny import roll_destiny
 
 
-def execute_card(card) -> dict:
+def execute_card(
+    card,
+    target_active_card_id: str | None = None
+) -> dict:
     destiny = roll_destiny()
     multiplier = destiny["multiplier"]
 
@@ -73,14 +76,25 @@ def execute_card(card) -> dict:
             )
 
         elif effect.type == "destroy_active_card":
+            selected_card_id = (
+                target_active_card_id
+                or effect.target_active_card_id
+            )
+
             result = execute_destroy_active_card(
                 target_type=effect.target_type
             )
+
+            result["target_active_card_id"] = selected_card_id
 
         else:
             raise ValueError(
                 f"Tipo de efeito não suportado: {effect.type}"
             )
+
+        if effect.type in {"buff", "debuff"}:
+            result["source_card_id"] = card.id
+            result["persistent"] = card.persistent
 
         results.append(result)
 

@@ -50,7 +50,8 @@ def apply_effect(
 
     if effect_type == "destroy_active_card":
         return _apply_destroy_active_card(
-            target
+            target,
+            effect_result.get("target_active_card_id")
         )
 
     raise ValueError(
@@ -135,6 +136,14 @@ def _apply_status_effect(
     attribute = effect_result["attribute"]
     value = effect_result["value"]
     duration = effect_result.get("duration")
+    source_card_id = effect_result.get("source_card_id")
+    persistent = effect_result.get("persistent", False)
+
+    remaining_turns = (
+        None
+        if persistent
+        else duration
+    )
 
     if hasattr(target, "status") and hasattr(
         target,
@@ -144,7 +153,8 @@ def _apply_status_effect(
             type=effect_type,
             attribute=attribute,
             value=value,
-            remaining_turns=duration or 1
+            remaining_turns=remaining_turns,
+            source_card_id=source_card_id
         )
 
         target.status.add_effect(active_effect)
@@ -159,7 +169,9 @@ def _apply_status_effect(
             "attribute": attribute,
             "value": value,
             "new_value": new_value,
-            "duration": duration
+            "duration": duration,
+            "source_card_id": source_card_id,
+            "persistent": persistent
         }
 
     current_value = getattr(
@@ -185,7 +197,9 @@ def _apply_status_effect(
         "attribute": attribute,
         "value": value,
         "new_value": new_value,
-        "duration": duration
+        "duration": duration,
+        "source_card_id": source_card_id,
+        "persistent": persistent
     }
 
 
@@ -216,7 +230,8 @@ def _apply_life_steal(
 
 
 def _apply_destroy_active_card(
-    target: Any
+    target: Any,
+    target_active_card_id: str | None = None
 ) -> Dict[str, Any]:
     deck_manager = getattr(
         target,
@@ -230,7 +245,8 @@ def _apply_destroy_active_card(
             "target": target,
             "value": 0,
             "destroyed": False,
-            "card": None
+            "card": None,
+            "target_active_card_id": target_active_card_id
         }
 
     active_cards = deck_manager.get_active_cards()
@@ -241,10 +257,27 @@ def _apply_destroy_active_card(
             "target": target,
             "value": 0,
             "destroyed": False,
-            "card": None
+            "card": None,
+            "target_active_card_id": target_active_card_id
         }
 
-    active_card = active_cards[0]
+    if target_active_card_id is None:
+        active_card = active_cards[0]
+        target_active_card_id = active_card.card_id
+    else:
+        active_card = deck_manager.get_active_card(
+            target_active_card_id
+        )
+
+        if active_card is None:
+            return {
+                "type": "destroy_active_card",
+                "target": target,
+                "value": 0,
+                "destroyed": False,
+                "card": None,
+                "target_active_card_id": target_active_card_id
+            }
 
     destroyed_card = deck_manager.destroy_active_card(
         active_card.card_id
@@ -257,7 +290,8 @@ def _apply_destroy_active_card(
         "target": target,
         "value": 1 if destroyed else 0,
         "destroyed": destroyed,
-        "card": destroyed_card
+        "card": destroyed_card,
+        "target_active_card_id": target_active_card_id
     }
 
 

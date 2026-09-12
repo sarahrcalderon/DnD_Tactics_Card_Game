@@ -471,3 +471,71 @@ def test_destroy_active_card_preserves_card_data():
     assert destroyed_card.name == "Escudo de Escamas"
     assert destroyed_card.persistent is True
     assert destroyed_card.defense == 2
+
+def test_destroy_specific_active_card():
+    shield = Card(
+        id="shield_scales",
+        name="Escudo de Escamas",
+        card_type="defesa",
+        persistent=True
+    )
+
+    armor = Card(
+        id="holy_armor",
+        name="Armadura Sagrada",
+        card_type="defesa",
+        persistent=True
+    )
+
+    deck_manager = DeckManager(
+        Deck(
+            cards=[shield, armor]
+        )
+    )
+
+    deck_manager.draw_cards(2)
+
+    deck_manager.activate_card(
+        shield.id,
+        "Paladino"
+    )
+
+    deck_manager.activate_card(
+        armor.id,
+        "Paladino"
+    )
+
+    destroyed = deck_manager.destroy_active_card(
+        shield.id
+    )
+
+    assert destroyed is shield
+    assert deck_manager.get_active_card("shield_scales") is None
+    assert deck_manager.get_active_card("holy_armor") is not None
+    assert deck_manager.get_discard_size() == 1
+    assert deck_manager.get_discard()[0] is shield
+
+
+def test_destroy_nonexistent_active_card():
+    shield = Card(
+        id="shield_scales",
+        name="Escudo de Escamas",
+        card_type="defesa",
+        persistent=True
+    )
+
+    deck_manager = DeckManager(
+        Deck(
+            cards=[shield]
+        )
+    )
+
+    deck_manager.draw_card()
+
+    result = deck_manager.destroy_active_card(
+        "nonexistent_card"
+    )
+
+    assert result is None
+    assert deck_manager.get_active_card_count() == 0
+    assert deck_manager.get_discard_size() == 0

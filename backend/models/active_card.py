@@ -14,10 +14,46 @@ class ActiveCard:
     active: bool = True
 
     def add_effect(self, effect: ActiveEffect) -> None:
+        if effect.source_card_id is None:
+            effect.source_card_id = self.card_id
+
         self.effects.append(effect)
 
     def get_effects(self) -> List[ActiveEffect]:
         return list(self.effects)
+
+    def get_effects_by_source(
+        self,
+        source_card_id: str
+    ) -> List[ActiveEffect]:
+        return [
+            effect
+            for effect in self.effects
+            if effect.source_card_id == source_card_id
+        ]
+
+    def remove_effects_by_source(
+        self,
+        source_card_id: str
+    ) -> List[ActiveEffect]:
+        removed = [
+            effect
+            for effect in self.effects
+            if effect.source_card_id == source_card_id
+        ]
+
+        self.effects = [
+            effect
+            for effect in self.effects
+            if effect.source_card_id != source_card_id
+        ]
+
+        return removed
+
+    def clear_effects(self) -> List[ActiveEffect]:
+        removed = list(self.effects)
+        self.effects.clear()
+        return removed
 
     def deactivate(self) -> None:
         self.active = False

@@ -10,7 +10,10 @@ class StatusManager:
         self.effects: List[ActiveEffect] = []
 
     def add_effect(self, effect: ActiveEffect) -> None:
-        if effect.remaining_turns < 1:
+        if (
+            effect.remaining_turns is not None
+            and effect.remaining_turns < 1
+        ):
             raise ValueError(
                 "A duração do efeito deve ser maior que zero."
             )
@@ -24,6 +27,40 @@ class StatusManager:
 
     def get_effects(self) -> List[ActiveEffect]:
         return list(self.effects)
+
+    def get_effects_by_source(
+        self,
+        source_card_id: str
+    ) -> List[ActiveEffect]:
+        return [
+            effect
+            for effect in self.effects
+            if effect.source_card_id == source_card_id
+        ]
+
+    def remove_effects_by_source(
+        self,
+        source_card_id: str
+    ) -> List[ActiveEffect]:
+        removed = [
+            effect
+            for effect in self.effects
+            if effect.source_card_id == source_card_id
+        ]
+
+        for effect in removed:
+            self.attributes.remove_modifier(
+                effect.attribute,
+                effect.modifier_value
+            )
+
+        self.effects = [
+            effect
+            for effect in self.effects
+            if effect.source_card_id != source_card_id
+        ]
+
+        return removed
 
     def process_turn(self) -> None:
         active_effects = []

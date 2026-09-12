@@ -1,7 +1,9 @@
 from typing import Any, List, Optional
 
+from core.board import Board
 from core.card_effects.applier import apply_effects
 from core.card_engine import execute_card
+from models.active_effect import ActiveEffect
 from models.card_effect import CardEffect
 
 
@@ -14,6 +16,7 @@ class Battle:
         self.log: List[str] = []
         self.is_active = True
         self.winner: Optional[Any] = None
+        self.board = Board()
 
     def execute_action(
         self,
@@ -119,6 +122,12 @@ class Battle:
                 "message": "Pontos de ação insuficientes."
             }
 
+        if card.persistent and not self._has_board_space():
+            return {
+                "success": False,
+                "message": "O tabuleiro está cheio."
+            }
+
         opponent = self._get_opponent()
 
         self.current_player.spend_action_points(
@@ -127,7 +136,10 @@ class Battle:
 
         self._prepare_legacy_card(card)
 
-        result = execute_card(card)
+        result = execute_card(
+            card,
+            target_active_card_id=target
+        )
 
         applied_effects = apply_effects(
             effects=result["effects"],
@@ -142,9 +154,36 @@ class Battle:
             )
 
             if active_card is None:
+                self.current_player.add_action_points(
+                    cost
+                )
+
                 return {
                     "success": False,
                     "message": "Não foi possível ativar a carta."
+                }
+
+            self._create_active_card_effects(
+                active_card,
+                card
+            )
+
+            board_added = self._add_active_card_to_board(
+                active_card
+            )
+
+            if not board_added:
+                self.current_player.add_action_points(
+                    cost
+                )
+
+                self.current_player.deck_manager.deactivate_card(
+                    active_card.card_id
+                )
+
+                return {
+                    "success": False,
+                    "message": "Não foi possível colocar a carta no tabuleiro."
                 }
 
         else:
@@ -154,6 +193,10 @@ class Battle:
             )
 
             active_card = None
+
+        self._remove_destroyed_cards_from_board(
+            applied_effects
+        )
 
         self._check_victory()
 
@@ -166,13 +209,95 @@ class Battle:
             "result": result,
             "applied_effects": self._serialize_applied_effects(
                 applied_effects
-            )
+            ),
+            "board": self.board.to_dict()
         }
 
         if active_card is not None:
             response["active_card"] = active_card.to_dict()
 
         return response
+
+    def _create_active_card_effects(
+        self,
+        active_card,
+        card
+    ) -> None:
+        for effect in card.effects:
+            if effect.type not in {
+                "buff",
+                "debuff"
+            }:
+                continue
+
+            active_effect = ActiveEffect(
+                type=effect.type,
+                attribute=effect.attribute,
+                value=effect.value,
+                remaining_turns=None,
+                source_card_id=card.id
+            )
+
+            active_card.add_effect(
+                active_effect
+            )
+
+    def _has_board_space(self) -> bool:
+        if self.current_player == self.player1:
+            return self.board.player_has_space()
+
+        return self.board.opponent_has_space()
+
+    def _add_active_card_to_board(
+        self,
+        active_card
+    ) -> bool:
+        if self.current_player == self.player1:
+            return self.board.add_player_card(
+                active_card
+            )
+
+        return self.board.add_opponent_card(
+            active_card
+        )
+
+    def _remove_destroyed_cards_from_board(
+        self,
+        effects: list[dict]
+    ) -> None:
+        for effect in effects:
+            if effect.get("type") != "destroy_active_card":
+                continue
+
+            if not effect.get("destroyed"):
+                continue
+
+            card = effect.get("card")
+
+            if card is None:
+                continue
+
+            card_id = card.id
+
+            player_card = self.board.get_player_card(
+                card_id
+            )
+
+            opponent_card = self.board.get_opponent_card(
+                card_id
+            )
+
+            if player_card is not None:
+                self.board.remove_player_card(card_id)
+                self.player1.status.remove_effects_by_source(
+                    card_id
+                )
+
+            if opponent_card is not None:
+                self.board.remove_opponent_card(card_id)
+                self.player2.status.remove_effects_by_source(
+                    card_id
+                )
 
     def _discard_played_card(
         self,
@@ -257,6 +382,14 @@ class Battle:
 
             if "duration" in effect:
                 item["duration"] = effect["duration"]
+
+            if "target_active_card_id" in effect:
+                item["target_active_card_id"] = effect[
+                    "target_active_card_id"
+                ]
+
+            if "destroyed" in effect:
+                item["destroyed"] = effect["destroyed"]
 
             serialized.append(item)
 
@@ -352,7 +485,8 @@ class Battle:
                 if self.winner
                 else None
             ),
-            "log": self.log[-10:]
+            "log": self.log[-10:],
+            "board": self.board.to_dict()
         }
 
     def end(self) -> dict:

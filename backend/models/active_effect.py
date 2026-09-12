@@ -13,7 +13,7 @@ class ActiveEffect:
     type: str
     attribute: str
     value: int | float
-    remaining_turns: int
+    remaining_turns: int | None
     source_card_id: str | None = None
 
     def __post_init__(self) -> None:
@@ -32,7 +32,10 @@ class ActiveEffect:
                 "O valor do efeito não pode ser negativo."
             )
 
-        if self.remaining_turns < 0:
+        if (
+            self.remaining_turns is not None
+            and self.remaining_turns < 0
+        ):
             raise ValueError(
                 "A duração do efeito não pode ser negativa."
             )
@@ -44,10 +47,19 @@ class ActiveEffect:
 
         return -self.value
 
+    def is_permanent(self) -> bool:
+        return self.remaining_turns is None
+
     def is_expired(self) -> bool:
+        if self.is_permanent():
+            return False
+
         return self.remaining_turns <= 0
 
     def decrease_turn(self) -> None:
+        if self.remaining_turns is None:
+            return
+
         if self.remaining_turns > 0:
             self.remaining_turns -= 1
 
@@ -66,6 +78,6 @@ class ActiveEffect:
             type=data["type"],
             attribute=data["attribute"],
             value=data["value"],
-            remaining_turns=data["remaining_turns"],
+            remaining_turns=data.get("remaining_turns"),
             source_card_id=data.get("source_card_id")
         )
