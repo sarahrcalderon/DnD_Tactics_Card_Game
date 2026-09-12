@@ -289,15 +289,17 @@ class Battle:
 
             if player_card is not None:
                 self.board.remove_player_card(card_id)
-                self.player1.status.remove_effects_by_source(
-                    card_id
-                )
 
             if opponent_card is not None:
                 self.board.remove_opponent_card(card_id)
-                self.player2.status.remove_effects_by_source(
-                    card_id
-                )
+
+            self.player1.status.remove_effects_by_source(
+                card_id
+            )
+
+            self.player2.status.remove_effects_by_source(
+                card_id
+            )
 
     def _discard_played_card(
         self,
