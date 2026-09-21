@@ -362,7 +362,7 @@ export const InfoRarity = styled.span<{ $rarity: string }>`
   font-size: 0.7rem;
   font-weight: 600;
   text-transform: uppercase;
-  background: ${({ rarity }) => {
+  background: ${({ $rarity }) => {
     const colors = {
       Comum: '#8a8a8a22',
       Incomum: '#4caf5022',
@@ -370,7 +370,7 @@ export const InfoRarity = styled.span<{ $rarity: string }>`
       Epica: '#9c27b022',
       Lendaria: '#ffd70022',
     };
-    return colors[rarity as keyof typeof colors] || '#8a8a8a22';
+    return colors[$rarity as keyof typeof colors] || '#8a8a8a22';
   }};
   color: ${({ $rarity }) => {
     const colors = {
@@ -382,7 +382,7 @@ export const InfoRarity = styled.span<{ $rarity: string }>`
     };
     return colors[$rarity as keyof typeof colors] || '#8a8a8a';
   }};
-  border: 1px solid ${({ rarity }) => {
+  border: 1px solid ${({ $rarity }) => {
     const colors = {
       Comum: '#8a8a8a44',
       Incomum: '#4caf5044',
@@ -390,7 +390,7 @@ export const InfoRarity = styled.span<{ $rarity: string }>`
       Epica: '#9c27b044',
       Lendaria: '#ffd70044',
     };
-    return colors[rarity as keyof typeof colors] || '#8a8a8a44';
+    return colors[$rarity as keyof typeof colors] || '#8a8a8a44';
   }};
   align-self: flex-start;
 `;

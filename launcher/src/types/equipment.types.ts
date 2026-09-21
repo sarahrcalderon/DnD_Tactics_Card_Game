@@ -94,6 +94,7 @@ export interface Equipment {
     cha?: number;
     manaRegen?: number;
     manaPower?: number;
+    initiative?: number;
     defense?: number;
     hp?: number;
     critical?: number;

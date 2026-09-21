@@ -703,20 +703,20 @@ def test_battle_victory_log(monkeypatch):
 
     assert "Jogador venceu!" in battle.log
 
-
 def test_battle_card_spends_action_points(monkeypatch):
     set_normal_destiny(monkeypatch)
 
+
     player1 = PlayerState(
         name="Jogador 1",
-        action_points=5,
-        max_action_points=5
+        action_points=10,
+        max_action_points=10
     )
 
     player2 = PlayerState(
         name="Jogador 2",
-        action_points=5,
-        max_action_points=5
+        action_points=10,
+        max_action_points=10
     )
 
     player1.hand = []
@@ -743,7 +743,7 @@ def test_battle_card_spends_action_points(monkeypatch):
     )
 
     assert result["success"] is True
-    assert player1.action_points == 3
+    assert player1.action_points == 8
 
 
 def test_battle_cannot_play_card_without_action_points(monkeypatch):
@@ -999,6 +999,8 @@ def test_battle_persistent_card_becomes_active_card(monkeypatch):
     assert active_card.card_id == "shield_scales"
     assert active_card.owner == "Paladino"
     assert active_card.is_active()
+    assert battle.board.player_card_count() == 1
+    assert battle.board.get_player_card("shield_scales") is active_card
 
 
 def test_battle_persistent_card_returns_active_card_in_result(
@@ -1182,6 +1184,8 @@ def test_battle_destroy_opponent_active_card(monkeypatch):
     assert player1.deck_manager.get_discard_size() == 1
     assert result["applied_effects"][0]["type"] == "destroy_active_card"
     assert result["applied_effects"][0]["value"] == 1
+    assert battle.board.opponent_card_count() == 0
+    assert battle.board.get_opponent_card("shield_scales") is None
 
 
 def test_battle_destroy_active_card_requires_target(monkeypatch):
@@ -1244,3 +1248,228 @@ def test_battle_destroy_active_card_requires_target(monkeypatch):
     assert player1.deck_manager.get_discard_size() == 0
     assert player2.deck_manager.get_active_card_count() == 0
     assert player2.deck_manager.get_discard_size() == 0
+
+def test_battle_instant_card_does_not_enter_board(monkeypatch):
+    set_normal_destiny(monkeypatch)
+
+    player1 = PlayerState(
+        name="Jogador 1",
+        action_points=5,
+        max_action_points=5,
+        deck_manager=DeckManager(
+            Deck(
+                cards=[
+                    Card(
+                        id="attack_01",
+                        name="Golpe",
+                        card_type="ataque",
+                        attack=5,
+                        cost=1
+                    )
+                ]
+            )
+        )
+    )
+
+    player2 = PlayerState(
+        name="Jogador 2",
+        action_points=5,
+        max_action_points=5
+    )
+
+    player1.deck_manager.draw_card()
+
+    battle = Battle(
+        player1,
+        player2
+    )
+
+    result = battle.execute_action(
+        action="play_card",
+        card_index=0
+    )
+
+    assert result["success"] is True
+    assert player1.deck_manager.get_hand_size() == 0
+    assert player1.deck_manager.get_discard_size() == 1
+    assert player1.deck_manager.get_active_card_count() == 0
+    assert battle.board.player_card_count() == 0
+    assert battle.board.opponent_card_count() == 0
+
+
+def test_battle_persistent_card_occupies_board_slot(monkeypatch):
+    set_normal_destiny(monkeypatch)
+
+    player1 = PlayerState(
+        name="Paladino",
+        action_points=5,
+        max_action_points=5,
+        deck_manager=DeckManager(
+            Deck(
+                cards=[
+                    Card(
+                        id="shield_01",
+                        name="Escudo 1",
+                        card_type="defesa",
+                        defense=2,
+                        cost=1,
+                        persistent=True
+                    ),
+                    Card(
+                        id="shield_02",
+                        name="Escudo 2",
+                        card_type="defesa",
+                        defense=2,
+                        cost=1,
+                        persistent=True
+                    ),
+                    Card(
+                        id="shield_03",
+                        name="Escudo 3",
+                        card_type="defesa",
+                        defense=2,
+                        cost=1,
+                        persistent=True
+                    ),
+                    Card(
+                        id="shield_04",
+                        name="Escudo 4",
+                        card_type="defesa",
+                        defense=2,
+                        cost=1,
+                        persistent=True
+                    ),
+                    Card(
+                        id="shield_05",
+                        name="Escudo 5",
+                        card_type="defesa",
+                        defense=2,
+                        cost=1,
+                        persistent=True
+                    ),
+                    Card(
+                        id="shield_06",
+                        name="Escudo 6",
+                        card_type="defesa",
+                        defense=2,
+                        cost=1,
+                        persistent=True
+                    )
+                ]
+            )
+        )
+    )
+
+    player2 = PlayerState(
+        name="Inimigo",
+        action_points=5,
+        max_action_points=5
+    )
+
+    player1.deck_manager.draw_cards(6)
+
+    battle = Battle(
+        player1,
+        player2
+    )
+
+    for _ in range(5):
+        result = battle.execute_action(
+            action="play_card",
+            card_index=0
+        )
+        assert result["success"] is True
+
+    action_points_before = player1.action_points
+    hand_size_before = player1.deck_manager.get_hand_size()
+
+    result = battle.execute_action(
+        action="play_card",
+        card_index=0
+    )
+
+    assert result["success"] is False
+    assert result["message"] == "O tabuleiro está cheio."
+    assert battle.board.player_card_count() == 5
+    assert player1.deck_manager.get_active_card_count() == 5
+    assert player1.deck_manager.get_hand_size() == hand_size_before
+    assert player1.action_points == action_points_before
+
+
+def test_battle_board_removes_destroyed_active_card(monkeypatch):
+    set_normal_destiny(monkeypatch)
+
+    shield = Card(
+        id="shield_scales",
+        name="Escudo de Escamas",
+        card_type="defesa",
+        defense=2,
+        cost=1,
+        persistent=True
+    )
+
+    destroy_card = Card(
+        id="destroy_shield",
+        name="Quebrar Encantamento",
+        card_type="debuff",
+        cost=1,
+        effects=[
+            CardEffect(
+                type="destroy_active_card",
+                target_type="single"
+            )
+        ]
+    )
+
+    player1 = PlayerState(
+        name="Mago",
+        action_points=5,
+        max_action_points=5,
+        deck_manager=DeckManager(
+            Deck(
+                cards=[destroy_card]
+            )
+        )
+    )
+
+    player2 = PlayerState(
+        name="Paladino",
+        action_points=5,
+        max_action_points=5,
+        deck_manager=DeckManager(
+            Deck(
+                cards=[shield]
+            )
+        )
+    )
+
+    player1.deck_manager.draw_card()
+    player2.deck_manager.draw_card()
+
+    active_card = player2.deck_manager.activate_card(
+        shield.id,
+        player2.name
+    )
+
+    battle = Battle(
+        player1,
+        player2
+    )
+
+    assert active_card is not None
+    assert battle.board.opponent_card_count() == 1
+    assert battle.board.get_opponent_card("shield_scales") is active_card
+
+    player1.deck_manager.draw_card()
+
+    result = battle.execute_action(
+        action="play_card",
+        card_index=0,
+        target="shield_scales"
+    )
+
+    assert result["success"] is True
+    assert battle.board.opponent_card_count() == 0
+    assert battle.board.get_opponent_card("shield_scales") is None
+    assert player2.deck_manager.get_active_card_count() == 0
+    assert player2.deck_manager.get_discard_size() == 1

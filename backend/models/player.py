@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from typing import Optional, List
 
 from models.card import Card
-from backend.deck.deck import Deck
+from deck.deck import Deck
 
 @dataclass
 class Player:

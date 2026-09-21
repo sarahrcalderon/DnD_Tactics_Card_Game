@@ -17,6 +17,7 @@ class Battle:
         self.is_active = True
         self.winner: Optional[Any] = None
         self.board = Board()
+        self._sync_board_with_active_cards()
 
     def execute_action(
         self,
@@ -49,6 +50,13 @@ class Battle:
             "success": False,
             "message": f"Ação '{action}' não reconhecida"
         }
+
+    def _sync_board_with_active_cards(self) -> None:
+        for active_card in self.player1.deck_manager.get_active_cards():
+            self.board.add_player_card(active_card)
+
+        for active_card in self.player2.deck_manager.get_active_cards():
+            self.board.add_opponent_card(active_card)
 
     def _end_turn(self) -> dict:
         self.current_player.restore_action_points()
@@ -150,8 +158,9 @@ class Battle:
         self,
         card_index: int,
         target: Optional[str] = None
-    ) -> dict:
+        ) -> dict:
         hand, hand_source = self._get_hand()
+
 
         if card_index < 0 or card_index >= len(hand):
             return {
@@ -166,6 +175,12 @@ class Battle:
             return {
                 "success": False,
                 "message": "O custo da carta não pode ser negativo."
+            }
+
+        if card.persistent and not self._has_board_space():
+            return {
+                "success": False,
+                "message": "O tabuleiro está cheio."
             }
 
         if cost > self.current_player.action_points:
@@ -186,12 +201,6 @@ class Battle:
             return {
                 "success": False,
                 "message": target_error
-            }
-
-        if card.persistent and not self._has_board_space():
-            return {
-                "success": False,
-                "message": "O tabuleiro está cheio."
             }
 
         self.current_player.spend_action_points(
@@ -281,6 +290,7 @@ class Battle:
             response["active_card"] = active_card.to_dict()
 
         return response
+
 
     def _create_active_card_effects(
         self,

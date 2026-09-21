@@ -1896,10 +1896,7 @@ export const SelectedDeityName = styled.span<{ color?: string }>`
 export const ConfirmButton = styled.button<{ disabled: boolean }>`
   min-width: 220px;
 
-      ${({ $active, $color }) => ($active ? $color : 'rgba(75, 47, 22, 0.3)')};
-
   border: 1px solid ${({ disabled }) => (disabled ? '#4b4b50' : '#f2cf7d')};
-      $active ? 'rgba(75, 47, 22, 0.65)' : 'rgba(255, 238, 190, 0.2)'};
   border-radius: 2px;
 
   background:

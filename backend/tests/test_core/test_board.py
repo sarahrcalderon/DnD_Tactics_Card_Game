@@ -336,3 +336,105 @@ def test_board_to_dict():
     assert len(data["opponent_cards"]) == 1
     assert data["player_cards"][0]["card_id"] == "shield"
     assert data["opponent_cards"][0]["card_id"] == "armor"
+
+def test_board_syncs_with_active_cards():
+    board = Board()
+
+    player_card_1 = create_active_card(
+        "shield_1",
+        "Player"
+    )
+
+    player_card_2 = create_active_card(
+        "shield_2",
+        "Player"
+    )
+
+    opponent_card = create_active_card(
+        "armor_1",
+        "Enemy"
+    )
+
+    board.sync(
+        [player_card_1, player_card_2],
+        [opponent_card]
+    )
+
+    assert board.player_card_count() == 2
+    assert board.opponent_card_count() == 1
+    assert board.get_player_card("shield_1") is player_card_1
+    assert board.get_player_card("shield_2") is player_card_2
+    assert board.get_opponent_card("armor_1") is opponent_card
+
+
+def test_board_sync_removes_cards_no_longer_active():
+    board = Board()
+
+    player_card = create_active_card(
+        "shield",
+        "Player"
+    )
+
+    opponent_card = create_active_card(
+        "armor",
+        "Enemy"
+    )
+
+    board.add_player_card(player_card)
+    board.add_opponent_card(opponent_card)
+
+    board.sync(
+        [],
+        []
+    )
+
+    assert board.player_card_count() == 0
+    assert board.opponent_card_count() == 0
+
+
+def test_board_sync_ignores_inactive_cards():
+    board = Board()
+
+    active_card = create_active_card(
+        "shield",
+        "Player"
+    )
+
+    inactive_card = create_active_card(
+        "destroyed_shield",
+        "Player"
+    )
+
+    inactive_card.deactivate()
+
+    board.sync(
+        [active_card, inactive_card],
+        []
+    )
+
+    assert board.player_card_count() == 1
+    assert board.get_player_card(
+        "shield"
+    ) is active_card
+
+    assert board.get_player_card(
+        "destroyed_shield"
+    ) is None
+
+
+def test_board_rejects_inactive_card():
+    board = Board()
+
+    active_card = create_active_card(
+        "destroyed_shield",
+        "Player"
+    )
+
+    active_card.deactivate()
+
+    result = board.add_player_card(
+        active_card
+    )
+
+    assert result is False
+    assert board.player_card_count() == 0

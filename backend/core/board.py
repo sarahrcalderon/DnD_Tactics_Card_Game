@@ -33,6 +33,9 @@ class Board:
         cards: List[ActiveCard],
         active_card: ActiveCard
     ) -> bool:
+        if not active_card.is_active():
+            return False
+
         if len(cards) >= self.MAX_SLOTS:
             return False
 
@@ -137,6 +140,23 @@ class Board:
 
     def is_opponent_full(self) -> bool:
         return self.opponent_card_count() >= self.MAX_SLOTS
+
+    def sync(
+        self,
+        player_active_cards: List[ActiveCard],
+        opponent_active_cards: List[ActiveCard]
+    ) -> None:
+        self.player_cards = [
+            card
+            for card in player_active_cards
+            if card.is_active()
+        ]
+
+        self.opponent_cards = [
+            card
+            for card in opponent_active_cards
+            if card.is_active()
+        ]
 
     def clear(self) -> None:
         self.player_cards.clear()

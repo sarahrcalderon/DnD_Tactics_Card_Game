@@ -21,7 +21,7 @@ import { AudioSection } from '../components/options/AudioSection';
 import { InterfaceSection } from '../components/options/InterfaceSection';
 import { ControlsSection } from '../components/options/ControlsSection';
 import { AccessibilitySection } from '../components/options/AcessibilitySection';
-import { PerformanceSection } from '../components/options/PerformanceSection';
+import { PerformanceSection } from '../components/options/performanceSection';
 import { NetworkSection } from '../components/options/NetworkSection';
 import { useAudio } from '../contexts/AudioContext';
 
