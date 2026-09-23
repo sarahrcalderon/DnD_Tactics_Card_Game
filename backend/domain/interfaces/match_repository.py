@@ -19,3 +19,9 @@ class MatchRepository(Protocol):
 
     async def list_players(self, match_id: UUID) -> list[MatchPlayer]:
         ...
+
+    async def update_player(self, player: MatchPlayer) -> MatchPlayer:
+        ...
+
+    async def update(self, match: Match) -> Match:
+        ...

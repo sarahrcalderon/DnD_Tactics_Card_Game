@@ -92,3 +92,7 @@ class GameInviteCreateRequest(BaseModel):
 class GameInviteAcceptRequest(BaseModel):
     character_id: Optional[str] = None
     deck_id: Optional[str] = None
+
+
+class MatchReadyRequest(BaseModel):
+    ready: bool

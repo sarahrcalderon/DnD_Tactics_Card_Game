@@ -66,6 +66,30 @@ class SqlAlchemyMatchRepository:
             )
             return [self._to_player(model) for model in result.scalars()]
 
+    async def update_player(self, player: MatchPlayer) -> MatchPlayer:
+        async with self._session_factory() as session:
+            model = await session.get(MatchPlayerModel, {"match_id": str(player.match_id), "user_id": str(player.user_id)})
+            if model is None:
+                raise ValueError("Match player not found.")
+            model.ready = player.ready
+            model.connected = player.connected
+            model.character_id = player.character_id
+            model.deck_id = player.deck_id
+            await session.commit()
+            return self._to_player(model)
+
+    async def update(self, match: Match) -> Match:
+        async with self._session_factory() as session:
+            model = await session.get(MatchModel, str(match.id))
+            if model is None:
+                raise ValueError("Match not found.")
+            model.status = match.status.value
+            model.started_at = match.started_at
+            model.finished_at = match.finished_at
+            model.winner_side = match.winner_side.value if match.winner_side else None
+            await session.commit()
+            return self._to_match(model)
+
     @staticmethod
     def _to_match(model: MatchModel) -> Match:
         return Match(

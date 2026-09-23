@@ -2,8 +2,8 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, status
 
-from api.models.requests import GameInviteAcceptRequest, GameInviteCreateRequest, MatchCreateRequest
-from api.models.responses import GameInviteResponse, MatchResponse
+from api.models.requests import GameInviteAcceptRequest, GameInviteCreateRequest, MatchCreateRequest, MatchReadyRequest
+from api.models.responses import GameInviteResponse, LobbyResponse, MatchPlayerResponse, MatchResponse
 from api.routes.auth import get_current_user
 from application.dtos.auth import AuthenticatedUser
 from domain.exceptions import ConflictError, DomainError, ResourceNotFoundError
@@ -58,8 +58,54 @@ async def reject_invite(invite_id: UUID, user: AuthenticatedUser = Depends(get_c
     return _invite_response(invite)
 
 
+@router.get("/{match_id}/lobby", response_model=LobbyResponse)
+async def get_lobby(match_id: UUID, user: AuthenticatedUser = Depends(get_current_user)) -> LobbyResponse:
+    try:
+        if not await container.matches.contains_player(match_id, user.id):
+            raise ResourceNotFoundError("Jogador não pertence a esta partida.")
+        match = await container.matches.get(match_id)
+        players = await container.matches.list_players(match_id)
+    except ResourceNotFoundError as error:
+        raise HTTPException(status_code=404, detail=str(error)) from error
+    return LobbyResponse(match=_match_response(match), players=[_player_response(player) for player in players])
+
+
+@router.post("/{match_id}/ready", response_model=MatchPlayerResponse)
+async def set_ready(match_id: UUID, data: MatchReadyRequest, user: AuthenticatedUser = Depends(get_current_user)) -> MatchPlayerResponse:
+    try:
+        player = await container.matches.set_ready(match_id, user.id, data.ready)
+    except ResourceNotFoundError as error:
+        raise HTTPException(status_code=404, detail=str(error)) from error
+    except ConflictError as error:
+        raise HTTPException(status_code=409, detail=str(error)) from error
+    return _player_response(player)
+
+
+@router.post("/{match_id}/start", response_model=MatchResponse)
+async def start_match(match_id: UUID, user: AuthenticatedUser = Depends(get_current_user)) -> MatchResponse:
+    try:
+        match = await container.matches.start(match_id, user.id)
+    except ResourceNotFoundError as error:
+        raise HTTPException(status_code=404, detail=str(error)) from error
+    except ConflictError as error:
+        raise HTTPException(status_code=409, detail=str(error)) from error
+    return _match_response(match)
+
+
 def _invite_response(invite) -> GameInviteResponse:
     return GameInviteResponse(
         id=invite.id, match_id=invite.match_id, sender_id=invite.sender_id, receiver_id=invite.receiver_id,
         side=invite.side.value, status=invite.status.value, created_at=invite.created_at, expires_at=invite.expires_at,
+    )
+
+
+def _match_response(match) -> MatchResponse:
+    return MatchResponse(id=match.id, status=match.status.value, created_at=match.created_at)
+
+
+def _player_response(player) -> MatchPlayerResponse:
+    return MatchPlayerResponse(
+        user_id=player.user_id, side=player.side.value, slot=player.slot,
+        ready=player.ready, connected=player.connected,
+        character_id=player.character_id, deck_id=player.deck_id,
     )

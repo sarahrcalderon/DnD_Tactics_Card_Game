@@ -60,6 +60,21 @@ class MatchResponse(BaseModel):
     created_at: datetime
 
 
+class MatchPlayerResponse(BaseModel):
+    user_id: UUID
+    side: str
+    slot: int
+    ready: bool
+    connected: bool
+    character_id: Optional[str] = None
+    deck_id: Optional[str] = None
+
+
+class LobbyResponse(BaseModel):
+    match: MatchResponse
+    players: list[MatchPlayerResponse]
+
+
 class GameInviteResponse(BaseModel):
     id: UUID
     match_id: UUID
