@@ -1,4 +1,4 @@
-# backend/api/routes/launcher.py
+"""Rota para iniciar o jogo."""
 from fastapi import APIRouter, HTTPException
 import subprocess
 import os

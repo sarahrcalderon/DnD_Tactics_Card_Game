@@ -1,4 +1,3 @@
-# backend/api/models/responses.py
 from pydantic import BaseModel
 from datetime import datetime
 from typing import Optional, Dict, List
@@ -53,3 +52,20 @@ class FriendRequestResponse(BaseModel):
     status: str
     created_at: datetime
     responded_at: Optional[datetime] = None
+
+
+class MatchResponse(BaseModel):
+    id: UUID
+    status: str
+    created_at: datetime
+
+
+class GameInviteResponse(BaseModel):
+    id: UUID
+    match_id: UUID
+    sender_id: UUID
+    receiver_id: UUID
+    side: str
+    status: str
+    created_at: datetime
+    expires_at: datetime

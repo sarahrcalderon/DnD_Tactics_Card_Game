@@ -1,5 +1,6 @@
-# backend/api/models/requests.py
 from pydantic import BaseModel, field_validator
+from uuid import UUID
+from domain.entities.match import MatchSide
 from typing import Optional, Dict, List
 
 class CharacterCreateRequest(BaseModel):
@@ -75,3 +76,19 @@ class FriendRequestCreateRequest(BaseModel):
         if len(normalized) > 320 or "@" not in normalized:
             raise ValueError("E-mail inválido.")
         return normalized
+
+
+class MatchCreateRequest(BaseModel):
+    side: MatchSide
+    character_id: Optional[str] = None
+    deck_id: Optional[str] = None
+
+
+class GameInviteCreateRequest(BaseModel):
+    receiver_id: UUID
+    side: MatchSide
+
+
+class GameInviteAcceptRequest(BaseModel):
+    character_id: Optional[str] = None
+    deck_id: Optional[str] = None

@@ -56,6 +56,14 @@ class MatchService:
         await self.get(match_id)
         return await self._matches.list_players(match_id)
 
+    async def ensure_slot_available(self, match_id: UUID, side: MatchSide) -> None:
+        match = await self._get_waiting_match(match_id)
+        self._available_slot(await self._matches.list_players(match.id), side)
+
+    async def contains_player(self, match_id: UUID, user_id: UUID) -> bool:
+        await self.get(match_id)
+        return await self._matches.get_player(match_id, user_id) is not None
+
     async def _get_waiting_match(self, match_id: UUID) -> Match:
         match = await self.get(match_id)
         if match.status != MatchStatus.WAITING:

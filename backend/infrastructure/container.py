@@ -1,11 +1,10 @@
-"""Composition root: infrastructure is wired to application use cases here."""
-
-from application.services import AuthService, BattleService, CatalogService, CharacterService, FriendService, MatchService
+from application.services import AuthService, BattleService, CatalogService, CharacterService, FriendService, GameInviteService, MatchService
 from infrastructure.config import get_settings
 from infrastructure.database import get_session_factory
 from infrastructure.repositories import (
     InMemoryGameSessionRepository,
     SqlAlchemyFriendRepository,
+    SqlAlchemyGameInviteRepository,
     SqlAlchemyMatchRepository,
     SqlAlchemyUserRepository,
     StaticCatalogRepository,
@@ -18,6 +17,7 @@ class ApplicationContainer:
         self._auth: AuthService | None = None
         self._friends: FriendService | None = None
         self._matches: MatchService | None = None
+        self._game_invites: GameInviteService | None = None
         self.characters = CharacterService(sessions)
         self.battles = BattleService(sessions)
         self.catalog = CatalogService(StaticCatalogRepository())
@@ -49,6 +49,18 @@ class ApplicationContainer:
         if self._matches is None:
             self._matches = MatchService(SqlAlchemyMatchRepository(get_session_factory()))
         return self._matches
+
+    @property
+    def game_invites(self) -> GameInviteService:
+        if self._game_invites is None:
+            session_factory = get_session_factory()
+            self._game_invites = GameInviteService(
+                users=SqlAlchemyUserRepository(session_factory),
+                friends=SqlAlchemyFriendRepository(session_factory),
+                invites=SqlAlchemyGameInviteRepository(session_factory),
+                matches=self.matches,
+            )
+        return self._game_invites
 
 
 container = ApplicationContainer()
