@@ -75,6 +75,7 @@ import {
 } from '../styles/attributeDistStyles';
 
 import { CardComponent } from '../components/Card/CardComponent';
+import { CampaignMapPreview } from '../components/campaign/CampaignMapPreview';
 
 import {
   CLASS_BASE_ATTRIBUTES,
@@ -806,6 +807,7 @@ export const AttributeDistPage = () => {
                   Tutorial
                 </BottomActionButton>
               </BottomActions>
+              <CampaignMapPreview onOpenCampaign={() => navigate('/map')} />
             </DeckFooter>
           </DeckSection>
         </MainContent>

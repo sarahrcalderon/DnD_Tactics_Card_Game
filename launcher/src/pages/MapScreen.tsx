@@ -32,21 +32,7 @@ import {
 import { LoadingScreen } from './LoadingScreen';
 import { RouteCoordinate, CampaignPoint } from '../types/mapScreen.types';
 import { awardBattleGold } from '../utils/goldUtils';
-
-const CAMPAIGN_STORAGE_KEY = 'blackmoorCampaignProgress';
-
-const getCampaignStorageKey = () => {
-  try {
-    const characterData = localStorage.getItem('characterData');
-    const saveId = characterData ? JSON.parse(characterData).saveId : null;
-
-    return saveId
-      ? `${CAMPAIGN_STORAGE_KEY}:${saveId}`
-      : `${CAMPAIGN_STORAGE_KEY}:new-character`;
-  } catch {
-    return `${CAMPAIGN_STORAGE_KEY}:new-character`;
-  }
-};
+import { getCampaignProgressStorageKey } from '../services/campaignProgressService';
 
 const ROUTE_PATH: RouteCoordinate[] = [
   // Vilarejo → Bosque
@@ -172,7 +158,7 @@ const createSvgPath = (points: RouteCoordinate[]) => {
 
 export const MapScreen = () => {
   const navigate = useNavigate();
-  const campaignStorageKey = getCampaignStorageKey();
+  const campaignStorageKey = getCampaignProgressStorageKey();
 
   const animationFrameRef = useRef<number | null>(null);
 

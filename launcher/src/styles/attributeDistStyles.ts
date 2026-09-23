@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+import { colors } from './colors';
 
 // ============================================================
 // CONTAINER
@@ -808,11 +809,15 @@ export const StatItem = styled.div`
 
   padding: 12px 10px;
 
-  display: flex;
-  flex-direction: column;
-
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr) max-content;
   align-items: center;
-  justify-content: center;
+  column-gap: 8px;
+  color: ${colors.text.secondary};
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
 
   border-radius: 2px;
 
@@ -896,26 +901,14 @@ export const StatIcon = styled.img`
 `;
 
 export const StatLabel = styled.div`
-  display: flex;
+  display: contents;
 
-  align-items: center;
-  justify-content: center;
-
-  gap: 7px;
-
-  color: #a7a3b2;
-
-  font-size: 0.62rem;
-
-  font-weight: 700;
-
-  text-transform: uppercase;
-
-  letter-spacing: 0.6px;
-
-  text-align: center;
-
-  line-height: 1.15;
+  img {
+    grid-column: 1;
+    width: 26px !important;
+    height: 26px !important;
+    margin: 0 !important;
+  }
 
   ${StatItem}:hover ${StatIcon} {
     transform: scale(1.08);
@@ -931,17 +924,21 @@ export const StatLabel = styled.div`
 `;
 
 export const StatValue = styled.span`
-  margin: 6px 0 3px;
+  grid-column: 3;
+  margin: 0;
 
   color: #ffd700;
 
-  font-family: 'Cinzel', serif;
+  font-family: 'Inter', 'Segoe UI', sans-serif;
 
   font-size: 1.35rem;
 
   font-weight: 700;
 
+  letter-spacing: 0;
+
   line-height: 1;
+  font-variant-numeric: tabular-nums;
 
   text-shadow:
     0 2px 4px rgba(0, 0, 0, 0.85),
@@ -949,6 +946,7 @@ export const StatValue = styled.span`
 `;
 
 export const StatModifier = styled.span`
+  display: none;
   color: #908b9d;
 
   font-size: 0.55rem;

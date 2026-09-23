@@ -1,128 +1,38 @@
 import React from 'react';
 import {
-  EquipmentPreview as PreviewContainer,
-  PreviewTitle,
-  PreviewRarity,
-  PreviewStats,
-  PreviewStat,
-  PreviewStatLabel,
-  PreviewStatValue,
+  EquipmentPreview as PreviewContainer, PreviewTitle, PreviewRarity, PreviewStats,
+  PreviewStat, PreviewStatLabel, PreviewStatValue, PreviewHeader, PreviewImage,
+  PreviewMeta, PreviewDescription, PreviewSectionTitle,
 } from '../../styles/equipmentStyles';
 import { Equipment, DerivedStats } from '../../types/character.types';
+import { formatStatBonus, formatStatValue, StatValueFormat } from '../../utils/statFormat';
 
-interface EquipmentPreviewProps {
-  equipment: Equipment;
-  currentStats: DerivedStats;
-}
+interface EquipmentPreviewProps { equipment: Equipment; currentStats: DerivedStats; }
 
-const getStatName = (key: string): string => {
-  const names: Record<string, string> = {
-    str: 'FORÇA',
-    dex: 'DESTREZA',
-    con: 'CONSTITUIÇÃO',
-    int: 'INTELIGÊNCIA',
-    wis: 'SABEDORIA',
-    cha: 'CARISMA',
-    defense: 'DEFESA',
-    awareness: 'AWARENESS',
-    critical: 'CRÍTICO',
-    avoidance: 'AVOIDANCE',
-    deflect: 'DEFLECT',
-    actionPoints: 'ACTION POINTS',
-    criticalSeverity: 'SEV. CRÍTICO',
-    initiative: 'INICIATIVA',
-    hp: 'HP',
-    speed: 'VELOCIDADE',
-    maxMana: 'MANA MÁXIMA',
-    manaRegen: 'REG. MANA',
-    manaPower: 'POTÊNCIA MÁGICA',
-  };
-  return names[key] || key.toUpperCase();
+const STAT_NAMES: Record<string, string> = {
+  attack: 'ATAQUE', str: 'FORÇA', dex: 'DESTREZA', con: 'CONSTITUIÇÃO', int: 'INTELIGÊNCIA', wis: 'SABEDORIA', cha: 'CARISMA', defense: 'DEFESA', awareness: 'PERCEPÇÃO', critical: 'CRÍTICO', avoidance: 'EVASÃO', deflect: 'BLOQUEIO', actionPoints: 'PONTOS DE AÇÃO', criticalSeverity: 'SEV. CRÍTICA', initiative: 'INICIATIVA', hp: 'VIDA MÁX.', speed: 'VELOCIDADE', maxMana: 'MANA MÁX.', manaRegen: 'REG. DE MANA', manaPower: 'POTÊNCIA MÁGICA',
+};
+const STAT_TO_DERIVED: Record<string, keyof DerivedStats> = {
+  defense: 'defense', awareness: 'awareness', critical: 'critical', avoidance: 'avoidance', deflect: 'deflect', actionPoints: 'actionPoints', criticalSeverity: 'criticalSeverity', initiative: 'initiative', hp: 'maxHP', speed: 'speed', maxMana: 'maxMana', manaRegen: 'manaRegen', manaPower: 'manaPower',
+};
+const getFormat = (key: string): StatValueFormat => {
+  if (['critical', 'avoidance', 'deflect', 'criticalSeverity'].includes(key)) return 'percentage';
+  if (key === 'speed') return 'distance';
+  return 'decimal';
 };
 
-const getCurrentValue = (stats: DerivedStats, key: string): number => {
-  const map: Record<string, keyof DerivedStats> = {
-    defense: 'defense',
-    awareness: 'awareness',
-    critical: 'critical',
-    avoidance: 'avoidance',
-    deflect: 'deflect',
-    actionPoints: 'actionPoints',
-    criticalSeverity: 'criticalSeverity',
-    initiative: 'initiative',
-    hp: 'maxHP',
-    speed: 'speed',
-    maxMana: 'maxMana',
-    manaRegen: 'manaRegen',
-    manaPower: 'manaPower',
-  };
-
-  const statKey = map[key];
-  if (statKey && statKey in stats) {
-    return stats[statKey] as number;
-  }
-  return 0;
-};
-
-export const EquipmentPreview: React.FC<EquipmentPreviewProps> = ({
-  equipment,
-  currentStats,
-}) => {
-  if (!equipment || !equipment.stats) return null;
-
-  const statsEntries = Object.entries(equipment.stats).filter(
-    ([, value]) => value && value > 0,
-  );
-
-  if (statsEntries.length === 0) {
-    return (
-      <PreviewContainer>
-        <PreviewTitle>{equipment.name}</PreviewTitle>
-        <div
-          style={{ color: '#666677', fontSize: '0.75rem', marginTop: '4px' }}
-        >
-          Este item não concede bônus de atributos.
-        </div>
-      </PreviewContainer>
-    );
-  }
-
-  return (
-    <PreviewContainer>
-      <PreviewTitle>
-        {equipment.name}
-        <PreviewRarity $rarity={equipment.rarity}>
-          {equipment.rarity}
-        </PreviewRarity>
-      </PreviewTitle>
-      <PreviewStats>
-        {statsEntries.map(([key, value]) => {
-          const currentValue = getCurrentValue(currentStats, key);
-          const newValue = currentValue + value;
-          const isPositive = value > 0;
-
-          return (
-            <PreviewStat key={key} $isPositive={isPositive}>
-              <PreviewStatLabel>{getStatName(key)}</PreviewStatLabel>
-              <PreviewStatValue $isPositive={isPositive}>
-                {currentValue} → {newValue}
-                <span
-                  style={{
-                    fontSize: '0.6rem',
-                    marginLeft: '2px',
-                    color: isPositive ? '#2ecc71' : '#ff6b6b',
-                  }}
-                >
-                  {isPositive ? `(+${value})` : `(${value})`}
-                </span>
-              </PreviewStatValue>
-            </PreviewStat>
-          );
-        })}
-        to
-      </PreviewStats>
-    </PreviewContainer>
-  );
+export const EquipmentPreview: React.FC<EquipmentPreviewProps> = ({ equipment, currentStats }) => {
+  const statsEntries = Object.entries(equipment.stats || {}).filter(([, value]) => Number(value) !== 0);
+  return <PreviewContainer role="status" aria-live="polite">
+    <PreviewHeader><PreviewImage src={equipment.image || equipment.icon} alt="" /><div><PreviewTitle>{equipment.name}</PreviewTitle><PreviewMeta>{equipment.type} · Nível {equipment.level}</PreviewMeta><PreviewRarity $rarity={equipment.rarity}>{equipment.rarity}</PreviewRarity></div></PreviewHeader>
+    <PreviewDescription>{equipment.description || 'Sem descrição disponível.'}</PreviewDescription>
+    <PreviewSectionTitle>Bônus do equipamento</PreviewSectionTitle>
+    {statsEntries.length ? <PreviewStats>{statsEntries.map(([key, value]) => {
+      const format = getFormat(key); const derivedKey = STAT_TO_DERIVED[key]; const total = derivedKey ? currentStats[derivedKey] : null;
+      return <PreviewStat key={key} $isPositive={Number(value) > 0}><PreviewStatLabel>{STAT_NAMES[key] || key.toUpperCase()}</PreviewStatLabel><PreviewStatValue $isPositive={Number(value) > 0}>{formatStatBonus(Number(value), format)}{total !== null && <small>Total: {formatStatValue(total, format)}</small>}</PreviewStatValue></PreviewStat>;
+    })}</PreviewStats> : <PreviewMeta>Este item não concede bônus de atributos.</PreviewMeta>}
+    <PreviewMeta>{equipment.isEquipped ? 'Equipado atualmente' : 'Disponível para equipar'}</PreviewMeta>
+  </PreviewContainer>;
 };
 
 export default EquipmentPreview;

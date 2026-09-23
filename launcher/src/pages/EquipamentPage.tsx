@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { CharacterData } from '../types/characterData.types';
@@ -43,6 +43,12 @@ import {
   StatBarFill,
   EquipmentGridWrapper,
   EquipmentSectionTitle,
+  AttributeGrid,
+  AttributeCard,
+  StatGroups,
+  StatGroup,
+  StatGroupTitle,
+  StatMetric,
 } from '../styles/equipmentStyles';
 import {
   Equipment,
@@ -56,6 +62,8 @@ import { EquipmentPreview } from '../components/Equipment/EquipmentPreview';
 import { calculateCharacter } from '../utils/characterCalculator';
 import { DerivedStats, Attributes } from '../types/character.types';
 import { getGold } from '../utils/goldUtils';
+import { getModifierDisplay } from '../utils/characterStats';
+import { formatStatValue } from '../utils/statFormat';
 
 const getSlotType = (slot: EquipmentSlot): string => {
   const types: Record<EquipmentSlot, string> = {
@@ -451,6 +459,12 @@ export const EquipmentPage = () => {
       ),
     [equipment],
   );
+  const statGroups = [
+    { title: 'Combate', stats: [['Defesa', formatStatValue(displayStats?.defense)], ['Ataque', formatStatValue(equipmentAttack, 'decimal')], ['Crítico', formatStatValue(displayStats?.critical, 'percentage')], ['Evasão', formatStatValue(displayStats?.avoidance, 'percentage')], ['Bloqueio', formatStatValue(displayStats?.deflect, 'percentage')]] },
+    { title: 'Percepção', stats: [['Awareness', formatStatValue(displayStats?.awareness)]] },
+    { title: 'Magia', stats: [['Potência Mágica', formatStatValue(displayStats?.manaPower, 'decimal')]] },
+    { title: 'Mobilidade', stats: [['Iniciativa', formatStatValue(displayStats?.initiative)], ['Velocidade', formatStatValue(displayStats?.speed, 'distance')]] },
+  ];
 
   if (loading) {
     return (
@@ -496,14 +510,7 @@ export const EquipmentPage = () => {
           >
             <CharacterStatsPanel>
               <StatsTitle>Atributos do Personagem</StatsTitle>
-              <div
-                style={{
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(3, 1fr)',
-                  gap: '8px',
-                  marginBottom: '16px',
-                }}
-              >
+              <AttributeGrid>
                 {(
                   [
                     ['STR', 'str'],
@@ -514,25 +521,16 @@ export const EquipmentPage = () => {
                     ['CHA', 'cha'],
                   ] as const
                 ).map(([label, key]) => (
-                  <div
-                    key={key}
-                    style={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      color: '#858594',
-                      fontSize: '0.72rem',
-                    }}
-                  >
+                  <AttributeCard key={key}>
                     <span>{label}</span>
-                    <strong style={{ color: '#ffd700' }}>
-                      {displayAttributes?.[key] || 0}
-                    </strong>
-                  </div>
+                    <strong>{displayAttributes?.[key] || 0}</strong>
+                    <small>{getModifierDisplay(displayAttributes?.[key] || 0)} modificador</small>
+                  </AttributeCard>
                 ))}
-              </div>
+              </AttributeGrid>
               <StatBarContainer>
                 <StatBarRow>
-                  <StatBarLabel>HP</StatBarLabel>
+                  <StatBarLabel>VIDA MÁX.</StatBarLabel>
                   <StatBarTrack>
                     <StatBarFill
                       $value={displayStats?.maxHP || 0}
@@ -540,11 +538,11 @@ export const EquipmentPage = () => {
                       $color="#e74c3c"
                     />
                   </StatBarTrack>
-                  <StatBarValue>{displayStats?.maxHP || 0}</StatBarValue>
+                  <StatBarValue>{formatStatValue(displayStats?.maxHP)}</StatBarValue>
                 </StatBarRow>
 
                 <StatBarRow>
-                  <StatBarLabel>MANA</StatBarLabel>
+                  <StatBarLabel>MANA MÁX.</StatBarLabel>
                   <StatBarTrack>
                     <StatBarFill
                       $value={displayStats?.maxMana || 0}
@@ -552,11 +550,11 @@ export const EquipmentPage = () => {
                       $color="#3498db"
                     />
                   </StatBarTrack>
-                  <StatBarValue>{displayStats?.maxMana || 0}</StatBarValue>
+                  <StatBarValue>{formatStatValue(displayStats?.maxMana)}</StatBarValue>
                 </StatBarRow>
 
                 <StatBarRow>
-                  <StatBarLabel>AP</StatBarLabel>
+                  <StatBarLabel>PONTOS DE AÇÃO</StatBarLabel>
                   <StatBarTrack>
                     <StatBarFill
                       $value={displayStats?.actionPoints || 0}
@@ -564,11 +562,11 @@ export const EquipmentPage = () => {
                       $color="#9b59b6"
                     />
                   </StatBarTrack>
-                  <StatBarValue>{displayStats?.actionPoints || 0}</StatBarValue>
+                  <StatBarValue>{formatStatValue(displayStats?.actionPoints)}</StatBarValue>
                 </StatBarRow>
 
                 <StatBarRow>
-                  <StatBarLabel>REG. MANA</StatBarLabel>
+                  <StatBarLabel>REG. DE MANA</StatBarLabel>
                   <StatBarTrack>
                     <StatBarFill
                       $value={displayStats?.manaRegen || 0}
@@ -576,13 +574,13 @@ export const EquipmentPage = () => {
                       $color="#2ecc71"
                     />
                   </StatBarTrack>
-                  <StatBarValue>{displayStats?.manaRegen || 0}</StatBarValue>
+                  <StatBarValue>{formatStatValue(displayStats?.manaRegen, 'decimal')}</StatBarValue>
                 </StatBarRow>
               </StatBarContainer>
 
               <div
                 style={{
-                  display: 'grid',
+                  display: 'none',
                   gridTemplateColumns: '1fr 1fr',
                   gap: '4px 12px',
                   marginTop: '12px',
@@ -598,7 +596,7 @@ export const EquipmentPage = () => {
                 >
                   <span>Defesa</span>
                   <span style={{ color: '#ffd700' }}>
-                    {displayStats?.defense || 0}
+                    {formatStatValue(displayStats?.defense)}
                   </span>
                 </div>
                 <div
@@ -610,7 +608,7 @@ export const EquipmentPage = () => {
                   }}
                 >
                   <span>Ataque</span>
-                  <span style={{ color: '#ffd700' }}>+{equipmentAttack}</span>
+                  <span style={{ color: '#ffd700' }}>{formatStatValue(equipmentAttack, 'decimal')}</span>
                 </div>
                 <div
                   style={{
@@ -622,7 +620,7 @@ export const EquipmentPage = () => {
                 >
                   <span>Awareness</span>
                   <span style={{ color: '#ffd700' }}>
-                    {displayStats?.awareness || 0}
+                    {formatStatValue(displayStats?.awareness)}
                   </span>
                 </div>
                 <div
@@ -635,7 +633,7 @@ export const EquipmentPage = () => {
                 >
                   <span>Crítico</span>
                   <span style={{ color: '#ffd700' }}>
-                    {displayStats?.critical || 0}%
+                    {formatStatValue(displayStats?.critical, 'percentage')}
                   </span>
                 </div>
                 <div
@@ -648,7 +646,7 @@ export const EquipmentPage = () => {
                 >
                   <span>Avoidance</span>
                   <span style={{ color: '#ffd700' }}>
-                    {displayStats?.avoidance || 0}%
+                    {formatStatValue(displayStats?.avoidance, 'percentage')}
                   </span>
                 </div>
                 <div
@@ -661,7 +659,7 @@ export const EquipmentPage = () => {
                 >
                   <span>Deflect</span>
                   <span style={{ color: '#ffd700' }}>
-                    {displayStats?.deflect || 0}%
+                    {formatStatValue(displayStats?.deflect, 'percentage')}
                   </span>
                 </div>
                 <div
@@ -674,7 +672,7 @@ export const EquipmentPage = () => {
                 >
                   <span>Potência Mágica</span>
                   <span style={{ color: '#ffd700' }}>
-                    {displayStats?.manaPower || 0}
+                    {formatStatValue(displayStats?.manaPower, 'decimal')}
                   </span>
                 </div>
                 <div
@@ -687,7 +685,7 @@ export const EquipmentPage = () => {
                 >
                   <span>Iniciativa</span>
                   <span style={{ color: '#ffd700' }}>
-                    {displayStats?.initiative || 0}
+                    {formatStatValue(displayStats?.initiative)}
                   </span>
                 </div>
                 <div
@@ -700,10 +698,23 @@ export const EquipmentPage = () => {
                 >
                   <span>Velocidade</span>
                   <span style={{ color: '#ffd700' }}>
-                    {displayStats?.speed || 0}m
+                    {formatStatValue(displayStats?.speed, 'distance')}
                   </span>
                 </div>
               </div>
+              <StatGroups>
+                {statGroups.map((group) => (
+                  <StatGroup key={group.title} $dense={group.title === 'Combate'}>
+                    <StatGroupTitle>{group.title}</StatGroupTitle>
+                    {group.stats.map(([label, value]) => (
+                      <StatMetric key={label}>
+                        <span>{label}</span>
+                        <strong>{value}</strong>
+                      </StatMetric>
+                    ))}
+                  </StatGroup>
+                ))}
+              </StatGroups>
             </CharacterStatsPanel>
 
             <EquipmentGridWrapper>
@@ -716,6 +727,8 @@ export const EquipmentPage = () => {
                   return (
                     <SlotItem
                       key={slot.id}
+                      type="button"
+                      data-slot={slot.label}
                       $isEmpty={isEmpty}
                       $rarity={item?.rarity}
                       onClick={() => handleSlotClick(slot.id)}
@@ -797,8 +810,8 @@ export const EquipmentPage = () => {
               </InfoContent>
             ) : (
               <InfoEmpty>
-                <span></span>
-                <p>Clique em um slot para ver os detalhes do equipamento</p>
+                <span aria-hidden="true">✦</span>
+                <p>Selecione um slot para inspecionar o equipamento</p>
               </InfoEmpty>
             )}
           </EquipmentInfo>
