@@ -6,6 +6,9 @@ from models.card import Card
 from models.card_effect import CardEffect
 from models.character import Character
 from player.state import PlayerState
+from domain.entities.user import User
+from domain.entities.friend_request import FriendRequest, FriendRequestStatus
+from domain.entities.friendship import Friendship
 
 __all__ = [
     "ActiveCard",
@@ -14,4 +17,8 @@ __all__ = [
     "CardEffect",
     "Character",
     "PlayerState",
+    "User",
+    "FriendRequest",
+    "FriendRequestStatus",
+    "Friendship",
 ]

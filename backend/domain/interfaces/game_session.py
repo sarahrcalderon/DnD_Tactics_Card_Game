@@ -2,10 +2,10 @@ from typing import Any, Protocol
 
 
 class GameSessionRepository(Protocol):
-    """Stores the current game session without exposing storage details."""
+    """Armazena sessão de jogo atual sem expor detalhes de armazenamento."""
 
     def get(self) -> Any:
-        """Return the current game session."""
+        """Retorna a sessão de jogo atual."""
 
     def save(self, game: Any) -> None:
-        """Persist the current game session."""
+        """Persiste a sessão de jogo atual."""

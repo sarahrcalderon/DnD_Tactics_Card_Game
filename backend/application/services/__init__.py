@@ -1,5 +1,7 @@
 from .battle_service import BattleService
+from .auth_service import AuthService
+from .friend_service import FriendService
 from .catalog_service import CatalogService
 from .character_service import CharacterService
 
-__all__ = ["BattleService", "CatalogService", "CharacterService"]
+__all__ = ["AuthService", "BattleService", "CatalogService", "CharacterService", "FriendService"]

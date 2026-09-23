@@ -1,8 +1,12 @@
 """Composition root: infrastructure is wired to application use cases here."""
 
-from application.services import BattleService, CatalogService, CharacterService
+from application.services import AuthService, BattleService, CatalogService, CharacterService, FriendService
+from infrastructure.config import get_settings
+from infrastructure.database import get_session_factory
 from infrastructure.repositories import (
     InMemoryGameSessionRepository,
+    SqlAlchemyFriendRepository,
+    SqlAlchemyUserRepository,
     StaticCatalogRepository,
 )
 
@@ -10,9 +14,33 @@ from infrastructure.repositories import (
 class ApplicationContainer:
     def __init__(self) -> None:
         sessions = InMemoryGameSessionRepository()
+        self._auth: AuthService | None = None
+        self._friends: FriendService | None = None
         self.characters = CharacterService(sessions)
         self.battles = BattleService(sessions)
         self.catalog = CatalogService(StaticCatalogRepository())
+
+    @property
+    def auth(self) -> AuthService:
+        if self._auth is None:
+            settings = get_settings()
+            self._auth = AuthService(
+                users=SqlAlchemyUserRepository(get_session_factory()),
+                jwt_secret=settings.jwt_secret,
+                jwt_algorithm=settings.jwt_algorithm,
+                access_token_expire_minutes=settings.access_token_expire_minutes,
+            )
+        return self._auth
+
+    @property
+    def friends(self) -> FriendService:
+        if self._friends is None:
+            session_factory = get_session_factory()
+            self._friends = FriendService(
+                users=SqlAlchemyUserRepository(session_factory),
+                friends=SqlAlchemyFriendRepository(session_factory),
+            )
+        return self._friends
 
 
 container = ApplicationContainer()

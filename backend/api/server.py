@@ -2,7 +2,7 @@
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
 
-from api.routes import classes, races, character, battle
+from api.routes import auth, battle, character, classes, friends, races
 from api.websocket import game_ws
 from api.middleware.cors import setup_cors
 
@@ -21,6 +21,8 @@ app = FastAPI(
 
 setup_cors(app)
 
+app.include_router(auth.router, prefix="/auth", tags=["Authentication"])
+app.include_router(friends.router, prefix="/friends", tags=["Friends"])
 app.include_router(classes.router, prefix="/api/classes", tags=["Classes"])
 app.include_router(races.router, prefix="/api/races", tags=["Raças"])
 app.include_router(character.router, prefix="/api/character", tags=["Personagem"])
