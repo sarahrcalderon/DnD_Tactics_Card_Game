@@ -1,11 +1,12 @@
 """Composition root: infrastructure is wired to application use cases here."""
 
-from application.services import AuthService, BattleService, CatalogService, CharacterService, FriendService
+from application.services import AuthService, BattleService, CatalogService, CharacterService, FriendService, MatchService
 from infrastructure.config import get_settings
 from infrastructure.database import get_session_factory
 from infrastructure.repositories import (
     InMemoryGameSessionRepository,
     SqlAlchemyFriendRepository,
+    SqlAlchemyMatchRepository,
     SqlAlchemyUserRepository,
     StaticCatalogRepository,
 )
@@ -16,6 +17,7 @@ class ApplicationContainer:
         sessions = InMemoryGameSessionRepository()
         self._auth: AuthService | None = None
         self._friends: FriendService | None = None
+        self._matches: MatchService | None = None
         self.characters = CharacterService(sessions)
         self.battles = BattleService(sessions)
         self.catalog = CatalogService(StaticCatalogRepository())
@@ -41,6 +43,12 @@ class ApplicationContainer:
                 friends=SqlAlchemyFriendRepository(session_factory),
             )
         return self._friends
+
+    @property
+    def matches(self) -> MatchService:
+        if self._matches is None:
+            self._matches = MatchService(SqlAlchemyMatchRepository(get_session_factory()))
+        return self._matches
 
 
 container = ApplicationContainer()
