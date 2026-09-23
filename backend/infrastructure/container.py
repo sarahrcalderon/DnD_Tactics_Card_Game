@@ -1,4 +1,5 @@
 from application.services import AuthService, BattleService, CatalogService, CharacterService, FriendService, GameInviteService, MatchService
+from application.services.match_realtime_service import MatchRealtimeService
 from infrastructure.config import get_settings
 from infrastructure.database import get_session_factory
 from infrastructure.repositories import (
@@ -17,6 +18,7 @@ class ApplicationContainer:
         self._auth: AuthService | None = None
         self._friends: FriendService | None = None
         self._matches: MatchService | None = None
+        self._match_realtime: MatchRealtimeService | None = None
         self._game_invites: GameInviteService | None = None
         self.characters = CharacterService(sessions)
         self.battles = BattleService(sessions)
@@ -49,6 +51,12 @@ class ApplicationContainer:
         if self._matches is None:
             self._matches = MatchService(SqlAlchemyMatchRepository(get_session_factory()))
         return self._matches
+
+    @property
+    def match_realtime(self) -> MatchRealtimeService:
+        if self._match_realtime is None:
+            self._match_realtime = MatchRealtimeService(self.matches)
+        return self._match_realtime
 
     @property
     def game_invites(self) -> GameInviteService:

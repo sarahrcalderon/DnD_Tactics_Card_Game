@@ -40,6 +40,7 @@ async def list_invites(user: AuthenticatedUser = Depends(get_current_user)) -> l
 async def accept_invite(invite_id: UUID, data: GameInviteAcceptRequest, user: AuthenticatedUser = Depends(get_current_user)) -> dict:
     try:
         player = await container.game_invites.accept(user.id, invite_id, data.character_id, data.deck_id)
+        await container.match_realtime.player_joined(player.match_id, player.user_id)
     except ResourceNotFoundError as error:
         raise HTTPException(status_code=404, detail=str(error)) from error
     except ConflictError as error:
@@ -73,7 +74,7 @@ async def get_lobby(match_id: UUID, user: AuthenticatedUser = Depends(get_curren
 @router.post("/{match_id}/ready", response_model=MatchPlayerResponse)
 async def set_ready(match_id: UUID, data: MatchReadyRequest, user: AuthenticatedUser = Depends(get_current_user)) -> MatchPlayerResponse:
     try:
-        player = await container.matches.set_ready(match_id, user.id, data.ready)
+        player = await container.match_realtime.set_ready(match_id, user.id, data.ready)
     except ResourceNotFoundError as error:
         raise HTTPException(status_code=404, detail=str(error)) from error
     except ConflictError as error:
@@ -84,7 +85,7 @@ async def set_ready(match_id: UUID, data: MatchReadyRequest, user: Authenticated
 @router.post("/{match_id}/start", response_model=MatchResponse)
 async def start_match(match_id: UUID, user: AuthenticatedUser = Depends(get_current_user)) -> MatchResponse:
     try:
-        match = await container.matches.start(match_id, user.id)
+        match = await container.match_realtime.start(match_id, user.id)
     except ResourceNotFoundError as error:
         raise HTTPException(status_code=404, detail=str(error)) from error
     except ConflictError as error:

@@ -3,7 +3,7 @@ from fastapi import FastAPI
 from contextlib import asynccontextmanager
 
 from api.routes import auth, battle, character, classes, friends, matches, races
-from api.websocket import game_ws
+from api.websocket import game_ws, match_ws
 from api.middleware.cors import setup_cors
 
 @asynccontextmanager
@@ -29,6 +29,7 @@ app.include_router(races.router, prefix="/api/races", tags=["Raças"])
 app.include_router(character.router, prefix="/api/character", tags=["Personagem"])
 app.include_router(battle.router, prefix="/api/battle", tags=["Batalha"])
 app.include_router(game_ws.router, prefix="/ws", tags=["WebSocket"])
+app.include_router(match_ws.router, prefix="/ws", tags=["WebSocket"])
 
 @app.get("/")
 async def root():

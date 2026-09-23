@@ -66,8 +66,8 @@ class MatchService:
 
     async def set_ready(self, match_id: UUID, user_id: UUID, ready: bool) -> MatchPlayer:
         player = await self._require_player(match_id, user_id)
-        if (await self.get(match_id)).status == MatchStatus.IN_PROGRESS:
-            raise ConflictError("A partida já está em andamento.")
+        if (await self.get(match_id)).status not in (MatchStatus.WAITING, MatchStatus.READY):
+            raise ConflictError("A partida não permite alterar a prontidão.")
         updated = MatchPlayer(
             match_id=player.match_id, user_id=player.user_id, side=player.side, slot=player.slot,
             ready=ready, connected=player.connected, character_id=player.character_id, deck_id=player.deck_id,
