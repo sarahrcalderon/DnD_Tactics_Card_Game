@@ -1,23 +1,25 @@
-// launcher/src/styles/theme.ts
+import { colors } from './colors';
+
 export const theme = {
   colors: {
-    primary: '#ffd700',
-    primaryDark: '#b8960f',
-    secondary: '#1a1730',
-    background: '#0a0810',
-    cardBg: '#1b1833',
-    cardBorder: '#3e3752',
-    white: '#ffffff',
-    whiteDim: '#dcdce5',
-    gray: '#7d7d91',
-    green: '#37be69',
-    red: '#d24b4b',
-    blue: '#2d91ff',
-    purple: '#aa46be',
+    primary: colors.accent.gold,
+    primaryDark: colors.accent.goldDark,
+    secondary: colors.background.secondary,
+    background: colors.background.primary,
+    cardBg: colors.surface.secondary,
+    cardBorder: colors.border.default,
+    white: colors.text.primary,
+    whiteDim: colors.text.secondary,
+    gray: colors.text.muted,
+    green: colors.status.success,
+    red: colors.status.danger,
+    blue: colors.status.info,
+    purple: colors.accent.purple,
+    palette: colors,
   },
   fonts: {
-    main: "'Segoe UI', sans-serif",
-    title: "'Cinzel', serif",
+    main: "'Inter', 'Segoe UI', sans-serif",
+    title: "'Cinzel', Georgia, serif",
   },
   breakpoints: {
     mobile: '768px',

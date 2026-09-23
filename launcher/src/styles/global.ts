@@ -1,4 +1,6 @@
 import { createGlobalStyle } from 'styled-components';
+import { fontFamilies } from './typography';
+import { colors } from './colors';
 
 
 export const GlobalStyle = createGlobalStyle`
@@ -24,16 +26,11 @@ export const GlobalStyle = createGlobalStyle`
     width: 100%;
     min-height: 100%;
 
-    font-family:
-      'Segoe UI',
-      Tahoma,
-      Geneva,
-      Verdana,
-      sans-serif;
+    font-family: ${fontFamilies.ui};
 
-    background: #0a0810;
+    background: ${colors.background.primary};
 
-    color: #ffffff;
+    color: ${colors.text.primary};
 
     /*
      * IMPORTANTE:
@@ -50,6 +47,18 @@ export const GlobalStyle = createGlobalStyle`
     cursor: pointer;
     border: none;
     outline: none;
+    font: inherit;
+  }
+
+  :root {
+    --color-bg-primary: ${colors.background.primary};
+    --color-bg-secondary: ${colors.background.secondary};
+    --color-surface: ${colors.surface.secondary};
+    --color-border: ${colors.border.default};
+    --color-text-primary: ${colors.text.primary};
+    --color-text-secondary: ${colors.text.secondary};
+    --color-text-muted: ${colors.text.muted};
+    --color-accent-gold: ${colors.accent.gold};
   }
 
   #root {

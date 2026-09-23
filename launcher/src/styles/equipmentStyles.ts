@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+import { typography } from './typography';
 
 export const Container = styled.main`
   width: 100%;
@@ -80,6 +81,12 @@ export const Header = styled.header`
   padding: 0 8px 20px;
   margin-bottom: 20px;
   border-bottom: 1px solid rgba(224, 181, 95, 0.38);
+
+  @media (max-width: 560px) {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 14px;
+  }
 `;
 
 export const TitleGroup = styled.div`
@@ -90,10 +97,7 @@ export const TitleGroup = styled.div`
 export const Title = styled.h1`
   margin: 0;
   color: #f4d88f;
-  font-family: 'Cinzel', serif;
-  font-size: clamp(1.6rem, 3vw, 2.2rem);
-  font-weight: 700;
-  letter-spacing: 0.08em;
+  ${typography.pageTitle};
   text-transform: uppercase;
   text-shadow: 0 2px 0 #35230e, 0 0 32px rgba(255, 215, 0, 0.3);
 `;
@@ -101,7 +105,7 @@ export const Title = styled.h1`
 export const Subtitle = styled.p`
   margin: 2px 0 0;
   color: #9999aa;
-  font-size: 0.85rem;
+  ${typography.bodySmall};
   opacity: 0.7;
 `;
 
@@ -109,6 +113,11 @@ export const HeaderActions = styled.div`
   display: flex;
   gap: 12px;
   align-items: center;
+
+  @media (max-width: 560px) {
+    width: 100%;
+    justify-content: space-between;
+  }
 `;
 
 export const GoldDisplay = styled.div`
@@ -120,8 +129,8 @@ export const GoldDisplay = styled.div`
   border-radius: 2px;
   padding: 8px 16px;
   color: #ffd700;
+  ${typography.statValue};
   font-size: 1rem;
-  font-weight: 600;
 
   span {
     font-size: 1.2rem;
@@ -137,9 +146,8 @@ export const BagButton = styled.button`
   border-radius: 2px;
   padding: 8px 18px;
   color: #dfc995;
-  font-family: 'Cinzel', Georgia, serif;
+  ${typography.button};
   font-size: 0.9rem;
-  font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
 
@@ -154,8 +162,8 @@ export const BagButton = styled.button`
 export const MainContent = styled.div`
   width: 100%;
   display: grid;
-  grid-template-columns: 1fr 320px;
-  gap: 28px;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 330px);
+  gap: clamp(18px, 2.4vw, 30px);
 
   @media (max-width: 900px) {
     grid-template-columns: 1fr;
@@ -167,7 +175,9 @@ export const EquipmentGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 12px;
-  background: linear-gradient(145deg, rgba(37, 39, 45, 0.96), rgba(14, 17, 23, 0.98));
+  background:
+    radial-gradient(circle at 50% 0%, rgba(200, 154, 72, 0.1), transparent 42%),
+    linear-gradient(145deg, rgba(37, 39, 45, 0.96), rgba(14, 17, 23, 0.98));
   border-radius: 3px;
   padding: 20px;
   border: 1px solid rgba(190, 148, 73, 0.48);
@@ -184,7 +194,7 @@ export const EquipmentGrid = styled.div`
   }
 `;
 
-export const SlotItem = styled.div<{ $isEmpty: boolean; $rarity?: string }>`
+export const SlotItem = styled.button<{ $isEmpty: boolean; $rarity?: string }>`
   aspect-ratio: 1 / 1;
   border-radius: 2px;
   background: ${({ $isEmpty }) =>
@@ -207,11 +217,12 @@ export const SlotItem = styled.div<{ $isEmpty: boolean; $rarity?: string }>`
   justify-content: center;
   position: relative;
   cursor: pointer;
+  font-family: inherit;
   transition: all 0.3s ease;
   overflow: hidden;
   padding: 8px;
 
-  &:hover {
+  &:hover, &:focus-visible {
     transform: translateY(-3px);
     border-color: ${({ $rarity }) => {
       const colors = {
@@ -227,6 +238,23 @@ export const SlotItem = styled.div<{ $isEmpty: boolean; $rarity?: string }>`
   }
 
   &:focus-visible { outline: 2px solid #f2cf7d; outline-offset: 3px; }
+
+  &:has(img)::before {
+    content: attr(data-slot);
+    position: absolute;
+    z-index: 2;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    padding: 6px 4px 4px;
+    color: #ded4bd;
+    background: linear-gradient(transparent, rgba(3, 5, 9, 0.94));
+    font-size: 0.54rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-align: center;
+    text-transform: uppercase;
+  }
 
   &::after {
     content: '';
@@ -306,16 +334,15 @@ export const EquipmentInfo = styled.div`
   gap: 16px;
 
   @media (max-width: 900px) {
-    order: -1;
+    order: initial;
   }
 `;
 
 export const InfoTitle = styled.h3`
   margin: 0;
   color: #e9cf93;
-  font-family: 'Cinzel', Georgia, serif;
+  ${typography.sectionTitle};
   font-size: 1rem;
-  font-weight: 600;
   text-align: center;
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
   padding-bottom: 12px;
@@ -333,7 +360,9 @@ export const InfoEmpty = styled.div`
 
   span {
     font-size: 3rem;
-    opacity: 0.3;
+    color: #d8b56b;
+    opacity: 0.5;
+    text-shadow: 0 0 20px rgba(216, 181, 107, 0.28);
   }
 
   p {
@@ -351,16 +380,13 @@ export const InfoContent = styled.div`
 export const InfoName = styled.h2`
   margin: 0;
   color: #f5dfad;
-  font-family: 'Cinzel', Georgia, serif;
-  font-size: 1.2rem;
-  font-weight: 700;
+  ${typography.itemName};
 `;
 
 export const InfoRarity = styled.span<{ $rarity: string }>`
   padding: 4px 12px;
   border-radius: 2px;
-  font-size: 0.7rem;
-  font-weight: 600;
+  ${typography.caption};
   text-transform: uppercase;
   background: ${({ $rarity }) => {
     const colors = {
@@ -423,8 +449,7 @@ export const InfoStat = styled.div`
 export const InfoDescription = styled.p`
   margin: 0;
   color: #9999aa;
-  font-size: 0.85rem;
-  line-height: 1.5;
+  ${typography.body};
 `;
 
 export const InfoActions = styled.div`
@@ -438,8 +463,8 @@ export const ActionButton = styled.button<{ variant?: 'primary' | 'danger' | 'se
   padding: 10px 16px;
   border: none;
   border-radius: 2px;
+  ${typography.button};
   font-size: 0.85rem;
-  font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
 
@@ -499,7 +524,7 @@ export const BackButton = styled.button`
   min-width: clamp(140px, 15vw, 180px);
   padding: 12px 32px;
   color: #dfc995;
-  font-family: 'Cinzel', Georgia, serif;
+  ${typography.button};
   background: linear-gradient(180deg, rgba(64, 53, 39, 0.95), rgba(25, 25, 28, 0.95));
   border: 1px solid rgba(216, 176, 98, 0.65);
   border-radius: 2px;
@@ -526,18 +551,71 @@ export const CharacterStatsPanel = styled.div`
   width: 100%;
   background: linear-gradient(145deg, rgba(37, 39, 45, 0.97), rgba(14, 17, 23, 0.99));
   border-radius: 3px;
-  padding: 20px;
+  padding: clamp(16px, 1.8vw, 22px);
   border: 1px solid rgba(190, 148, 73, 0.48);
   backdrop-filter: blur(10px);
-  margin-bottom: 12px;
+  margin-bottom: 4px;
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.34), inset 0 0 0 3px rgba(0, 0, 0, 0.16);
+
+  > div:first-of-type {
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 8px !important;
+    margin: 0 0 14px !important;
+  }
+
+  > div:first-of-type > div {
+    min-height: 70px;
+    display: flex !important;
+    flex-direction: column;
+    justify-content: center !important;
+    gap: 1px;
+    padding: 9px 10px;
+    overflow: hidden;
+    color: #afa996 !important;
+    background: linear-gradient(150deg, rgba(89, 71, 43, 0.3), rgba(8, 11, 17, 0.72));
+    border: 1px solid rgba(211, 170, 94, 0.25);
+    border-radius: 2px;
+    transition: transform 180ms ease, border-color 180ms ease, background 180ms ease;
+  }
+
+  > div:first-of-type > div:hover {
+    transform: translateY(-2px);
+    background: linear-gradient(150deg, rgba(131, 101, 50, 0.35), rgba(10, 14, 22, 0.78));
+    border-color: rgba(235, 194, 111, 0.7);
+  }
+
+  > div:first-of-type span {
+    color: #b7af99;
+    font-family: 'Cinzel', Georgia, serif;
+    font-size: 0.64rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+  }
+
+  > div:first-of-type strong {
+    color: #f2d28b !important;
+    font-family: 'Cinzel', Georgia, serif;
+    font-size: 1.35rem;
+    line-height: 1.08;
+    text-shadow: 0 0 18px rgba(240, 194, 101, 0.16);
+  }
+
+  > div:first-of-type small {
+    color: #70b991;
+    font-size: 0.59rem;
+    line-height: 1.15;
+  }
+
+  @media (max-width: 420px) {
+    > div:first-of-type { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+  }
 `;
 
 export const StatsTitle = styled.h3`
   color: #e9cf93;
-  font-family: 'Cinzel', Georgia, serif;
-  font-size: 0.85rem;
-  font-weight: 600;
-  margin: 0 0 12px 0;
+  ${typography.sectionTitle};
+  margin: 0 0 16px 0;
   text-transform: uppercase;
   letter-spacing: 1px;
   text-align: center;
@@ -546,7 +624,7 @@ export const StatsTitle = styled.h3`
 export const StatBarContainer = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
 `;
 
 export const StatBarRow = styled.div`
@@ -557,16 +635,15 @@ export const StatBarRow = styled.div`
 
 export const StatBarLabel = styled.span`
   color: #dcdce5;
-  font-size: 0.75rem;
-  font-weight: 500;
+  ${typography.label};
   min-width: 40px;
   text-align: right;
 `;
 
 export const StatBarValue = styled.span`
   color: #ffd700;
+  ${typography.statValue};
   font-size: 0.8rem;
-  font-weight: 600;
   min-width: 30px;
   text-align: center;
 `;
@@ -596,17 +673,20 @@ export const StatBarFill = styled.div<StatBarFillProps>`
 
 export const EquipmentPreview = styled.div`
   position: fixed;
-  bottom: 20px;
-  right: 20px;
-  background: rgba(10, 8, 16, 0.95);
-  border: 1px solid rgba(255, 215, 0, 0.2);
-  border-radius: 12px;
-  padding: 16px 20px;
-  max-width: 320px;
-  z-index: 100;
+  right: clamp(16px, 3vw, 40px);
+  bottom: clamp(16px, 3vw, 40px);
+  width: min(420px, calc(100vw - 32px));
+  max-height: min(76dvh, 680px);
+  overflow-y: auto;
+  box-sizing: border-box;
+  background: linear-gradient(145deg, rgba(27, 29, 38, 0.98), rgba(7, 9, 15, 0.99));
+  border: 1px solid rgba(224, 181, 95, 0.58);
+  border-radius: 3px;
+  padding: clamp(20px, 2.2vw, 28px);
+  z-index: 1000;
   backdrop-filter: blur(10px);
   animation: slideUp 0.3s ease;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+  box-shadow: 0 18px 52px rgba(0, 0, 0, 0.7), inset 0 0 0 3px rgba(0, 0, 0, 0.22);
 
   @keyframes slideUp {
     from {
@@ -618,20 +698,69 @@ export const EquipmentPreview = styled.div`
       transform: translateY(0);
     }
   }
+
+  @media (max-width: 560px) {
+    right: 16px;
+    bottom: 16px;
+    max-height: 70dvh;
+  }
 `;
 
 export const PreviewTitle = styled.div`
-  color: #ffffff;
-  font-size: 0.9rem;
-  font-weight: 600;
-  margin-bottom: 6px;
+  color: #f5dfad;
+  font-family: 'Cinzel', Georgia, serif;
+  font-size: 1.2rem;
+  line-height: 1.25;
+  margin-bottom: 7px;
+`;
+
+export const PreviewHeader = styled.div`
+  display: grid;
+  grid-template-columns: 76px 1fr;
+  align-items: center;
+  gap: 16px;
+`;
+
+export const PreviewImage = styled.img`
+  width: 76px;
+  height: 76px;
+  padding: 6px;
+  object-fit: contain;
+  background: rgba(2, 5, 10, 0.62);
+  border: 1px solid rgba(221, 180, 101, 0.36);
+`;
+
+export const PreviewMeta = styled.div`
+  color: #a7a297;
+  font-size: 0.82rem;
+  line-height: 1.55;
+`;
+
+export const PreviewDescription = styled.p`
+  margin: 18px 0 0;
+  padding: 18px 0;
+  color: #d1cab9;
+  border-top: 1px solid rgba(220, 181, 105, 0.16);
+  border-bottom: 1px solid rgba(220, 181, 105, 0.16);
+  font-size: 0.92rem;
+  line-height: 1.65;
+`;
+
+export const PreviewSectionTitle = styled.div`
+  color: #e5c780;
+  font-family: 'Cinzel', Georgia, serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 `;
 
 export const PreviewRarity = styled.span<{ $rarity: string }>`
-  font-size: 0.6rem;
+  display: inline-block;
+  margin: 7px 0 0;
+  font-size: 0.68rem;
   font-weight: 600;
   text-transform: uppercase;
-  margin-left: 6px;
   color: ${({ $rarity }) => {
     const colors: Record<string, string> = {
       Comum: '#8a8a8a',
@@ -648,17 +777,18 @@ export const PreviewRarity = styled.span<{ $rarity: string }>`
 export const PreviewStats = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 4px 12px;
-  margin-top: 6px;
+  gap: 8px 12px;
+  margin: 12px 0 18px;
 `;
 
 export const PreviewStat = styled.div<{ $isPositive?: boolean }>`
   display: flex;
   justify-content: space-between;
-  font-size: 0.7rem;
+  ${typography.label};
   color: ${({ $isPositive }) => ($isPositive ? '#2ecc71' : '#ff6b6b')};
-  padding: 2px 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+  padding: 8px 10px;
+  background: rgba(4, 6, 10, 0.42);
+  border: 1px solid rgba(221, 180, 101, 0.12);
 `;
 
 export const PreviewStatLabel = styled.span`
@@ -668,6 +798,15 @@ export const PreviewStatLabel = styled.span`
 export const PreviewStatValue = styled.span<{ $isPositive?: boolean }>`
   color: ${({ $isPositive }) => ($isPositive ? '#2ecc71' : '#ff6b6b')};
   font-weight: 600;
+
+  small {
+    display: block;
+    margin-top: 2px;
+    color: #9f9a8e;
+    font-size: 0.67rem;
+    font-weight: 500;
+  }
+
 `;
 
 export const EquipmentGridWrapper = styled.div`
@@ -684,4 +823,89 @@ export const EquipmentSectionTitle = styled.h3`
   font-weight: 600;
   margin: 0;
   letter-spacing: 0.5px;
+  text-transform: uppercase;
+
+  &::after {
+    content: ' · clique para inspecionar';
+    color: #8e8878;
+    font-family: 'Segoe UI', sans-serif;
+    font-size: 0.62rem;
+    font-weight: 500;
+    letter-spacing: 0.03em;
+    text-transform: none;
+  }
+`;
+
+export const AttributeGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 22px;
+
+  @media (max-width: 420px) { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+`;
+
+export const AttributeCard = styled.div`
+  min-height: 88px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 3px;
+  padding: 12px;
+  background: linear-gradient(150deg, rgba(89, 71, 43, 0.3), rgba(8, 11, 17, 0.72));
+  border: 1px solid rgba(211, 170, 94, 0.25);
+
+  span { color: #b7af99; ${typography.label}; letter-spacing: 0.08em; }
+  strong { color: #f2d28b; ${typography.statValue}; font-size: 1.35rem; }
+  small { color: #70b991; ${typography.caption}; }
+`;
+
+export const StatGroups = styled.div`
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+  gap: 10px;
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(213, 177, 102, 0.2);
+
+  @media (max-width: 560px) { grid-template-columns: 1fr; }
+`;
+
+export const StatGroup = styled.section<{ $dense?: boolean }>`
+  padding: 11px 12px;
+  background: rgba(5, 8, 13, 0.38);
+  border: 1px solid rgba(211, 170, 94, 0.16);
+
+  ${({ $dense }) => $dense && `
+    grid-column: span 2;
+    @media (min-width: 561px) {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      column-gap: 18px;
+      align-items: start;
+
+      h4 { grid-column: 1 / -1; }
+    }
+  `}
+`;
+
+export const StatGroupTitle = styled.h4`
+  margin: 0 0 8px;
+  color: #d9bd7a;
+  ${typography.sectionTitle};
+  text-transform: uppercase;
+`;
+
+export const StatMetric = styled.div`
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 5px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.055);
+
+  &:first-of-type { border-top: 0; }
+  span { color: #aaa797; ${typography.label}; }
+  strong { color: #f2d28b; ${typography.statValue}; font-size: 1.05rem; white-space: nowrap; }
 `;
