@@ -9,6 +9,8 @@ from player.state import PlayerState
 from domain.entities.user import User
 from domain.entities.friend_request import FriendRequest, FriendRequestStatus
 from domain.entities.friendship import Friendship
+from domain.entities.game_invite import GameInvite, GameInviteStatus
+from domain.entities.match import Match, MatchPlayer, MatchSide, MatchStatus
 
 __all__ = [
     "ActiveCard",
@@ -21,4 +23,10 @@ __all__ = [
     "FriendRequest",
     "FriendRequestStatus",
     "Friendship",
+    "GameInvite",
+    "GameInviteStatus",
+    "Match",
+    "MatchPlayer",
+    "MatchSide",
+    "MatchStatus",
 ]
