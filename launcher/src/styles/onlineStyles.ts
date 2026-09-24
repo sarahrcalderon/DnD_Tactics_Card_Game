@@ -212,8 +212,20 @@ export const InputWithIcon = styled.div`
     pointer-events: none;
   }
 
+  button {
+    position: absolute;
+    right: 4px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #d8b56e;
+  }
+
   input {
     padding-left: 42px;
+  }
+
+  input:has(+ button) {
+    padding-right: 44px;
   }
 `;
 

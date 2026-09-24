@@ -1,5 +1,11 @@
 import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { useState, type FormEvent } from 'react';
+import EmailOutlinedIcon from '@mui/icons-material/EmailOutlined';
+import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
+import PersonOutlineIcon from '@mui/icons-material/PersonOutlined';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
+import IconButton from '@mui/material/IconButton';
 import { useAuth } from '../contexts/AuthContext';
 import { useTask } from '../hooks/useTask';
 import { Button } from '../components/common/Button';
@@ -25,6 +31,7 @@ export function LoginPage({ register = false }: { register?: boolean }) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [passwordVisible, setPasswordVisible] = useState(false);
 
   const from = (location.state as { from?: string } | null)?.from;
   const destination = from?.startsWith('/online') ? from : '/online';
@@ -70,7 +77,7 @@ export function LoginPage({ register = false }: { register?: boolean }) {
           {register && (
             <Field>
               Nome de jogador
-              <InputWithIcon><span aria-hidden="true">♜</span><input
+              <InputWithIcon><span aria-hidden="true"><PersonOutlineIcon fontSize="small" /></span><input
                 required
                 minLength={3}
                 maxLength={50}
@@ -83,7 +90,7 @@ export function LoginPage({ register = false }: { register?: boolean }) {
 
           <Field>
             E-mail
-            <InputWithIcon><span aria-hidden="true">✉</span><input
+            <InputWithIcon><span aria-hidden="true"><EmailOutlinedIcon fontSize="small" /></span><input
               type="email"
               required
               autoComplete="email"
@@ -94,15 +101,15 @@ export function LoginPage({ register = false }: { register?: boolean }) {
 
           <Field>
             Senha
-            <InputWithIcon><span aria-hidden="true">▣</span><input
-              type="password"
+            <InputWithIcon><span aria-hidden="true"><LockOutlinedIcon fontSize="small" /></span><input
+              type={passwordVisible ? 'text' : 'password'}
               required
               minLength={register ? 8 : undefined}
               maxLength={72}
               autoComplete={register ? 'new-password' : 'current-password'}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-            /></InputWithIcon>
+            /><IconButton type="button" aria-label={passwordVisible ? 'Ocultar senha' : 'Mostrar senha'} onClick={() => setPasswordVisible(value => !value)}>{passwordVisible ? <VisibilityOffIcon /> : <VisibilityIcon />}</IconButton></InputWithIcon>
           </Field>
 
           <Button disabled={task.busy}>
