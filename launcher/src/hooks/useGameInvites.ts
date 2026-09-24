@@ -1,34 +1,26 @@
-import { friendService } from '../services/friendService';
+import { gameInviteService } from '../services/gameInviteService';
+import type { LoadoutSelection } from '../types/online.types';
 import { useAsyncResource } from './useAsyncResource';
 import { useTask } from './useTask';
 
-const load = async (signal: AbortSignal) => {
-  const [friends, requests] = await Promise.all([
-    friendService.list(signal),
-    friendService.requests(signal),
-  ]);
-
-  return { friends, requests };
-};
-
-export function useFriends() {
-  const resource = useAsyncResource(load, 10000);
+export function useGameInvites() {
+  const resource = useAsyncResource(gameInviteService.list, 10000);
   const task = useTask();
-
-  const act = (action: () => Promise<void>) =>
-    task.run(async () => {
-      await action();
-      await resource.refresh();
-      return true;
-    });
 
   return {
     ...resource,
     busy: task.busy,
     actionError: task.error,
-    send: (email: string) => act(() => friendService.send(email)),
-    respond: (id: string, response: 'accept' | 'reject') =>
-      act(() => friendService.respond(id, response)),
-    remove: (id: string) => act(() => friendService.remove(id)),
+    accept: (id: string, selection: LoadoutSelection) =>
+      task.run(async () => {
+        const result = await gameInviteService.accept(id, selection);
+        await resource.refresh();
+        return result;
+      }),
+    reject: (id: string) =>
+      task.run(async () => {
+        await gameInviteService.reject(id);
+        await resource.refresh();
+      }),
   };
 }
