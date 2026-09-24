@@ -103,14 +103,21 @@ import { useAttributeDistribution } from '../hooks/useAttributeDistribution';
 import { useCharacterPersistence } from '../hooks/useCharacterPersistence';
 import { useDeckGeneration } from '../hooks/useCharacterDeck';
 import { characterStorageService } from '../services/characterStorageService';
+import { useCharacterCreation } from '../contexts/CharacterCreationContext';
+import { useAuth } from '../contexts/AuthContext';
+import { loadoutService } from '../services/loadoutService';
+import { apiError } from '../utils/apiError';
 
 export const AttributeDistPage = () => {
-  const location = useLocation();
   const navigate = useNavigate();
-  const routeState = useMemo<AttributeDistributionRouteState>(
-    () => (location.state as AttributeDistributionRouteState | null) ?? {},
-    [location.state],
-  );
+  const location = useLocation();
+  const { state: creation, setAttributes, setPointsRemaining, saveCharacter: markCreated, reset } = useCharacterCreation();
+  const auth = useAuth();
+  const storedCharacter = useMemo(() => characterStorageService.load(), []);
+  const ownedStoredCharacter = storedCharacter?.userId === auth.user?.id ? storedCharacter : null;
+  const routeSheet = (location.state as AttributeDistributionRouteState | null) ?? {};
+  const viewingRouteSheet = !creation.classId && routeSheet.ownerId === auth.user?.id && Boolean(routeSheet.classId);
+  const viewingSavedCharacter = !creation.classId && !viewingRouteSheet && Boolean(ownedStoredCharacter?.isSaved || ownedStoredCharacter?.isFinalized);
 
   const {
     classId,
@@ -121,7 +128,17 @@ export const AttributeDistPage = () => {
     deckId,
     deityId,
     deityName,
-  } = routeState;
+  } = {
+    classId: creation.classId || routeSheet.classId || ownedStoredCharacter?.classId || null,
+    raceId: creation.raceId || routeSheet.raceId || ownedStoredCharacter?.raceId || null,
+    raceName: creation.raceName || routeSheet.raceName || ownedStoredCharacter?.raceName || null,
+    raceImage: creation.raceImage || routeSheet.raceImage || ownedStoredCharacter?.raceImage || null,
+    raceIcon: creation.raceIcon || routeSheet.raceIcon || ownedStoredCharacter?.raceIcon || null,
+    deckId: creation.deckId || routeSheet.deckId || ownedStoredCharacter?.deckId || null,
+    deityId: creation.deityId || routeSheet.deityId || ownedStoredCharacter?.deityId || null,
+    deityName: creation.deityName || routeSheet.deityName || ownedStoredCharacter?.deityName || null,
+  };
+  const selectedCharacterName = creation.characterName || routeSheet.characterName || ownedStoredCharacter?.name || null;
 
   const normalizedClassId = useMemo(
     () => classId || DEFAULT_CLASS_ID,
@@ -148,14 +165,19 @@ export const AttributeDistPage = () => {
     loadAttributes,
   } = useAttributeDistribution({
     baseAttributes,
-    initialAttributes: routeState?.attributes,
-    initialPoints: routeState?.pointsRemaining ?? TOTAL_POINTS,
+    initialAttributes: viewingRouteSheet ? routeSheet.attributes : viewingSavedCharacter ? ownedStoredCharacter?.attributes : creation.attributes,
+    initialPoints: viewingRouteSheet ? routeSheet.pointsRemaining : viewingSavedCharacter ? ownedStoredCharacter?.pointsRemaining : creation.pointsRemaining,
   });
 
   const derivedStats = useMemo(
     () => calculateDerivedStats(attributes, normalizedClassId),
     [attributes, normalizedClassId],
   );
+
+  useEffect(() => {
+    setAttributes(attributes);
+    setPointsRemaining(pointsRemaining);
+  }, [attributes, pointsRemaining, setAttributes, setPointsRemaining]);
 
   const {
     characterName,
@@ -177,15 +199,17 @@ export const AttributeDistPage = () => {
     derivedStats,
     className,
     classId: normalizedClassId,
-    raceId,
-    raceName,
-    raceImage,
-    raceIcon,
-    deityId,
-    deityName,
+    raceId: raceId || undefined,
+    raceName: raceName || undefined,
+    raceImage: raceImage || undefined,
+    raceIcon: raceIcon || undefined,
+    deityId: deityId || undefined,
+    deityName: deityName || undefined,
     deckId: deckId || DEFAULT_DECK_ID,
     pointsRemaining,
     onLoadAttributes: loadAttributes,
+    initialName: selectedCharacterName || '',
+    isCreationFlow: !viewingSavedCharacter && !viewingRouteSheet,
   });
 
   const currentDeckId = useMemo(
@@ -200,7 +224,7 @@ export const AttributeDistPage = () => {
     [raceImage, raceId],
   );
   const avatarIcon = raceIcon || '🧙';
-  const isFromMap = routeState.fromMap === true;
+  const isFromMap = false;
   const displayName = characterName || raceName || 'Herói';
   const characterInfo = `${className}${raceName ? ` • ${raceName}` : ''}${
     deityName ? ` • ${deityName}` : ''
@@ -213,7 +237,6 @@ export const AttributeDistPage = () => {
     if (
       !isPersistenceLoaded ||
       isCharacterSaved ||
-      routeState.isSaved ||
       hasShownAttributeReminder.current
     ) {
       return;
@@ -224,7 +247,7 @@ export const AttributeDistPage = () => {
       icon: '',
       duration: 4000,
     });
-  }, [isCharacterSaved, isPersistenceLoaded, routeState.isSaved]);
+  }, [isCharacterSaved, isPersistenceLoaded]);
 
   const handleBack = useCallback(() => {
     if (isCharacterSaved && pointsRemaining === 0) {
@@ -233,7 +256,7 @@ export const AttributeDistPage = () => {
       );
       if (!shouldLeave) return;
       persistCurrentCharacter();
-      navigate('/');
+      navigate(auth.token ? '/online' : '/');
       return;
     }
 
@@ -273,20 +296,55 @@ export const AttributeDistPage = () => {
     deityName,
     isCharacterSaved,
     persistCurrentCharacter,
+    auth.token,
   ]);
 
   const handleSaveCharacter = useCallback(() => {
-    saveCharacter();
-  }, [saveCharacter]);
+    if (pointsRemaining > 0) {
+      toast.error(`VocÃª ainda tem ${pointsRemaining} ponto(s) para distribuir!`);
+      return;
+    }
+    if (!auth.token || !auth.user) {
+      toast.error('Entre na sua conta para finalizar o personagem online.');
+      navigate('/login', { state: { from: '/attribute-dist' } });
+      return;
+    }
+
+    void (async () => {
+      try {
+        const onlineCharacter = await loadoutService.createCharacter(
+          creation.characterName || characterName || 'HerÃ³i',
+          classId!,
+          raceId!,
+          attributes,
+          raceImage || undefined,
+        );
+        await loadoutService.createSelectedDeck(
+          creation.deckName || deckName || 'Deck inicial',
+          classId!,
+          deckId!,
+        );
+        auth.retry();
+        if (await saveCharacter()) {
+          characterStorageService.update({ userId: auth.user!.id });
+          markCreated(onlineCharacter.id);
+          reset();
+          navigate('/online/characters', { replace: true });
+        }
+      } catch (error) {
+        toast.error(apiError(error));
+      }
+    })();
+  }, [pointsRemaining, auth.token, auth.user, auth.retry, navigate, creation.characterName, creation.deckName, classId, raceId, deckId, attributes, characterName, deckName, saveCharacter, markCreated, reset]);
 
   const handleStartMatch = useCallback(() => {
     persistCurrentCharacter();
-    navigate('/map');
+    navigate('/online/characters');
   }, [navigate, persistCurrentCharacter]);
 
   const handleDeleteCharacter = useCallback(() => {
-    deleteCharacter(() => navigate('/class-select'));
-  }, [deleteCharacter, navigate]);
+    deleteCharacter(() => navigate(auth.token ? '/online' : '/class-select'));
+  }, [auth.token, deleteCharacter, navigate]);
 
   const handleOpenEquipment = useCallback(() => {
     persistCurrentCharacter();
@@ -309,6 +367,8 @@ export const AttributeDistPage = () => {
         deckName: currentDeckName,
         pointsRemaining,
         isFinalized: isCharacterSaved,
+        ownerId: auth.user?.id,
+        returnTo: '/online',
         fromMap: isFromMap,
       },
     });
@@ -329,6 +389,7 @@ export const AttributeDistPage = () => {
     pointsRemaining,
     isFromMap,
     persistCurrentCharacter,
+    auth.user?.id,
   ]);
 
   const handleOpenDeckView = useCallback(() => {
@@ -341,6 +402,7 @@ export const AttributeDistPage = () => {
         raceImage,
         raceIcon,
         fromMap: isFromMap,
+        returnTo: '/attribute-dist',
       },
     });
   }, [
@@ -400,7 +462,7 @@ export const AttributeDistPage = () => {
     );
   }
 
-  if (!classId) {
+  if (!classId || !raceId || !deityId || !deckId || !selectedCharacterName) {
     return (
       <Container>
         <BackgroundImage />
@@ -409,7 +471,7 @@ export const AttributeDistPage = () => {
           <Subtitle>Dados do personagem não encontrados.</Subtitle>
         </Header>
         <Actions>
-          <BackButton type="button" onClick={() => navigate('/')}>
+          <BackButton type="button" onClick={() => navigate(auth.token ? '/online' : '/class-select')}>
             Voltar ao Início
           </BackButton>
         </Actions>
@@ -822,6 +884,9 @@ export const AttributeDistPage = () => {
           )}
           {isCharacterSaved && pointsRemaining === 0 ? (
             <>
+              <BackButton type="button" onClick={() => navigate('/online')}>
+                Voltar ao online
+              </BackButton>
               <ConfirmButton
                 type="button"
                 disabled={false}

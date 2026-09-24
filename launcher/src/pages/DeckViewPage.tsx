@@ -178,14 +178,12 @@ export const DeckViewPage = () => {
       return;
     }
 
-    navigate('/deck-select', {
-      state: {
-        classId: className.toLowerCase(),
-        raceName,
-        raceImage,
-      },
-    });
-  }, [className, isFromMap, navigate, raceImage, raceName]);
+    if (routeState.returnTo) {
+      navigate(routeState.returnTo);
+      return;
+    }
+    navigate('/deck-select');
+  }, [isFromMap, navigate, routeState.returnTo]);
 
   const handleConfirm = useCallback(() => {
     if (!deck) return;

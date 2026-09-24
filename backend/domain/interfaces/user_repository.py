@@ -16,3 +16,6 @@ class UserRepository(Protocol):
 
     async def create(self, user: User) -> User:
         ...
+
+    async def update_avatar(self, user_id: UUID, avatar_url: str | None) -> User | None:
+        ...

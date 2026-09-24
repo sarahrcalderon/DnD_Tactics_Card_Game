@@ -16,10 +16,11 @@ class LoadoutService:
         self._repository = repository
         self._catalog = catalog
 
-    async def create_character(self, user_id: UUID, name: str, class_id: str, race_id: str) -> OwnedCharacter:
+    async def create_character(self, user_id: UUID, name: str, class_id: str, race_id: str,
+                               attributes: dict | None = None, portrait_url: str | None = None) -> OwnedCharacter:
         self._catalog.class_by_id(class_id)
-        self._catalog.race_by_id(class_id, race_id)
-        character = OwnedCharacter(uuid4(), user_id, self._name(name), Character(class_id, race_id))
+        character = OwnedCharacter(uuid4(), user_id, self._name(name), Character(
+            class_id, race_id, attributes=dict(attributes or {}), portrait_url=portrait_url))
         return await self._repository.create_character(character)
 
     async def create_deck(
@@ -35,6 +36,14 @@ class LoadoutService:
 
     async def list_characters(self, user_id: UUID) -> list[OwnedCharacter]:
         return await self._repository.list_characters(user_id)
+
+    async def delete_character(self, user_id: UUID, character_id: str) -> None:
+        try:
+            deleted = await self._repository.delete_character(user_id, UUID(character_id))
+        except (TypeError, ValueError) as error:
+            raise ResourceNotFoundError("Personagem não encontrado.") from error
+        if not deleted:
+            raise ResourceNotFoundError("Personagem não encontrado.")
 
     async def list_decks(self, user_id: UUID) -> list[OwnedDeck]:
         return await self._repository.list_decks(user_id)

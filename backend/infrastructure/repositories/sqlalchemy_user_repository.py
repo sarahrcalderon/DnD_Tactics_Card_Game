@@ -44,6 +44,16 @@ class SqlAlchemyUserRepository:
             await session.refresh(model)
             return self._to_entity(model)
 
+    async def update_avatar(self, user_id: UUID, avatar_url: str | None) -> User | None:
+        async with self._session_factory() as session:
+            model = await session.get(UserModel, str(user_id))
+            if model is None:
+                return None
+            model.avatar_url = avatar_url
+            await session.commit()
+            await session.refresh(model)
+            return self._to_entity(model)
+
     async def _get_one(self, clause) -> User | None:
         async with self._session_factory() as session:
             result = await session.execute(select(UserModel).where(clause))

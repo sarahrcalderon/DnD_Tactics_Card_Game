@@ -2,6 +2,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
+import { useCharacterCreation } from '../contexts/CharacterCreationContext';
 import { NameSelectState } from '../types/nameSelect.types';
 import {
   Container,
@@ -43,6 +44,7 @@ const formatClassName = (classId: string | undefined): string => {
 export const NameSelectPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { state: creation, setName: setCreationName } = useCharacterCreation();
 
   const routeState = getRouteState(location.state);
 
@@ -50,12 +52,12 @@ export const NameSelectPage = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const classId = routeState.classId ?? null;
-  const raceName = routeState.raceName ?? '';
-  const raceImage = routeState.raceImage ?? '';
-  const raceIcon = routeState.raceIcon ?? '';
-  const deityName = routeState.deityName ?? '';
-  const deckName = routeState.deckName ?? '';
+  const classId = creation.classId;
+  const raceName = creation.raceName ?? '';
+  const raceImage = creation.raceImage ?? '';
+  const raceIcon = creation.raceIcon ?? '';
+  const deityName = creation.deityName ?? '';
+  const deckName = creation.deckName ?? '';
 
   useEffect(() => {
     if (!classId) {
@@ -63,18 +65,18 @@ export const NameSelectPage = () => {
       return;
     }
 
-    if (!routeState.deityId) {
+    if (!creation.raceId || !creation.deityId) {
       toast.error('Nenhuma divindade selecionada');
       navigate('/deity-select', { replace: true });
       return;
     }
 
-    if (!routeState.deckId) {
+    if (!creation.deckId) {
       toast.error('Nenhum deck selecionado');
       navigate('/deck-select', { replace: true });
       return;
     }
-  }, [classId, navigate, routeState.deityId, routeState.deckId]);
+  }, [classId, creation.raceId, creation.deityId, creation.deckId, navigate]);
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -98,25 +100,14 @@ export const NameSelectPage = () => {
     }
 
     setLoading(true);
+    setCreationName(trimmedName);
 
     const toastId = toast.loading(`Criando ${trimmedName}...`);
 
     window.setTimeout(() => {
       toast.success(`${trimmedName} foi criado!`, { id: toastId });
 
-      navigate('/attribute-dist', {
-        state: {
-          classId,
-          raceName,
-          raceImage,
-          raceIcon,
-          deityId: routeState.deityId,
-          deityName,
-          deckId: routeState.deckId,
-          deckName,
-          characterName: trimmedName,
-        },
-      });
+      navigate('/attribute-dist');
 
       setLoading(false);
     }, 800);
@@ -127,10 +118,9 @@ export const NameSelectPage = () => {
     raceImage,
     raceIcon,
     deityName,
-    routeState.deityId,
-    routeState.deckId,
     deckName,
     navigate,
+    setCreationName,
   ]);
 
   const handleBack = useCallback(() => {

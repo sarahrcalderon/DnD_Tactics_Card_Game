@@ -2,6 +2,7 @@ import React, {
   createContext,
   useContext,
   useState,
+  useEffect,
   useCallback,
   ReactNode,
 } from 'react';
@@ -43,28 +44,32 @@ const CharacterCreationContext = createContext<
 >(undefined);
 
 const TOTAL_POINTS = 5;
+const STORAGE_KEY = 'dnd.character-creation';
+
+const initialState = (): CharacterCreationState => ({
+  step: 'class', classId: null, raceId: null, raceName: null, raceImage: null,
+  raceIcon: null, deityId: null, deityName: null, deckId: null, deckName: null,
+  characterName: null, attributes: { ...DEFAULT_ATTRIBUTES },
+  pointsRemaining: TOTAL_POINTS, isSaved: false, saveId: null, equipment: {},
+});
+
+const restoredState = (): CharacterCreationState => {
+  try {
+    const saved = sessionStorage.getItem(STORAGE_KEY);
+    return saved ? { ...initialState(), ...JSON.parse(saved), isSaved: false } : initialState();
+  } catch {
+    return initialState();
+  }
+};
 
 export const CharacterCreationProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
-  const [state, setState] = useState<CharacterCreationState>({
-    step: 'class',
-    classId: null,
-    raceId: null,
-    raceName: null,
-    raceImage: null,
-    raceIcon: null,
-    deityId: null,
-    deityName: null,
-    deckId: null,
-    deckName: null,
-    characterName: null,
-    attributes: { ...DEFAULT_ATTRIBUTES },
-    pointsRemaining: TOTAL_POINTS,
-    isSaved: false,
-    saveId: null,
-    equipment: {},
-  });
+  const [state, setState] = useState<CharacterCreationState>(restoredState);
+
+  useEffect(() => {
+    sessionStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  }, [state]);
 
   const setClass = useCallback((classId: string, className: string) => {
     const baseAttrs =
@@ -73,6 +78,15 @@ export const CharacterCreationProvider: React.FC<{ children: ReactNode }> = ({
       ...prev,
       classId,
       className,
+      raceId: null,
+      raceName: null,
+      raceImage: null,
+      raceIcon: null,
+      deityId: null,
+      deityName: null,
+      deckId: null,
+      deckName: null,
+      characterName: null,
       attributes: { ...baseAttrs },
       pointsRemaining: TOTAL_POINTS,
       step: 'race',
@@ -87,6 +101,11 @@ export const CharacterCreationProvider: React.FC<{ children: ReactNode }> = ({
         raceName,
         raceImage,
         raceIcon,
+        deityId: null,
+        deityName: null,
+        deckId: null,
+        deckName: null,
+        characterName: null,
         step: 'deity',
       }));
     },
@@ -98,6 +117,9 @@ export const CharacterCreationProvider: React.FC<{ children: ReactNode }> = ({
       ...prev,
       deityId,
       deityName,
+      deckId: null,
+      deckName: null,
+      characterName: null,
       step: 'deck',
     }));
   }, []);
@@ -107,6 +129,7 @@ export const CharacterCreationProvider: React.FC<{ children: ReactNode }> = ({
       ...prev,
       deckId,
       deckName,
+      characterName: null,
       step: 'name',
     }));
   }, []);
@@ -174,24 +197,8 @@ export const CharacterCreationProvider: React.FC<{ children: ReactNode }> = ({
   }, []);
 
   const reset = useCallback(() => {
-    setState({
-      step: 'class',
-      classId: null,
-      raceId: null,
-      raceName: null,
-      raceImage: null,
-      raceIcon: null,
-      deityId: null,
-      deityName: null,
-      deckId: null,
-      deckName: null,
-      characterName: null,
-      attributes: { ...DEFAULT_ATTRIBUTES },
-      pointsRemaining: TOTAL_POINTS,
-      isSaved: false,
-      saveId: null,
-      equipment: {},
-    });
+    sessionStorage.removeItem(STORAGE_KEY);
+    setState(initialState());
   }, []);
 
   return (

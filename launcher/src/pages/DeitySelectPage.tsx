@@ -7,6 +7,7 @@ import React, {
 } from 'react';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
+import { useCharacterCreation } from '../contexts/CharacterCreationContext';
 import { useDeitySelection } from '../hooks/useDeitySelection';
 import { useDeityNavigation } from '../hooks/useDeityNavigation';
 import { DEITY_FULL_DATA } from '../data/deitiesModalData';
@@ -47,6 +48,7 @@ const getDeityImage = (deityId: string) =>
 
 export const DeitySelectPage: React.FC = () => {
   const navigate = useNavigate();
+  const { setDeity } = useCharacterCreation();
 
   const {
     classId,
@@ -129,21 +131,12 @@ export const DeitySelectPage: React.FC = () => {
 
     confirmTimeoutRef.current = window.setTimeout(() => {
       try {
+        setDeity(selectedDeityData.id, selectedDeityData.name);
         toast.success(`${selectedDeityData.name} foi escolhida!`, {
           id: toastId,
         });
         setIsConfirming(false);
-        navigate('/deck-select', {
-          state: {
-            classId,
-            raceId,
-            raceName,
-            raceImage,
-            raceIcon,
-            deityId: selectedDeityData.id,
-            deityName: selectedDeityData.name,
-          },
-        });
+        navigate('/deck-select');
       } catch (error) {
         toast.error('Erro ao escolher divindade. Tente novamente.', {
           id: toastId,
@@ -156,11 +149,7 @@ export const DeitySelectPage: React.FC = () => {
   }, [
     selectedDeityData,
     navigate,
-    classId,
-    raceId,
-    raceName,
-    raceImage,
-    raceIcon,
+    setDeity,
   ]);
 
   useEffect(() => {

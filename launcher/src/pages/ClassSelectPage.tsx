@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { ClassData } from '../types/classSelect.types';
 import { resetGold } from '../utils/goldUtils';
+import { useCharacterCreation } from '../contexts/CharacterCreationContext';
 
 import {
   Container,
@@ -104,6 +105,7 @@ const CLASSES_DATA: ClassData[] = [
 
 export const ClassSelectPage = () => {
   const navigate = useNavigate();
+  const { setClass } = useCharacterCreation();
   const [selectedClass, setSelectedClass] = useState<ClassData | null>(null);
   const [loading, setLoading] = useState(false);
   const [imagesLoaded, setImagesLoaded] = useState<Record<string, boolean>>({});
@@ -188,15 +190,16 @@ export const ClassSelectPage = () => {
     if (!selectedClass) return;
 
     resetGold();
+    setClass(selectedClass.id, selectedClass.name);
     setLoading(true);
     toast.loading(`Selecionando ${selectedClass.name}...`);
 
     setTimeout(() => {
       toast.success(`${selectedClass.name} selecionado!`);
       setLoading(false);
-      navigate('/race-select', { state: { classId: selectedClass.id } });
+      navigate('/race-select');
     }, 800);
-  }, [selectedClass, navigate]);
+  }, [selectedClass, navigate, setClass]);
 
   const handleBack = useCallback(() => {
     navigate('/');

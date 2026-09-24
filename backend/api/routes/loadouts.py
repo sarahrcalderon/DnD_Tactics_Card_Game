@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Response, status
 
 from api.models.requests import OnlineCharacterCreateRequest, OnlineDeckCreateRequest
 from api.models.responses import OwnedCharacterResponse, OwnedDeckResponse
@@ -18,7 +18,9 @@ async def get_catalog(user: AuthenticatedUser = Depends(get_current_user)) -> di
 @router.post("/characters", response_model=OwnedCharacterResponse, status_code=201)
 async def create_character(data: OnlineCharacterCreateRequest, user: AuthenticatedUser = Depends(get_current_user)):
     try:
-        character = await container.loadouts.create_character(user.id, data.name, data.class_id, data.race_id)
+        character = await container.loadouts.create_character(
+            user.id, data.name, data.class_id, data.race_id, data.attributes, data.portrait_url)
+        await container.auth.use_character_portrait_as_avatar(user, data.portrait_url)
     except ResourceNotFoundError as error:
         raise HTTPException(status_code=404, detail=str(error)) from error
     except DomainError as error:
@@ -29,6 +31,15 @@ async def create_character(data: OnlineCharacterCreateRequest, user: Authenticat
 @router.get("/characters", response_model=list[OwnedCharacterResponse])
 async def list_characters(user: AuthenticatedUser = Depends(get_current_user)):
     return [_character_response(character) for character in await container.loadouts.list_characters(user.id)]
+
+
+@router.delete("/characters/{character_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_character(character_id: str, user: AuthenticatedUser = Depends(get_current_user)) -> Response:
+    try:
+        await container.loadouts.delete_character(user.id, character_id)
+    except ResourceNotFoundError as error:
+        raise HTTPException(status_code=404, detail=str(error)) from error
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
 @router.post("/decks", response_model=OwnedDeckResponse, status_code=201)

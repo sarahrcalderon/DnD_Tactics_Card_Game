@@ -129,6 +129,8 @@ const defaultDerivedStats: DerivedStats = {
 
 type EquipmentRouteState = Partial<CharacterData> & {
   fromMap?: boolean;
+  ownerId?: string;
+  returnTo?: string;
   inventory?: Equipment[];
 };
 
@@ -425,6 +427,8 @@ export const EquipmentPage = () => {
         saveId: characterData?.saveId || state?.saveId || null,
         pointsRemaining:
           characterData?.pointsRemaining ?? state?.pointsRemaining ?? 0,
+        ownerId: state?.ownerId,
+        returnTo: state?.returnTo,
       },
     });
   };

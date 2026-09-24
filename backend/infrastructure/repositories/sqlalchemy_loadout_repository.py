@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from sqlalchemy import select
+from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from domain.entities import Character
@@ -30,6 +30,13 @@ class SqlAlchemyLoadoutRepository:
         async with self._session_factory() as session:
             models = await session.scalars(select(CharacterModel).where(CharacterModel.user_id == str(user_id)))
             return [self._character(model) for model in models]
+
+    async def delete_character(self, user_id: UUID, character_id: UUID) -> bool:
+        async with self._session_factory() as session:
+            result = await session.execute(delete(CharacterModel).where(
+                CharacterModel.id == str(character_id), CharacterModel.user_id == str(user_id)))
+            await session.commit()
+            return result.rowcount > 0
 
     async def create_deck(self, deck: OwnedDeck) -> OwnedDeck:
         async with self._session_factory() as session:

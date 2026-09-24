@@ -16,6 +16,7 @@ class CharacterResponse(BaseModel):
     build: Optional[str] = None
     wins: int = 0
     losses: int = 0
+    portrait_url: Optional[str] = None
 
 class BattleResponse(BaseModel):
     player1: Dict
@@ -44,6 +45,11 @@ class FriendResponse(BaseModel):
     email: str
     username: str
     avatar_url: Optional[str] = None
+    online: bool = False
+    character_name: Optional[str] = None
+    character_class: Optional[str] = None
+    character_level: Optional[int] = None
+    portrait_url: Optional[str] = None
 
 
 class FriendRequestResponse(BaseModel):

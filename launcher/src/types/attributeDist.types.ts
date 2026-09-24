@@ -17,4 +17,6 @@ export interface AttributeDistributionRouteState {
   deckName?: string;
   pointsRemaining?: number;
   fromMap?: boolean;
+  ownerId?: string;
+  returnTo?: string;
 }

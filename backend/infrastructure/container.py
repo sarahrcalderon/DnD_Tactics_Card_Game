@@ -4,6 +4,7 @@ from application.services.match_battle_service import MatchBattleService
 from application.services.loadout_service import LoadoutService
 from infrastructure.repositories.match_battle_repository import InMemoryMatchBattleRepository
 from infrastructure.repositories.sqlalchemy_loadout_repository import SqlAlchemyLoadoutRepository
+from infrastructure.presence import OnlinePresence
 from infrastructure.repositories.password_reset_repository import PasswordResetRepository
 from infrastructure.email.smtp_email_service import SmtpEmailService
 from infrastructure.config import get_settings
@@ -27,6 +28,7 @@ class ApplicationContainer:
         self._match_realtime: MatchRealtimeService | None = None
         self._match_battles: MatchBattleService | None = None
         self._loadouts: LoadoutService | None = None
+        self.presence = OnlinePresence()
         self._game_invites: GameInviteService | None = None
         self.characters = CharacterService(sessions)
         self.battles = BattleService(sessions)

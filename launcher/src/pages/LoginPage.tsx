@@ -36,16 +36,21 @@ export function LoginPage({ register = false }: { register?: boolean }) {
   const from = (location.state as { from?: string } | null)?.from;
   const destination = from?.startsWith('/online') ? from : '/online';
 
-  if (auth.token && auth.user) return <Navigate to={destination} replace />;
+  if (auth.token && auth.user && !register) {
+    return <Navigate to={destination} replace />;
+  }
 
   async function submit(event: FormEvent) {
     event.preventDefault();
 
     await task.run(async () => {
-      if (register) await auth.register(name.trim(), email.trim(), password);
-      else await auth.login(email.trim(), password);
-
-      navigate(destination, { replace: true });
+      if (register) {
+        await auth.register(name.trim(), email.trim(), password);
+        navigate('/class-select', { replace: true });
+      } else {
+        await auth.login(email.trim(), password);
+        navigate(destination, { replace: true });
+      }
     });
   }
 

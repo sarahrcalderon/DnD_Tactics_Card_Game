@@ -34,6 +34,7 @@ import {
   ViewCardsButton,
 } from '../styles/deckSelectStyles';
 import { generateAndSaveDecks } from '../utils/deckGenerator';
+import { useCharacterCreation } from '../contexts/CharacterCreationContext';
 
 interface RouteState {
   classId?: string;
@@ -156,6 +157,7 @@ const getIconForDeck = (deckId: string) => {
 export const DeckSelectPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { state: creation, setDeck } = useCharacterCreation();
 
   const routeState = useMemo(
     () => getRouteState(location.state),
@@ -165,13 +167,13 @@ export const DeckSelectPage = () => {
   const [selectedDeckId, setSelectedDeckId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const classId = routeState.classId ?? null;
-  const raceId = routeState.raceId ?? null;
-  const raceName = routeState.raceName ?? null;
-  const raceImage = routeState.raceImage ?? null;
-  const raceIcon = routeState.raceIcon ?? null;
-  const deityId = routeState.deityId ?? null;
-  const deityName = routeState.deityName ?? null;
+  const classId = creation.classId;
+  const raceId = creation.raceId;
+  const raceName = creation.raceName;
+  const raceImage = creation.raceImage;
+  const raceIcon = creation.raceIcon;
+  const deityId = creation.deityId;
+  const deityName = creation.deityName;
 
   const decks = useMemo(
     () =>
@@ -185,8 +187,8 @@ export const DeckSelectPage = () => {
   );
 
   useEffect(() => {
-    if (!classId) {
-      navigate('/race-select', { replace: true });
+    if (!classId || !raceId || !deityId) {
+      navigate(deityId ? '/race-select' : '/deity-select', { replace: true });
       return;
     }
 
@@ -221,25 +223,14 @@ export const DeckSelectPage = () => {
     if (!selectedDeck) return;
 
     setLoading(true);
+    setDeck(selectedDeck.id, selectedDeck.name);
     const toastId = toast.loading(`Preparando ${selectedDeck.name}...`);
 
     window.setTimeout(() => {
       toast.success(`${selectedDeck.name} selecionado!`, { id: toastId });
 
       // Navega para NameSelectPage em vez de AttributeDistPage
-      navigate('/name-select', {
-        state: {
-          classId,
-          raceId,
-          raceName,
-          raceImage,
-          raceIcon,
-          deityId,
-          deityName,
-          deckId: selectedDeck.id,
-          deckName: selectedDeck.name,
-        },
-      });
+      navigate('/name-select');
 
       setLoading(false);
     }, 800);
@@ -252,7 +243,7 @@ export const DeckSelectPage = () => {
     raceId,
     raceImage,
     raceName,
-    selectedDeck,
+    selectedDeck, setDeck,
   ]);
 
   const handleBack = useCallback(() => {

@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
+import { useCharacterCreation } from '../contexts/CharacterCreationContext';
 import {
   Container,
   Header,
@@ -301,6 +302,7 @@ const RACE_DATA: Record<string, any[]> = {
 export const RaceSelectPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { state: creation, setRace } = useCharacterCreation();
   const [selectedRace, setSelectedRace] = useState<any | null>(null);
   const [selectedRaceId, setSelectedRaceId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -309,8 +311,7 @@ export const RaceSelectPage = () => {
   const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
-    const state = location.state as { classId?: string };
-    const id = state?.classId;
+    const id = creation.classId;
 
     if (!id) {
       navigate('/class-select');
@@ -325,7 +326,7 @@ export const RaceSelectPage = () => {
     if (classRaces.length === 0) {
       toast.error('Nenhuma raca disponivel para esta classe.');
     }
-  }, [location, navigate]);
+  }, [creation.classId, navigate]);
 
   const handleSelect = useCallback((race: any) => {
     setSelectedRace(race);
@@ -342,6 +343,7 @@ export const RaceSelectPage = () => {
     }
 
     setLoading(true);
+    setRace(selectedRace.id, selectedRace.name, selectedRace.image || '', '');
 
     const toastId = toast.loading(`Selecionando ${selectedRace.name}...`);
 
@@ -351,17 +353,9 @@ export const RaceSelectPage = () => {
       });
       setLoading(false);
 
-      navigate('/deity-select', {
-        state: {
-          classId: classId,
-          raceId: selectedRace.id,
-          raceName: selectedRace.name,
-          raceImage: selectedRace.image || '',
-          raceIcon: '',
-        },
-      });
+      navigate('/deity-select');
     }, 800);
-  }, [loading, selectedRace, classId, navigate]);
+  }, [loading, selectedRace, classId, navigate, setRace]);
 
   const handleBack = useCallback(() => {
     navigate('/class-select');

@@ -19,6 +19,7 @@ interface AuthState {
   retry: () => void;
   login: (email: string, password: string) => Promise<void>;
   register: (name: string, email: string, password: string) => Promise<void>;
+  uploadAvatar: (image: File) => Promise<void>;
   logout: () => void;
 }
 
@@ -67,6 +68,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => controller.abort();
   }, [token, attempt]);
 
+  useEffect(() => {
+    if (!token) return;
+    const sendHeartbeat = () => void authService.heartbeat().catch(() => undefined);
+    sendHeartbeat();
+    const interval = window.setInterval(sendHeartbeat, 30_000);
+    return () => window.clearInterval(interval);
+  }, [token]);
+
   const login = useCallback(async (email: string, password: string) => {
     const result = await authService.login(email, password);
 
@@ -84,6 +93,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     [],
   );
 
+  const uploadAvatar = useCallback(async (image: File) => {
+    const updated = await authService.uploadAvatar(image);
+    setUser(updated);
+  }, []);
+
   return (
     <AuthContext.Provider
       value={{
@@ -93,6 +107,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         error,
         login,
         register,
+        uploadAvatar,
         retry: () => setAttempt((value) => value + 1),
         logout: () => authSession.set(null),
       }}

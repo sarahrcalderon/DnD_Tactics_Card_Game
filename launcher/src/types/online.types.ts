@@ -11,6 +11,11 @@ export interface OnlineUser {
   email: string;
   username: string;
   avatar_url: string | null;
+  online?: boolean;
+  character_name?: string | null;
+  character_class?: string | null;
+  character_level?: number | null;
+  portrait_url?: string | null;
 }
 
 export interface Authentication {
@@ -45,6 +50,7 @@ export interface OnlineCharacter {
     hp: number;
     max_hp: number;
     mana: number;
+    portrait_url?: string | null;
     level: number;
   };
 }

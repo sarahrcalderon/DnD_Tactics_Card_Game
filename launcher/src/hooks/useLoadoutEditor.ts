@@ -18,6 +18,11 @@ export function useLoadoutEditor() {
         await resource.refresh();
         return result;
       }),
+    deleteCharacter: (characterId: string) =>
+      task.run(async () => {
+        await loadoutService.deleteCharacter(characterId);
+        await resource.refresh();
+      }),
     createDeck: (
       name: string,
       side: MatchSide,

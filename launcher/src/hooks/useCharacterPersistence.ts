@@ -21,6 +21,8 @@ interface UseCharacterPersistenceParams {
   deckId: string;
   pointsRemaining: number;
   onLoadAttributes: (attributes: Attributes, pointsRemaining: number) => void;
+  initialName?: string;
+  isCreationFlow?: boolean;
 }
 
 export const useCharacterPersistence = ({
@@ -37,11 +39,13 @@ export const useCharacterPersistence = ({
   deckId,
   pointsRemaining,
   onLoadAttributes,
+  initialName = '',
+  isCreationFlow = false,
 }: UseCharacterPersistenceParams) => {
   const location = useLocation();
 
   // Estados internos
-  const [characterName, setCharacterName] = useState('');
+  const [characterName, setCharacterName] = useState(initialName);
   const [imageError, setImageError] = useState(false);
   const [isCharacterSaved, setIsCharacterSaved] = useState(false);
   const [saveId, setSaveId] = useState<string | null>(null);
@@ -82,6 +86,7 @@ export const useCharacterPersistence = ({
     // Dados salvos localmente (storage)
     const isNewCharacterFlow = Boolean(state?.characterName && !state?.isSaved);
     if (
+      !isCreationFlow &&
       !isNewCharacterFlow &&
       !hasRoutedAttributes &&
       savedData &&
@@ -111,7 +116,7 @@ export const useCharacterPersistence = ({
       setStoredDeckId(state.deckId);
     }
     setIsPersistenceLoaded(true);
-  }, [location.state, onLoadAttributes]);
+  }, [location.state, onLoadAttributes, isCreationFlow]);
 
   // Persistir personagem atual (salvar progresso)
   const persistCurrentCharacter = useCallback(() => {
@@ -165,12 +170,12 @@ export const useCharacterPersistence = ({
 
   // Finalizar e salvar personagem
   const saveCharacter = useCallback(
-    (onSuccess?: () => void) => {
+    (onSuccess?: () => void): Promise<boolean> => {
       if (pointsRemaining > 0) {
         toast.error(
           `Você ainda tem ${pointsRemaining} ponto(s) para distribuir!`
         );
-        return;
+        return Promise.resolve(false);
       }
 
       setLoading(true);
@@ -214,12 +219,13 @@ export const useCharacterPersistence = ({
       characterStorageService.save(fullData as any);
       setIsCharacterSaved(true);
 
-      setTimeout(() => {
+      return new Promise((resolve) => setTimeout(() => {
         toast.dismiss(loadingToast);
         toast.success('Personagem salvo com sucesso!');
         setLoading(false);
         if (onSuccess) onSuccess();
-      }, 800);
+        resolve(true);
+      }, 800));
     },
     [
       pointsRemaining,

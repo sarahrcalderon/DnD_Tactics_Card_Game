@@ -68,6 +68,22 @@ class AuthService:
             raise ResourceNotFoundError("Usuário não encontrado.")
         return self._to_authenticated_user(user)
 
+    async def update_avatar(self, user_id: UUID, avatar_url: str) -> AuthenticatedUser:
+        update = getattr(self._users, "update_avatar", None)
+        if update is None:
+            raise ResourceNotFoundError("Atualização de avatar indisponível.")
+        user = await update(user_id, avatar_url)
+        if user is None:
+            raise ResourceNotFoundError("Usuário não encontrado.")
+        return self._to_authenticated_user(user)
+
+    async def use_character_portrait_as_avatar(self, user: AuthenticatedUser, portrait_url: str | None) -> None:
+        if user.avatar_url or not portrait_url:
+            return
+        update = getattr(self._users, "update_avatar", None)
+        if update is not None:
+            await update(user.id, portrait_url)
+
     def _authentication_result(self, user: User) -> AuthenticationResult:
         return AuthenticationResult(
             access_token=self._create_access_token(user.id),

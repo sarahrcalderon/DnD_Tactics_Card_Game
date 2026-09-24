@@ -1,4 +1,6 @@
 from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
+from pathlib import Path
 from contextlib import asynccontextmanager
 import logging
 
@@ -22,6 +24,10 @@ app = FastAPI(
 )
 
 setup_cors(app)
+
+uploads_directory = Path(__file__).resolve().parents[1] / "uploads"
+uploads_directory.mkdir(parents=True, exist_ok=True)
+app.mount("/uploads", StaticFiles(directory=uploads_directory), name="uploads")
 
 app.include_router(auth.router, prefix="/auth", tags=["Authentication"])
 app.include_router(friends.router, prefix="/friends", tags=["Friends"])

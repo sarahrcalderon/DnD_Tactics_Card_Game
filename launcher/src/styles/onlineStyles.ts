@@ -153,6 +153,91 @@ export const Row = styled.div`
   flex-wrap: wrap;
 `;
 
+export const AccountIdentity = styled(Row)`
+  color: #e7dfcf;
+`;
+
+export const AccountAvatar = styled.img`
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  flex: 0 0 38px;
+  border: 2px solid #cba460;
+  border-radius: 50%;
+  background: #322b20;
+  color: #f7e5b9;
+  object-fit: cover;
+  font-family: ${fontFamilies.display};
+`;
+
+export const AvatarUploadButton = styled.button`
+  position: relative;
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
+
+  > span:last-child {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: rgba(8, 10, 14, 0.72);
+    color: #f8e3ad;
+    font-size: 0.56rem;
+    font-weight: 700;
+    opacity: 0;
+    transition: opacity 160ms ease;
+  }
+
+  &:hover > span:last-child,
+  &:focus-visible > span:last-child { opacity: 1; }
+`;
+
+export const HiddenFileInput = styled.input`
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+`;
+
+export const FriendProfile = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 13px;
+`;
+
+export const FriendAvatar = styled.img`
+  width: 58px;
+  height: 58px;
+  display: grid;
+  place-items: center;
+  border: 1px solid #9d7d45;
+  border-radius: 50%;
+  background: #24211d;
+  color: #f4dfaa;
+  object-fit: cover;
+  font-family: ${fontFamilies.display};
+`;
+
+export const FriendPresence = styled.span<{ $online: boolean }>`
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  margin-right: 7px;
+  border-radius: 50%;
+  background: ${({ $online }) => ($online ? '#48c878' : '#7b7c82')};
+  box-shadow: ${({ $online }) => ($online ? '0 0 8px #48c878' : 'none')};
+`;
+
 export const Spread = styled(Row)`
   justify-content: space-between;
 `;
@@ -166,6 +251,7 @@ export const Grid = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 265px), 1fr));
   gap: 22px;
+  align-items: start;
 `;
 
 export const Muted = styled.p`

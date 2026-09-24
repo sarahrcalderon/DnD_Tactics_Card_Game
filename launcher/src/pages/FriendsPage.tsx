@@ -3,6 +3,9 @@ import { useFriends } from '../hooks/useFriends';
 import { Button } from '../components/common/Button';
 import { Feedback } from '../components/online/Feedback';
 import {
+  FriendAvatar,
+  FriendPresence,
+  FriendProfile,
   Field,
   Form,
   Grid,
@@ -125,8 +128,22 @@ export function FriendsPage() {
           <ListRow key={friend.id}>
             <Spread>
               <div>
-                <strong>{friend.username}</strong>
-                <Muted>{friend.email}</Muted>
+                <FriendProfile>
+                  {friend.portrait_url ? (
+                    <FriendAvatar src={friend.portrait_url} alt={`Personagem de ${friend.username}`} />
+                  ) : (
+                    <FriendAvatar as="span">{friend.username.slice(0, 1).toUpperCase()}</FriendAvatar>
+                  )}
+                  <div>
+                    <strong><FriendPresence $online={friend.online === true} />{friend.username}</strong>
+                    {friend.character_name ? (
+                      <Muted>{friend.character_name} · Nv. {friend.character_level ?? 1} · {friend.character_class}</Muted>
+                    ) : (
+                      <Muted>Sem personagem salvo</Muted>
+                    )}
+                    <Muted>{friend.online ? 'Online no jogo' : 'Offline'}</Muted>
+                  </div>
+                </FriendProfile>
               </div>
 
               {removing === friend.id ? (

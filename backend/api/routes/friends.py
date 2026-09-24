@@ -26,7 +26,7 @@ async def send_friend_request(
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(error)) from error
     except DomainError as error:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(error)) from error
-    return _to_request_response(request)
+    return await _to_request_response(request)
 
 
 @router.get("/requests", response_model=list[FriendRequestResponse])
@@ -34,7 +34,7 @@ async def list_friend_requests(
     user: AuthenticatedUser = Depends(get_current_user),
 ) -> list[FriendRequestResponse]:
     requests = await container.friends.list_received_requests(user.id)
-    return [_to_request_response(request) for request in requests]
+    return [await _to_request_response(request) for request in requests]
 
 
 @router.post("/requests/{request_id}/accept", response_model=FriendRequestResponse)
@@ -48,7 +48,7 @@ async def accept_friend_request(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(error)) from error
     except ConflictError as error:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(error)) from error
-    return _to_request_response(request)
+    return await _to_request_response(request)
 
 
 @router.post("/requests/{request_id}/reject", response_model=FriendRequestResponse)
@@ -62,13 +62,13 @@ async def reject_friend_request(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(error)) from error
     except ConflictError as error:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(error)) from error
-    return _to_request_response(request)
+    return await _to_request_response(request)
 
 
 @router.get("", response_model=list[FriendResponse])
 async def list_friends(user: AuthenticatedUser = Depends(get_current_user)) -> list[FriendResponse]:
     friends = await container.friends.list_friends(user.id)
-    return [_to_friend_response(friend) for friend in friends]
+    return [await _to_friend_response(friend) for friend in friends]
 
 
 @router.delete("/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
@@ -85,20 +85,27 @@ async def remove_friend(
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
-def _to_request_response(request: FriendRequestData) -> FriendRequestResponse:
+async def _to_request_response(request: FriendRequestData) -> FriendRequestResponse:
     return FriendRequestResponse(
         id=request.id,
-        sender=_to_friend_response(request.sender),
+        sender=await _to_friend_response(request.sender),
         status=request.status.value,
         created_at=request.created_at,
         responded_at=request.responded_at,
     )
 
 
-def _to_friend_response(friend: FriendData) -> FriendResponse:
+async def _to_friend_response(friend: FriendData) -> FriendResponse:
+    characters = await container.loadouts.list_characters(friend.id)
+    character = characters[0] if characters else None
     return FriendResponse(
         id=friend.id,
         email=friend.email,
         username=friend.username,
         avatar_url=friend.avatar_url,
+        online=container.presence.is_online(friend.id),
+        character_name=character.name if character else None,
+        character_class=character.character.class_id if character else None,
+        character_level=character.character.level if character else None,
+        portrait_url=character.character.portrait_url if character else None,
     )

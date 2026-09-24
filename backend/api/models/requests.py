@@ -128,6 +128,8 @@ class OnlineCharacterCreateRequest(BaseModel):
     name: str
     class_id: str
     race_id: str
+    attributes: Dict[str, int] = {}
+    portrait_url: Optional[str] = None
 
 
 class OnlineDeckCreateRequest(BaseModel):

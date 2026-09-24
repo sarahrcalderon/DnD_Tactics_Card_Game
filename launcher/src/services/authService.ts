@@ -21,6 +21,17 @@ export const authService = {
   async me(signal?: AbortSignal) {
     return (await apiClient.get<OnlineUser>('/auth/me', { signal })).data;
   },
+
+  async heartbeat() {
+    await apiClient.post('/auth/presence');
+  },
+  async uploadAvatar(image: File) {
+    const data = new FormData();
+    data.append('image', image);
+    return (await apiClient.post<OnlineUser>('/auth/avatar', data, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    })).data;
+  },
   async requestPasswordReset(email: string) {
     await apiClient.post('/auth/password-reset', { email });
   },

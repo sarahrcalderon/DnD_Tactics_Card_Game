@@ -17,6 +17,7 @@ class Character:
     wins: int = 0
     losses: int = 0
     skills: list = None
+    portrait_url: Optional[str] = None
     
     def __post_init__(self):
         if self.attributes is None:
@@ -43,7 +44,8 @@ class Character:
             "build": self.build,
             "wins": self.wins,
             "losses": self.losses,
-            "skills": self.skills
+            "skills": self.skills,
+            "portrait_url": self.portrait_url,
         }
     
     @classmethod
@@ -61,5 +63,6 @@ class Character:
             build=data.get("build"),
             wins=data.get("wins", 0),
             losses=data.get("losses", 0),
-            skills=data.get("skills", [])
+            skills=data.get("skills", []),
+            portrait_url=data.get("portrait_url"),
         )

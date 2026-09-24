@@ -5,6 +5,7 @@ export interface RouteState {
   raceImage?: string;
   raceIcon?: string;
   fromMap?: boolean;
+  returnTo?: string;
 }
 
 export interface Card {
