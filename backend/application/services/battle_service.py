@@ -18,22 +18,30 @@ class BattleService:
         if character is None:
             raise DomainError("Crie um personagem primeiro")
 
-        player = PlayerState(
-            name="Jogador",
-            hp=character.hp,
-            max_hp=character.max_hp,
-            mana=character.mana,
-            action_points=self.DEFAULT_ACTION_POINTS,
-        )
-        enemy = PlayerState(
-            name="Inimigo",
-            hp=15 + character.level * 2,
-            mana=0,
-            action_points=self.DEFAULT_ACTION_POINTS,
-        )
+        player = self.build_player(character)
+        enemy = self.build_enemy(character.level)
         game.battle = Battle(player, enemy)
         self._sessions.save(game)
         return game.battle
+
+    @classmethod
+    def build_player(cls, character, name: str = "Jogador") -> PlayerState:
+        return PlayerState(
+            name=name,
+            hp=character.hp,
+            max_hp=character.max_hp,
+            mana=character.mana,
+            action_points=cls.DEFAULT_ACTION_POINTS,
+        )
+
+    @classmethod
+    def build_enemy(cls, level: int = 1, name: str = "Inimigo") -> PlayerState:
+        return PlayerState(
+            name=name,
+            hp=15 + level * 2,
+            mana=0,
+            action_points=cls.DEFAULT_ACTION_POINTS,
+        )
 
     def action(self, action: str, card_index: int | None, target: str | None) -> dict:
         battle = self.get_active()

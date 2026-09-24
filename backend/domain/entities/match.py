@@ -17,6 +17,11 @@ class MatchStatus(StrEnum):
     CANCELLED = "CANCELLED"
 
 
+class WinnerSide(StrEnum):
+    ENEMY = "ENEMY"
+    CHAMPIONS = "CHAMPIONS"
+
+
 @dataclass(frozen=True)
 class Match:
     id: UUID
@@ -24,7 +29,7 @@ class Match:
     created_at: datetime
     started_at: datetime | None = None
     finished_at: datetime | None = None
-    winner_side: MatchSide | None = None
+    winner_side: WinnerSide | None = None
 
 
 @dataclass(frozen=True)

@@ -10,6 +10,9 @@ class CatalogService:
     def classes(self) -> list[dict]:
         return self._catalog.classes()
 
+    def cards(self) -> list[dict]:
+        return self._catalog.cards()
+
     def races(self) -> list[dict]:
         return self._catalog.races()
 

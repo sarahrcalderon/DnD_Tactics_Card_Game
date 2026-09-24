@@ -16,10 +16,21 @@ import { EquipmentPage } from './pages/EquipamentPage';
 import { BagPage } from './pages/BagPage';
 import { MapScreen } from './pages/MapScreen';
 import { BestiaryPage } from './pages/BestiaryPage';
+import { AuthProvider } from './contexts/AuthContext';
+import { OnlineLayout } from './components/online/OnlineLayout';
+import { LoginPage } from './pages/LoginPage';
+import { OnlineMenuPage } from './pages/OnlineMenuPage';
+import { FriendsPage } from './pages/FriendsPage';
+import { InvitationsPage } from './pages/InvitationsPage';
+import { CreateMatchPage } from './pages/CreateMatchPage';
+import { OnlineCharactersPage } from './pages/OnlineCharactersPage';
+import { OnlineDecksPage } from './pages/OnlineDecksPage';
+import { LobbyPage } from './pages/LobbyPage';
 
 function App() {
   return (
     <BrowserRouter>
+      <AuthProvider>
       <AudioProvider>
         <CharacterCreationProvider>
           <GlobalStyle />
@@ -36,6 +47,17 @@ function App() {
           />
           <Routes>
             <Route path="/" element={<LauncherPage />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<LoginPage register />} />
+            <Route path="/online" element={<OnlineLayout />}>
+              <Route index element={<OnlineMenuPage />} />
+              <Route path="friends" element={<FriendsPage />} />
+              <Route path="invites" element={<InvitationsPage />} />
+              <Route path="characters" element={<OnlineCharactersPage />} />
+              <Route path="decks" element={<OnlineDecksPage />} />
+              <Route path="create" element={<CreateMatchPage />} />
+              <Route path="lobby/:matchId" element={<LobbyPage />} />
+            </Route>
             <Route path="/class-select" element={<ClassSelectPage />} />
             <Route path="/options" element={<OptionsPage />} />
             <Route path="/race-select" element={<RaceSelectPage />} />
@@ -51,6 +73,7 @@ function App() {
           </Routes>
         </CharacterCreationProvider>
       </AudioProvider>
+      </AuthProvider>
     </BrowserRouter>
   );
 }

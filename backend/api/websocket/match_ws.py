@@ -4,10 +4,11 @@ from typing import Literal
 from uuid import UUID
 
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
-from pydantic import BaseModel, ConfigDict, StrictBool, ValidationError
+from pydantic import BaseModel, ConfigDict, StrictBool, ValidationError, model_validator
 
 from domain.exceptions import AuthenticationError, ConflictError, DomainError, ResourceNotFoundError
 from infrastructure.container import container
+from application.dtos.battle import BattleAction
 
 router = APIRouter()
 
@@ -15,8 +16,28 @@ router = APIRouter()
 class MatchCommand(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
-    type: Literal["get_state", "set_ready", "start_match", "ping"]
+    type: Literal["get_state", "set_ready", "start_match", "ping", "play_card", "end_turn", "attack", "defend"]
     ready: StrictBool | None = None
+    card_id: str | None = None
+    target_player_id: UUID | None = None
+    target_card_id: str | None = None
+
+    @model_validator(mode="after")
+    def validate_command(self):
+        allowed = {"type"}
+        if self.type == "set_ready":
+            allowed.add("ready")
+            if self.ready is None:
+                raise ValueError("ready is required")
+        if self.type == "play_card":
+            allowed.update({"card_id", "target_player_id", "target_card_id"})
+            if not self.card_id:
+                raise ValueError("card_id is required")
+        if self.type == "attack":
+            allowed.add("target_player_id")
+        if self.model_fields_set - allowed:
+            raise ValueError("Unexpected command fields")
+        return self
 
 
 class WebSocketMatchConnection:
@@ -82,6 +103,10 @@ async def websocket_match(websocket: WebSocket, match_id: UUID):
                     await realtime.set_ready(match_id, user.id, command.ready)
                 elif command.type == "start_match":
                     await realtime.start(match_id, user.id)
+                elif command.type in {"play_card", "end_turn", "attack", "defend"}:
+                    await realtime.battle_action(match_id, user.id, BattleAction(
+                        command.type, command.card_id, command.target_player_id, command.target_card_id,
+                    ))
                 else:
                     await connection.send({"type": "pong", "match_id": str(match_id)})
             except (ValidationError, ValueError, KeyError):

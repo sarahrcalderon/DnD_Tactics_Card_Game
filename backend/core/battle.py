@@ -61,16 +61,12 @@ class Battle:
     def _end_turn(self) -> dict:
         self.current_player.restore_action_points()
 
-        self.player1.status.process_turn()
-        self.player2.status.process_turn()
+        for player in self._turn_players():
+            player.status.process_turn()
 
         self.turn += 1
 
-        self.current_player = (
-            self.player2
-            if self.current_player == self.player1
-            else self.player1
-        )
+        self.current_player = self._next_player()
 
         self.log.append(
             f"Turno {self.turn} - {self.current_player.name}"
@@ -80,6 +76,12 @@ class Battle:
             "success": True,
             "message": f"Turno {self.turn} iniciado"
         }
+
+    def _turn_players(self):
+        return [self.player1, self.player2]
+
+    def _next_player(self):
+        return self.player2 if self.current_player == self.player1 else self.player1
 
     def _get_hand(self):
         legacy_hand = getattr(
@@ -353,27 +355,13 @@ class Battle:
 
             card_id = card.id
 
-            player_card = self.board.get_player_card(
-                card_id
-            )
+            self._remove_board_card(card_id)
+            for player in self._turn_players():
+                player.status.remove_effects_by_source(card_id)
 
-            opponent_card = self.board.get_opponent_card(
-                card_id
-            )
-
-            if player_card is not None:
-                self.board.remove_player_card(card_id)
-
-            if opponent_card is not None:
-                self.board.remove_opponent_card(card_id)
-
-            self.player1.status.remove_effects_by_source(
-                card_id
-            )
-
-            self.player2.status.remove_effects_by_source(
-                card_id
-            )
+    def _remove_board_card(self, card_id: str) -> None:
+        self.board.remove_player_card(card_id)
+        self.board.remove_opponent_card(card_id)
 
     def _discard_played_card(
         self,
@@ -490,13 +478,7 @@ class Battle:
             f"{self.current_player.name} causou {damage} de dano"
         )
 
-        if opponent.hp <= 0:
-            self.is_active = False
-            self.winner = self.current_player
-
-            self.log.append(
-                f"{self.current_player.name} venceu!"
-            )
+        self._check_victory()
 
         return {
             "success": True,

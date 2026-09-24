@@ -1,16 +1,18 @@
-# backend/api/server.py
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
+import logging
 
-from api.routes import auth, battle, character, classes, friends, matches, races
+from api.routes import auth, battle, character, classes, friends, loadouts, matches, races
 from api.websocket import game_ws, match_ws
 from api.middleware.cors import setup_cors
 
+logger = logging.getLogger(__name__)
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    print("🚀 D&D Tactics API iniciando...")
+    logger.info("D&D Tactics API iniciando...")
     yield
-    print("🛑 D&D Tactics API encerrando...")
+    logger.info("D&D Tactics API encerrando...")
 
 app = FastAPI(
     title="D&D Tactics API",
@@ -24,6 +26,7 @@ setup_cors(app)
 app.include_router(auth.router, prefix="/auth", tags=["Authentication"])
 app.include_router(friends.router, prefix="/friends", tags=["Friends"])
 app.include_router(matches.router, prefix="/matches", tags=["Matches"])
+app.include_router(loadouts.router, prefix="/loadouts", tags=["Loadouts"])
 app.include_router(classes.router, prefix="/api/classes", tags=["Classes"])
 app.include_router(races.router, prefix="/api/races", tags=["Raças"])
 app.include_router(character.router, prefix="/api/character", tags=["Personagem"])

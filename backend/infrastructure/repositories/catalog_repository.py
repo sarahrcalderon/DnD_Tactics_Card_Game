@@ -1,4 +1,5 @@
 from data.classes import CLASSES
+from data.cards import CARDS
 from data.races import RACES
 
 
@@ -7,6 +8,15 @@ class StaticCatalogRepository:
 
     def classes(self) -> list[dict]:
         return CLASSES
+
+    def cards(self) -> list[dict]:
+        return [
+            {**card, "class_id": class_id, "build": build}
+            for class_id, builds in CARDS.items()
+            for build, cards in builds.items()
+            for card in cards
+            if card.get("attack", 0) > 0 or card.get("defense", 0) > 0 or card.get("effects")
+        ]
 
     def races(self) -> list[dict]:
         return RACES

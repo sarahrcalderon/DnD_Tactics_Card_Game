@@ -69,6 +69,8 @@ htmlcov/
 *.tar.gz
 *.zip
 node_modules
+launcher/test-results/
+launcher/playwright-report/
 
 .env
 .env.*

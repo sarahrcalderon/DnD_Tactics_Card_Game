@@ -1,8 +1,8 @@
-// launcher/src/api/client.ts
 import axios from 'axios';
+import { authSession } from '../services/authSession';
 
-// Usando import.meta.env com tipagem correta
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+
+export const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
 export const apiClient = axios.create({
   baseURL: API_URL,
@@ -12,10 +12,10 @@ export const apiClient = axios.create({
   timeout: 10000,
 });
 
-// Interceptor para logs
 apiClient.interceptors.request.use(
   (config) => {
-    console.log(`📤 ${config.method?.toUpperCase()} ${config.url}`);
+    const token = authSession.get();
+    if (token) config.headers.Authorization = `Bearer ${token}`;
     return config;
   },
   (error) => Promise.reject(error)
@@ -23,11 +23,13 @@ apiClient.interceptors.request.use(
 
 apiClient.interceptors.response.use(
   (response) => {
-    console.log(`📥 ${response.status} ${response.config.url}`);
     return response;
   },
   (error) => {
-    console.error('❌ API Error:', error.message);
+    if (error.response?.status === 401 && error.config?.url !== '/auth/login' && error.config?.url !== '/auth/register'
+        && error.config?.headers?.Authorization === `Bearer ${authSession.get()}`) {
+      authSession.set(null);
+    }
     return Promise.reject(error);
   }
 );

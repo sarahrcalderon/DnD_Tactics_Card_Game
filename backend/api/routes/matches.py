@@ -28,12 +28,12 @@ async def create_invite(match_id: UUID, data: GameInviteCreateRequest, user: Aut
         raise HTTPException(status_code=409, detail=str(error)) from error
     except DomainError as error:
         raise HTTPException(status_code=400, detail=str(error)) from error
-    return _invite_response(invite)
+    return await _invite_response(invite)
 
 
 @router.get("/invites", response_model=list[GameInviteResponse])
 async def list_invites(user: AuthenticatedUser = Depends(get_current_user)) -> list[GameInviteResponse]:
-    return [_invite_response(invite) for invite in await container.game_invites.list_for(user.id)]
+    return [await _invite_response(invite) for invite in await container.game_invites.list_for(user.id)]
 
 
 @router.post("/invites/{invite_id}/accept", status_code=status.HTTP_200_OK)
@@ -56,19 +56,16 @@ async def reject_invite(invite_id: UUID, user: AuthenticatedUser = Depends(get_c
         raise HTTPException(status_code=404, detail=str(error)) from error
     except ConflictError as error:
         raise HTTPException(status_code=409, detail=str(error)) from error
-    return _invite_response(invite)
+    return await _invite_response(invite)
 
 
 @router.get("/{match_id}/lobby", response_model=LobbyResponse)
 async def get_lobby(match_id: UUID, user: AuthenticatedUser = Depends(get_current_user)) -> LobbyResponse:
     try:
-        if not await container.matches.contains_player(match_id, user.id):
-            raise ResourceNotFoundError("Jogador não pertence a esta partida.")
-        match = await container.matches.get(match_id)
-        players = await container.matches.list_players(match_id)
+        state = await container.match_realtime.get_state_for_player(match_id, user.id)
     except ResourceNotFoundError as error:
         raise HTTPException(status_code=404, detail=str(error)) from error
-    return LobbyResponse(match=_match_response(match), players=[_player_response(player) for player in players])
+    return LobbyResponse.model_validate(state)
 
 
 @router.post("/{match_id}/ready", response_model=MatchPlayerResponse)
@@ -90,18 +87,23 @@ async def start_match(match_id: UUID, user: AuthenticatedUser = Depends(get_curr
         raise HTTPException(status_code=404, detail=str(error)) from error
     except ConflictError as error:
         raise HTTPException(status_code=409, detail=str(error)) from error
+    except DomainError as error:
+        raise HTTPException(status_code=400, detail=str(error)) from error
     return _match_response(match)
 
 
-def _invite_response(invite) -> GameInviteResponse:
+async def _invite_response(invite) -> GameInviteResponse:
     return GameInviteResponse(
         id=invite.id, match_id=invite.match_id, sender_id=invite.sender_id, receiver_id=invite.receiver_id,
         side=invite.side.value, status=invite.status.value, created_at=invite.created_at, expires_at=invite.expires_at,
+        sender_name=await container.game_invites.sender_name(invite),
     )
 
 
 def _match_response(match) -> MatchResponse:
-    return MatchResponse(id=match.id, status=match.status.value, created_at=match.created_at)
+    return MatchResponse(id=match.id, status=match.status.value, created_at=match.created_at,
+                         started_at=match.started_at, finished_at=match.finished_at,
+                         winner_side=match.winner_side.value if match.winner_side else None)
 
 
 def _player_response(player) -> MatchPlayerResponse:

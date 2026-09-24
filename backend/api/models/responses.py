@@ -58,6 +58,9 @@ class MatchResponse(BaseModel):
     id: UUID
     status: str
     created_at: datetime
+    started_at: Optional[datetime] = None
+    finished_at: Optional[datetime] = None
+    winner_side: Optional[str] = None
 
 
 class MatchPlayerResponse(BaseModel):
@@ -68,6 +71,25 @@ class MatchPlayerResponse(BaseModel):
     connected: bool
     character_id: Optional[str] = None
     deck_id: Optional[str] = None
+    username: Optional[str] = None
+    avatar_url: Optional[str] = None
+    character_name: Optional[str] = None
+    class_id: Optional[str] = None
+    race_id: Optional[str] = None
+
+
+class OwnedCharacterResponse(BaseModel):
+    id: UUID
+    name: str
+    character: CharacterResponse
+
+
+class OwnedDeckResponse(BaseModel):
+    id: UUID
+    name: str
+    side: str
+    class_id: Optional[str] = None
+    card_ids: list[str]
 
 
 class LobbyResponse(BaseModel):
@@ -84,3 +106,4 @@ class GameInviteResponse(BaseModel):
     status: str
     created_at: datetime
     expires_at: datetime
+    sender_name: Optional[str] = None

@@ -4,7 +4,7 @@ from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
-from domain.entities.match import Match, MatchPlayer, MatchSide, MatchStatus
+from domain.entities.match import Match, MatchPlayer, MatchSide, MatchStatus, WinnerSide
 from domain.exceptions import ConflictError
 from infrastructure.database.models.match import MatchModel, MatchPlayerModel
 
@@ -98,7 +98,7 @@ class SqlAlchemyMatchRepository:
             created_at=model.created_at,
             started_at=model.started_at,
             finished_at=model.finished_at,
-            winner_side=MatchSide(model.winner_side) if model.winner_side else None,
+            winner_side=WinnerSide(model.winner_side) if model.winner_side else None,
         )
 
     @staticmethod

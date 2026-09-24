@@ -416,6 +416,7 @@ export const LauncherPage = () => {
   const hoverSoundLoadedRef = useRef<boolean>(false);
 
   const options: LauncherOption[] = [
+    { id: 'online', label: 'Jogar online', icon: '' },
     { id: 'iniciar', label: 'Iniciar', icon: '' },
     { id: 'continuar', label: 'Continuar', icon: '' },
     { id: 'carregar', label: 'Carregar Jogo', icon: '' },
@@ -556,6 +557,9 @@ export const LauncherPage = () => {
   const handleSelect = async (id: string) => {
     try {
       switch (id) {
+        case 'online':
+          navigate('/online');
+          break;
         case 'iniciar':
           toast.loading('Iniciando novo jogo...', { duration: 2000 });
           setTimeout(() => {

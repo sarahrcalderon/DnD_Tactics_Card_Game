@@ -39,6 +39,10 @@ class GameInviteService:
         invites = await self._invites.list_pending_for(receiver_id)
         return [invite for invite in invites if invite.expires_at > datetime.now(timezone.utc)]
 
+    async def sender_name(self, invite: GameInvite) -> str:
+        sender = await self._users.get_by_id(invite.sender_id)
+        return sender.username if sender else "Aventureiro"
+
     async def accept(self, receiver_id: UUID, invite_id: UUID, character_id: str | None, deck_id: str | None) -> MatchPlayer:
         invite = await self._get_pending_for_receiver(receiver_id, invite_id)
         if invite.expires_at <= datetime.now(timezone.utc):

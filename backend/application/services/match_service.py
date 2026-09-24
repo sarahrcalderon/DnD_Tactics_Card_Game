@@ -1,14 +1,40 @@
 from datetime import datetime, timezone
 from uuid import UUID, uuid4
 
-from domain.entities.match import Match, MatchPlayer, MatchSide, MatchStatus
+from domain.entities.match import Match, MatchPlayer, MatchSide, MatchStatus, WinnerSide
 from domain.exceptions import ConflictError, ResourceNotFoundError
 from domain.interfaces.match_repository import MatchRepository
+from domain.interfaces.user_repository import UserRepository
+from domain.interfaces.loadout_repository import LoadoutRepository
 
 
 class MatchService:
-    def __init__(self, matches: MatchRepository):
+    def __init__(self, matches: MatchRepository, users: UserRepository | None = None,
+                 loadouts: LoadoutRepository | None = None):
         self._matches = matches
+        self._users = users
+        self._loadouts = loadouts
+
+    async def public_player_profiles(self, players: list[MatchPlayer]) -> dict[UUID, dict]:
+        profiles = {}
+        for player in players:
+            profile = {}
+            if self._users is not None:
+                user = await self._users.get_by_id(player.user_id)
+                if user is not None:
+                    profile.update(username=user.username, avatar_url=user.avatar_url)
+            if self._loadouts is not None and player.character_id:
+                try:
+                    character_id = UUID(player.character_id)
+                except ValueError:
+                    character_id = None
+                if character_id is not None:
+                    owned = await self._loadouts.get_character(player.user_id, character_id)
+                    if owned is not None:
+                        profile.update(character_name=owned.name, class_id=owned.character.class_id,
+                                       race_id=owned.character.race_id)
+            profiles[player.user_id] = profile
+        return profiles
 
     async def create(self, creator_id: UUID, side: MatchSide, character_id: str | None, deck_id: str | None) -> Match:
         match = Match(id=uuid4(), status=MatchStatus.WAITING, created_at=datetime.now(timezone.utc))
@@ -92,6 +118,15 @@ class MatchService:
             started_at=datetime.now(timezone.utc), finished_at=match.finished_at, winner_side=match.winner_side,
         )
         return await self._matches.update(started)
+
+    async def finish(self, match_id: UUID, winner_side: WinnerSide) -> Match:
+        match = await self.get(match_id)
+        if match.status != MatchStatus.IN_PROGRESS:
+            raise ConflictError("A partida não está em andamento.")
+        return await self._matches.update(Match(
+            id=match.id, status=MatchStatus.FINISHED, created_at=match.created_at,
+            started_at=match.started_at, finished_at=datetime.now(timezone.utc), winner_side=winner_side,
+        ))
 
     async def _get_waiting_match(self, match_id: UUID) -> Match:
         match = await self.get(match_id)

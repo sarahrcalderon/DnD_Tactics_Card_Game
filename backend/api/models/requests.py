@@ -96,3 +96,20 @@ class GameInviteAcceptRequest(BaseModel):
 
 class MatchReadyRequest(BaseModel):
     ready: bool
+
+
+class OnlineCharacterCreateRequest(BaseModel):
+    model_config = {"extra": "forbid"}
+
+    name: str
+    class_id: str
+    race_id: str
+
+
+class OnlineDeckCreateRequest(BaseModel):
+    model_config = {"extra": "forbid"}
+
+    name: str
+    side: MatchSide
+    class_id: Optional[str] = None
+    card_ids: list[str]

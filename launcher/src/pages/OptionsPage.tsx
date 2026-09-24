@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import {
   Container,
@@ -83,17 +83,21 @@ interface SectionMap {
 }
 
 export const OptionsPage = () => {
+  const location = useLocation();
   const navigate = useNavigate();
   const { playSound } = useAudio();
+
   const [options, setOptions] = useState<OptionsData>(defaultOptions);
   const [activeSection, setActiveSection] = useState<OptionsSection>('audio');
   const [hasChanges, setHasChanges] = useState(false);
 
   useEffect(() => {
     const savedOptions = localStorage.getItem('gameOptions');
+
     if (savedOptions) {
       try {
         const parsed = JSON.parse(savedOptions);
+
         if (parsed && typeof parsed === 'object') {
           setOptions(parsed);
         }
@@ -106,6 +110,7 @@ export const OptionsPage = () => {
   const handleUpdate = (section: keyof OptionsData, updates: any) => {
     setOptions((prev) => {
       const currentSection = prev[section] || {};
+
       return {
         ...prev,
         [section]: {
@@ -149,8 +154,13 @@ export const OptionsPage = () => {
         handleSave();
       }
     }
+
     playSound('click');
-    navigate('/');
+    navigate(
+      (location.state as { returnTo?: string } | null)?.returnTo === '/online'
+        ? '/online'
+        : '/',
+    );
   };
 
   const sections: SectionMap = {
