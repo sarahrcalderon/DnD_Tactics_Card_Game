@@ -1,9 +1,15 @@
 venv/
+.venv/
+env/
 __pycache__/
 *.pyc
 .pytest_cache/
 .coverage
+.env
+.env.*
+!/.env.example
 .git/
 .gitignore
-Dockerfile
+alembic/__pycache__/
+tests/
 
