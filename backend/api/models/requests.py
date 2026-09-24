@@ -66,6 +66,30 @@ class LoginRequest(BaseModel):
         return normalized
 
 
+class PasswordResetRequest(BaseModel):
+    email: str
+
+    @field_validator("email")
+    @classmethod
+    def validate_email(cls, value: str) -> str:
+        normalized = value.strip().lower()
+        if len(normalized) > 320 or "@" not in normalized:
+            raise ValueError("E-mail inválido.")
+        return normalized
+
+
+class PasswordResetConfirmRequest(BaseModel):
+    token: str
+    password: str
+
+    @field_validator("password")
+    @classmethod
+    def validate_password(cls, value: str) -> str:
+        if not 8 <= len(value) <= 128:
+            raise ValueError("A senha deve ter entre 8 e 128 caracteres.")
+        return value
+
+
 class FriendRequestCreateRequest(BaseModel):
     receiver_email: str
 

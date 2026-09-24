@@ -1,7 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
-from api.models.requests import LoginRequest, RegisterRequest
+from api.models.requests import LoginRequest, PasswordResetConfirmRequest, PasswordResetRequest, RegisterRequest
+from infrastructure.config import get_settings
 from api.models.responses import AuthenticatedUserResponse, AuthenticationResponse
 from application.dtos.auth import AuthenticatedUser, LoginData, RegisterUserData
 from domain.exceptions import AuthenticationError, ConflictError, ResourceNotFoundError
@@ -45,6 +46,26 @@ async def login(data: LoginRequest) -> AuthenticationResponse:
     except AuthenticationError as error:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=str(error)) from error
     return _to_authentication_response(result.access_token, result.token_type, result.user)
+
+
+@router.post("/password-reset")
+async def request_password_reset(data: PasswordResetRequest) -> dict:
+    settings = get_settings()
+    try:
+        await container.auth.request_password_reset(data.email, container.password_resets, container.email,
+                                                    settings.client_url, settings.password_reset_expire_minutes)
+    except RuntimeError:
+        raise HTTPException(status_code=503, detail="O envio de e-mail não está configurado.")
+    return {"message": "Se houver uma conta com este e-mail, enviaremos um link para redefinir sua senha."}
+
+
+@router.post("/password-reset/confirm")
+async def confirm_password_reset(data: PasswordResetConfirmRequest) -> dict:
+    try:
+        await container.auth.reset_password(data.token, data.password, container.password_resets)
+    except AuthenticationError as error:
+        raise HTTPException(status_code=400, detail=str(error)) from error
+    return {"message": "Senha redefinida com sucesso."}
 
 
 @router.get("/me", response_model=AuthenticatedUserResponse)

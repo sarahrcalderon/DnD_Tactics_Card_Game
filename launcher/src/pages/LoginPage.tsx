@@ -13,6 +13,7 @@ import {
   Muted,
   PageHeading,
   World,
+  InputWithIcon,
 } from '../styles/onlineStyles';
 
 export function LoginPage({ register = false }: { register?: boolean }) {
@@ -69,31 +70,31 @@ export function LoginPage({ register = false }: { register?: boolean }) {
           {register && (
             <Field>
               Nome de jogador
-              <input
+              <InputWithIcon><span aria-hidden="true">♜</span><input
                 required
                 minLength={3}
                 maxLength={50}
                 autoComplete="username"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-              />
+              /></InputWithIcon>
             </Field>
           )}
 
           <Field>
             E-mail
-            <input
+            <InputWithIcon><span aria-hidden="true">✉</span><input
               type="email"
               required
               autoComplete="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-            />
+            /></InputWithIcon>
           </Field>
 
           <Field>
             Senha
-            <input
+            <InputWithIcon><span aria-hidden="true">▣</span><input
               type="password"
               required
               minLength={register ? 8 : undefined}
@@ -101,7 +102,7 @@ export function LoginPage({ register = false }: { register?: boolean }) {
               autoComplete={register ? 'new-password' : 'current-password'}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-            />
+            /></InputWithIcon>
           </Field>
 
           <Button disabled={task.busy}>
@@ -117,6 +118,7 @@ export function LoginPage({ register = false }: { register?: boolean }) {
               {register ? 'Entrar' : 'Criar conta'}
             </Link>
           </Muted>
+          {!register && <Muted><Link to="/forgot-password">Esqueceu sua senha?</Link></Muted>}
         </Form>
       </AuthCard>
     </World>

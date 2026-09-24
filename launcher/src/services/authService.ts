@@ -21,4 +21,10 @@ export const authService = {
   async me(signal?: AbortSignal) {
     return (await apiClient.get<OnlineUser>('/auth/me', { signal })).data;
   },
+  async requestPasswordReset(email: string) {
+    await apiClient.post('/auth/password-reset', { email });
+  },
+  async confirmPasswordReset(token: string, password: string) {
+    await apiClient.post('/auth/password-reset/confirm', { token, password });
+  },
 };

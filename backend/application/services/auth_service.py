@@ -1,5 +1,7 @@
 import bcrypt
 import jwt
+import hashlib
+import secrets
 from datetime import datetime, timedelta, timezone
 from uuid import UUID, uuid4
 
@@ -72,6 +74,19 @@ class AuthService:
             token_type="bearer",
             user=self._to_authenticated_user(user),
         )
+
+    async def request_password_reset(self, email, resets, email_service, client_url, expires_minutes):
+        user = await self._users.get_by_email(self._normalize_email(email))
+        if user is None:
+            return
+        token = secrets.token_urlsafe(48)
+        await resets.create(user.id, hashlib.sha256(token.encode()).hexdigest(), datetime.now(timezone.utc) + timedelta(minutes=expires_minutes))
+        await email_service.send_password_reset(user.email, f"{client_url.rstrip('/')}/reset-password?token={token}")
+
+    async def reset_password(self, token, password, resets) -> None:
+        success = await resets.consume(hashlib.sha256(token.encode()).hexdigest(), datetime.now(timezone.utc), self._hash_password(password))
+        if not success:
+            raise AuthenticationError("O link de redefinição é inválido ou expirou.")
 
     def _create_access_token(self, user_id: UUID) -> str:
         now = datetime.now(timezone.utc)

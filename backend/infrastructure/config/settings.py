@@ -18,6 +18,14 @@ class Settings(BaseSettings):
     jwt_secret: str | None = None
     jwt_algorithm: str = "HS256"
     access_token_expire_minutes: int = 60
+    password_reset_expire_minutes: int = 30
+    smtp_host: str | None = None
+    smtp_port: int = 587
+    smtp_username: str | None = None
+    smtp_password: str | None = None
+    smtp_from: str | None = None
+    smtp_use_tls: bool = True
+    client_url: str = "http://localhost:5173"
     cors_origins: list[str] = [
         "http://localhost:3000",
         "http://127.0.0.1:3000",

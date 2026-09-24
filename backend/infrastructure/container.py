@@ -4,6 +4,8 @@ from application.services.match_battle_service import MatchBattleService
 from application.services.loadout_service import LoadoutService
 from infrastructure.repositories.match_battle_repository import InMemoryMatchBattleRepository
 from infrastructure.repositories.sqlalchemy_loadout_repository import SqlAlchemyLoadoutRepository
+from infrastructure.repositories.password_reset_repository import PasswordResetRepository
+from infrastructure.email.smtp_email_service import SmtpEmailService
 from infrastructure.config import get_settings
 from infrastructure.database import get_session_factory
 from infrastructure.repositories import (
@@ -89,6 +91,16 @@ class ApplicationContainer:
                 matches=self.matches,
             )
         return self._game_invites
+
+    @property
+    def password_resets(self):
+        return PasswordResetRepository(get_session_factory())
+
+    @property
+    def email(self):
+        settings = get_settings()
+        return SmtpEmailService(settings.smtp_host, settings.smtp_port, settings.smtp_username,
+                                settings.smtp_password, settings.smtp_from, settings.smtp_use_tls)
 
 
 container = ApplicationContainer()

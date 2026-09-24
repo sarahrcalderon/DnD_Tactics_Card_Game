@@ -26,6 +26,7 @@ import { CreateMatchPage } from './pages/CreateMatchPage';
 import { OnlineCharactersPage } from './pages/OnlineCharactersPage';
 import { OnlineDecksPage } from './pages/OnlineDecksPage';
 import { LobbyPage } from './pages/LobbyPage';
+import { PasswordResetPage } from './pages/PasswordResetPage';
 
 function App() {
   return (
@@ -49,6 +50,8 @@ function App() {
             <Route path="/" element={<LauncherPage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<LoginPage register />} />
+            <Route path="/forgot-password" element={<PasswordResetPage />} />
+            <Route path="/reset-password" element={<PasswordResetPage confirm />} />
             <Route path="/online" element={<OnlineLayout />}>
               <Route index element={<OnlineMenuPage />} />
               <Route path="friends" element={<FriendsPage />} />

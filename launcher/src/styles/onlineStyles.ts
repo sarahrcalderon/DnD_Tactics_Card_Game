@@ -200,6 +200,23 @@ export const Field = styled.label`
   }
 `;
 
+export const InputWithIcon = styled.div`
+  position: relative;
+
+  span {
+    position: absolute;
+    left: 13px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #d8b56e;
+    pointer-events: none;
+  }
+
+  input {
+    padding-left: 42px;
+  }
+`;
+
 export const Form = styled.form`
   display: grid;
   gap: 20px;
