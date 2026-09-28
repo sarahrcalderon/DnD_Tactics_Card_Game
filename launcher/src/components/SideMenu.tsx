@@ -1,5 +1,5 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 
 import {
@@ -22,6 +22,7 @@ const ICON_PATHS: Record<string, string> = {
 
 const SideMenu: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleDeck = () => {
     const savedData = localStorage.getItem('characterData');
@@ -143,7 +144,12 @@ const SideMenu: React.FC = () => {
   };
 
   const handleBestiary = () => {
-    navigate('/bestiary');
+    navigate('/bestiary', {
+      state: {
+        returnTo: location.pathname + location.search + location.hash,
+        returnState: location.state,
+      },
+    });
   };
 
   const handleRanking = () => {};

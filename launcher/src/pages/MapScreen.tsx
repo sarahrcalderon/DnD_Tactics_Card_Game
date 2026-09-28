@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import SideMenu from '../components/SideMenu';
 import EnemyMenu from '../components/EnemyMenu';
@@ -158,6 +158,7 @@ const createSvgPath = (points: RouteCoordinate[]) => {
 
 export const MapScreen = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const campaignStorageKey = getCampaignProgressStorageKey();
 
   const animationFrameRef = useRef<number | null>(null);
@@ -507,7 +508,12 @@ export const MapScreen = () => {
   };
 
   const handleOpenBestiary = () => {
-    navigate('/bestiary');
+    navigate('/bestiary', {
+      state: {
+        returnTo: location.pathname + location.search + location.hash,
+        returnState: location.state,
+      },
+    });
   };
 
   if (isLoading) {

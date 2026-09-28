@@ -75,6 +75,7 @@ import {
 } from '../styles/attributeDistStyles';
 
 import { CardComponent } from '../components/Card/CardComponent';
+import { BestiaryPreview } from '../components/bestiary/BestiaryPreview';
 import { CampaignMapPreview } from '../components/campaign/CampaignMapPreview';
 
 import {
@@ -870,6 +871,15 @@ export const AttributeDistPage = () => {
                 </BottomActionButton>
               </BottomActions>
               <CampaignMapPreview onOpenCampaign={() => navigate('/map')} />
+              <BestiaryPreview onOpen={() => {
+                persistCurrentCharacter();
+                navigate('/bestiary', {
+                  state: {
+                    returnTo: location.pathname + location.search + location.hash,
+                    returnState: { ...routeSheet, attributes, pointsRemaining },
+                  },
+                });
+              }} />
             </DeckFooter>
           </DeckSection>
         </MainContent>

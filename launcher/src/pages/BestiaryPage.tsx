@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 import { BestiaryProvider } from '../contexts/BestiaryContext';
 
@@ -22,6 +22,12 @@ import {
 
 const BestiaryContent = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const origin = location.state as {
+    returnTo?: string;
+    returnState?: unknown;
+  } | null;
+  const returnTo = origin?.returnTo || '/map';
 
   const { monsters, visibleMonsters, selectedMonster, selectMonster } =
     useBestiary();
@@ -29,8 +35,10 @@ const BestiaryContent = () => {
   return (
     <BestiaryShell>
       <TopBar>
-        <BackButton type="button" onClick={() => navigate('/map')}>
-          ← Voltar ao mapa
+        <BackButton type="button" onClick={() => {
+          navigate(returnTo, { state: origin?.returnState, replace: true });
+        }}>
+          ← Voltar
         </BackButton>
 
         <Heading>

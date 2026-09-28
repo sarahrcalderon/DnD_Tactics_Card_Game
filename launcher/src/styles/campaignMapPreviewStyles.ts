@@ -103,3 +103,7 @@ export const CampaignMarker = styled.span<{ $x: number; $y: number; $active: boo
   background: ${({ $active, $completed }) => ($active ? '#ffd700' : $completed ? '#43c777' : 'rgba(9, 11, 16, 0.78)')};
   box-shadow: ${({ $active }) => ($active ? '0 0 18px rgba(255, 215, 0, 0.95)' : '0 1px 4px rgba(0, 0, 0, 0.8)')};
 `;
+
+export const BestiaryPreviewButton = styled(CampaignMapButton)`
+  background-image: url('/assets/images/bestiario_card/card_bestiario.jpg');
+`;
