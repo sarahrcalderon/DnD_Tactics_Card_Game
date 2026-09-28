@@ -25,16 +25,22 @@ export const PerformanceSection: React.FC<PerformanceSectionProps> = ({
   return (
     <>
       <OptionGroup>
-        <OptionLabel>Limite de FPS</OptionLabel>
-        <Select aria-label="Limite de FPS" value="auto" disabled>
-          <option value="auto">Automatico (navegador)</option>
+        <OptionLabel>FPS das animacoes do mapa</OptionLabel>
+        <Select aria-label="FPS das animacoes do mapa" value={performance.fpsLimit} onChange={event => onUpdate({ fpsLimit: Number(event.target.value) })}>
+          <option value={30}>30 FPS</option>
+          <option value={60}>60 FPS</option>
+          <option value={120}>120 FPS</option>
+          <option value={144}>144 FPS</option>
+          <option value={0}>Sem limite</option>
         </Select>
-        <OptionDescription>O navegador controla os quadros desta interface. Use baixo consumo para reduzir animacoes e efeitos.</OptionDescription>
+        <OptionDescription>Limita a atualizacao do movimento no mapa. A taxa das demais telas e controlada pelo navegador.</OptionDescription>
       </OptionGroup>
 
       <OptionGroup>
         <ToggleContainer>
-          <Toggle aria-label="Modo de Baixo Consumo"             active={performance.lowPowerMode}
+          <Toggle
+            aria-label="Modo de Baixo Consumo"
+            active={performance.lowPowerMode}
             onClick={() =>
               onUpdate({ lowPowerMode: !performance.lowPowerMode })
             }
@@ -49,7 +55,8 @@ export const PerformanceSection: React.FC<PerformanceSectionProps> = ({
       <OptionGroup>
         <OptionLabel>Qualidade dos Efeitos Visuais</OptionLabel>
         <Select
-aria-label="Qualidade dos Efeitos Visuais"           value={performance.visualEffects}
+          aria-label="Qualidade dos Efeitos Visuais"
+          value={performance.visualEffects}
           onChange={(e) => onUpdate({ visualEffects: e.target.value })}
         >
           <option value="low">Baixa</option>
@@ -61,7 +68,8 @@ aria-label="Qualidade dos Efeitos Visuais"           value={performance.visualEf
       <OptionGroup>
         <OptionLabel>Qualidade dos Efeitos</OptionLabel>
         <Select
-aria-label="Qualidade dos Efeitos"           value={performance.effectQuality}
+          aria-label="Qualidade dos Efeitos"
+          value={performance.effectQuality}
           onChange={(e) => onUpdate({ effectQuality: e.target.value })}
         >
           <option value="low">Baixa</option>
@@ -72,7 +80,9 @@ aria-label="Qualidade dos Efeitos"           value={performance.effectQuality}
 
       <OptionGroup>
         <ToggleContainer>
-          <Toggle aria-label="Reduzir Efeitos/Particulas"             active={performance.reduceParticles}
+          <Toggle
+            aria-label="Reduzir Efeitos/Particulas"
+            active={performance.reduceParticles}
             onClick={() =>
               onUpdate({ reduceParticles: !performance.reduceParticles })
             }

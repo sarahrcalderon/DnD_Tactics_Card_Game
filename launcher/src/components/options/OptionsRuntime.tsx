@@ -87,6 +87,35 @@ export function OptionsRuntime() {
   }, [options]);
 
   useEffect(() => {
+    if (options.interface.showTips) return;
+    const titles = new Map<HTMLElement, string>();
+    const labels = new Set<HTMLElement>();
+    const hideTitles = () => {
+      document.querySelectorAll<HTMLElement>('#root [title]').forEach(element => {
+        const title = element.getAttribute('title') || '';
+        titles.set(element, title);
+        if (!element.getAttribute('aria-label') && !element.textContent?.trim()) {
+          element.setAttribute('aria-label', title);
+          labels.add(element);
+        }
+        element.removeAttribute('title');
+      });
+    };
+    hideTitles();
+    const observer = new MutationObserver(hideTitles);
+    observer.observe(document.getElementById('root')!, { childList: true, subtree: true, attributes: true, attributeFilter: ['title'] });
+    return () => {
+      observer.disconnect();
+      titles.forEach((title, element) => {
+        if (element.isConnected) {
+          element.setAttribute('title', title);
+          if (labels.has(element)) element.removeAttribute('aria-label');
+        }
+      });
+    };
+  }, [options.interface.showTips]);
+
+  useEffect(() => {
     if (!options.network.showPing) return;
 
     let disposed = false;

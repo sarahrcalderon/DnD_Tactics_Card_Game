@@ -35,7 +35,7 @@ export const defaultOptions: OptionsData = {
     reduceMotion: false,
   },
   performance: {
-    fpsLimit: 0,
+    fpsLimit: 60,
     lowPowerMode: false,
     visualEffects: 'high',
     effectQuality: 'high',
@@ -88,6 +88,7 @@ export function normalizeOptions(value: unknown): OptionsData {
   }
 
   const performance = record(input.performance);
+  if ([0, 30, 60, 120, 144].includes(performance.fpsLimit as number)) result.performance.fpsLimit = performance.fpsLimit as number;
   for (const key of ['visualEffects', 'effectQuality'] as const) {
     if (['low', 'medium', 'high'].includes(String(performance[key]))) {
       result.performance[key] = String(performance[key]);

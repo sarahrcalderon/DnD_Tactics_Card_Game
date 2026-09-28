@@ -24,7 +24,8 @@ export const AccessibilitySection: React.FC<AccessibilitySectionProps> = ({
       <OptionGroup>
         <OptionLabel>Modo Daltonico</OptionLabel>
         <Select
-aria-label="Modo Daltonico"           value={accessibility.colorblindMode}
+          aria-label="Modo Daltonico"
+          value={accessibility.colorblindMode}
           onChange={(e) => onUpdate({ colorblindMode: e.target.value })}
         >
           <option value="none">Desativado</option>
@@ -32,12 +33,14 @@ aria-label="Modo Daltonico"           value={accessibility.colorblindMode}
           <option value="deuteranopia">Deuteranopia</option>
           <option value="tritanopia">Tritanopia</option>
         </Select>
-        <OptionDescription>Ajusta cores para daltonicos</OptionDescription>
+        <OptionDescription>Usa uma paleta alternativa nos títulos, seleções e indicadores de foco. Os estados também mantêm seus textos e ícones.</OptionDescription>
       </OptionGroup>
 
       <OptionGroup>
         <ToggleContainer>
-          <Toggle aria-label="Alto Contraste"             active={accessibility.highContrast}
+          <Toggle
+            aria-label="Alto Contraste"
+            active={accessibility.highContrast}
             onClick={() =>
               onUpdate({ highContrast: !accessibility.highContrast })
             }
@@ -49,7 +52,9 @@ aria-label="Modo Daltonico"           value={accessibility.colorblindMode}
 
       <OptionGroup>
         <ToggleContainer>
-          <Toggle aria-label="Reduzir Movimento"             active={accessibility.reduceMotion}
+          <Toggle
+            aria-label="Reduzir Movimento"
+            active={accessibility.reduceMotion}
             onClick={() =>
               onUpdate({ reduceMotion: !accessibility.reduceMotion })
             }

@@ -100,6 +100,8 @@ test('partial legacy preferences load safely and rebound shortcuts work', async 
   await expect(page.getByRole('slider', { name: 'Volume Geral' })).toHaveValue('0');
   await page.getByRole('button', { name: 'Controles', exact: true }).click();
   await page.getByRole('button', { name: 'Alterar atalho: Opcoes', exact: true }).click();
+  await page.keyboard.press('m');
+  await expect(page.getByText('Esta tecla ja esta em uso por outro atalho.')).toBeVisible();
   await page.keyboard.press('p');
   await page.getByRole('button', { name: 'Salvar Opções' }).click();
   await page.getByRole('button', { name: 'Cancelar' }).click();
@@ -107,4 +109,24 @@ test('partial legacy preferences load safely and rebound shortcuts work', async 
   await expect(page).toHaveURL(/options/);
   await page.getByRole('button', { name: 'Interface', exact: true }).click();
   await expect(page.getByRole('combobox', { name: 'Idioma' })).toBeDisabled();
+  await page.evaluate(() => localStorage.setItem('gameOptions', '{invalid'));
+  await page.reload();
+  await expect(page.getByRole('slider', { name: 'Volume Geral' })).toHaveValue('80');
+});
+
+test('reduced motion skips map travel while keeping campaign progression', async ({ page }) => {
+  await page.goto('/options');
+  await page.getByRole('button', { name: 'Acessibilidade', exact: true }).click();
+  await page.getByRole('switch', { name: 'Reduzir Movimento' }).click();
+  await page.getByRole('button', { name: 'Desempenho', exact: true }).click();
+  await page.getByRole('combobox', { name: 'FPS das animacoes do mapa' }).selectOption('30');
+  await page.getByRole('switch', { name: 'Reduzir Efeitos/Particulas' }).click();
+  await page.getByRole('button', { name: 'Salvar Opções' }).click();
+  await page.goto('/map');
+  const victory = page.getByRole('button', { name: /Vitória/ });
+  await expect(victory).toBeVisible();
+  await victory.click();
+  await expect.poll(() => page.evaluate(() => JSON.parse(localStorage.getItem('blackmoorCampaignProgress:new-character') || '{}').currentStep), { timeout: 1000 }).toBe(1);
+  await expect(victory).toBeEnabled();
+  await expect(page.locator('[data-decorative]')).toBeHidden();
 });

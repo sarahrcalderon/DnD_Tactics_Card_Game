@@ -27,7 +27,9 @@ export const AudioSection: React.FC = () => {
     <>
       <OptionGroup>
         <ToggleContainer>
-          <Toggle aria-label="Ativar som" active={!isMuted} onClick={toggleMute} />
+          <Toggle
+            aria-label="Ativar som"
+            active={!isMuted} onClick={toggleMute} />
           <ToggleLabel>
             {isMuted ? ' Som Desativado' : ' Som Ativado'}
           </ToggleLabel>

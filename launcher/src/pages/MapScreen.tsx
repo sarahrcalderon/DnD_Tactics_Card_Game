@@ -1,3 +1,5 @@
+import { useOptions } from '../contexts/OptionsContext';
+import { useAudio } from '../contexts/AudioContext';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
@@ -158,6 +160,8 @@ const createSvgPath = (points: RouteCoordinate[]) => {
 
 export const MapScreen = () => {
   const navigate = useNavigate();
+  const { options } = useOptions();
+  const { playSound } = useAudio();
   const location = useLocation();
   const campaignStorageKey = getCampaignProgressStorageKey();
 
@@ -298,6 +302,13 @@ export const MapScreen = () => {
           return;
         }
 
+        if (!options.interface.animations || options.accessibility.reduceMotion || options.performance.lowPowerMode) {
+          const finalPoint = routeSegment[routeSegment.length - 1];
+          setPlayerPosition({ x: finalPoint.x, y: finalPoint.y });
+          resolve();
+          return;
+        }
+
         const segmentLengths: number[] = [];
 
         let totalDistance = 0;
@@ -313,7 +324,9 @@ export const MapScreen = () => {
           totalDistance += distance;
         }
 
-        const duration = Math.min(Math.max(totalDistance * 35, 900), 3000);
+        const duration = Math.min(Math.max(totalDistance * 35, 900), 3000) / options.interface.animationSpeed;
+        const frameInterval = options.performance.fpsLimit ? 1000 / options.performance.fpsLimit : 0;
+        let lastFrame = -Infinity;
 
         let startTime: number | null = null;
 
@@ -324,6 +337,11 @@ export const MapScreen = () => {
 
           const elapsedTime = timestamp - startTime;
 
+          if (elapsedTime < duration && timestamp - lastFrame < frameInterval) {
+            animationFrameRef.current = requestAnimationFrame(animate);
+            return;
+          }
+          lastFrame = timestamp;
           const progress = Math.min(elapsedTime / duration, 1);
 
           const easedProgress = progress * progress * (3 - 2 * progress);
@@ -383,7 +401,7 @@ export const MapScreen = () => {
         animationFrameRef.current = requestAnimationFrame(animate);
       });
     },
-    [],
+    [options.interface.animations, options.interface.animationSpeed, options.accessibility.reduceMotion, options.performance.lowPowerMode, options.performance.fpsLimit],
   );
 
   const handleBattleWin = async () => {
@@ -404,6 +422,7 @@ export const MapScreen = () => {
       return;
     }
 
+    playSound('effect');
     const reward = awardBattleGold();
     toast.success(
       `💰 +${100 + reward.bonus} ouro${reward.bonus ? ' (bônus!)' : ''}`,

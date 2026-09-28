@@ -36,7 +36,8 @@ export const InterfaceSection: React.FC<InterfaceSectionProps> = ({
         <OptionLabel>Escala da UI</OptionLabel>
         <Row>
           <Slider
-aria-label="Escala da UI"             type="range"
+          aria-label="Escala da UI"
+          type="range"
             min="50"
             max="150"
             value={interfaceOptions.uiScale}
@@ -50,7 +51,8 @@ aria-label="Escala da UI"             type="range"
         <OptionLabel>Tamanho da Fonte</OptionLabel>
         <Row>
           <Slider
-aria-label="Tamanho da Fonte"             type="range"
+          aria-label="Tamanho da Fonte"
+          type="range"
             min="12"
             max="24"
             value={interfaceOptions.fontSize}
@@ -62,7 +64,9 @@ aria-label="Tamanho da Fonte"             type="range"
 
       <OptionGroup>
         <ToggleContainer>
-          <Toggle aria-label="Mostrar Dicas"             active={interfaceOptions.showTips}
+          <Toggle
+            aria-label="Mostrar Dicas"
+            active={interfaceOptions.showTips}
             onClick={() => onUpdate({ showTips: !interfaceOptions.showTips })}
           />
           <ToggleLabel>Mostrar Dicas</ToggleLabel>
@@ -72,7 +76,9 @@ aria-label="Tamanho da Fonte"             type="range"
 
       <OptionGroup>
         <ToggleContainer>
-          <Toggle aria-label="Animações"             active={interfaceOptions.animations}
+          <Toggle
+            aria-label="Animações"
+            active={interfaceOptions.animations}
             onClick={() =>
               onUpdate({ animations: !interfaceOptions.animations })
             }
@@ -88,7 +94,8 @@ aria-label="Tamanho da Fonte"             type="range"
         <OptionLabel>Velocidade das Animações</OptionLabel>
         <Row>
           <Slider
-aria-label="Velocidade das Animações"             type="range"
+          aria-label="Velocidade das Animações"
+          type="range"
             min="0.5"
             max="2"
             step="0.1"

@@ -36,7 +36,9 @@ export const NetworkSection: React.FC<NetworkSectionProps> = ({
 
       <OptionGroup>
         <ToggleContainer>
-          <Toggle aria-label="Mostrar Ping"             active={network.showPing}
+          <Toggle
+            aria-label="Mostrar Ping"
+            active={network.showPing}
             onClick={() => onUpdate({ showPing: !network.showPing })}
           />
           <ToggleLabel>Mostrar Ping</ToggleLabel>
