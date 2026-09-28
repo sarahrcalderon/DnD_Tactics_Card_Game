@@ -1,3 +1,4 @@
+import { useAudio } from '../contexts/AudioContext';
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
@@ -110,38 +111,9 @@ export const ClassSelectPage = () => {
   const [loading, setLoading] = useState(false);
   const [imagesLoaded, setImagesLoaded] = useState<Record<string, boolean>>({});
 
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-  const [audioLoaded, setAudioLoaded] = useState(false);
+  const { playSound } = useAudio();
   const lastHoveredClass = useRef<string | null>(null);
-
-  useEffect(() => {
-    const audio = new Audio('/assets/sounds/som_botao.mp3');
-    audio.volume = 0.3;
-
-    audio.addEventListener('canplaythrough', () => {
-      setAudioLoaded(true);
-    });
-
-    audio.addEventListener('error', () => {});
-
-    audioRef.current = audio;
-
-    return () => {
-      if (audioRef.current) {
-        audioRef.current.pause();
-        audioRef.current = null;
-      }
-    };
-  }, []);
-
-  const playHoverSound = useCallback(() => {
-    if (audioRef.current && audioLoaded) {
-      try {
-        audioRef.current.currentTime = 0;
-        audioRef.current.play().catch(() => {});
-      } catch (error) {}
-    }
-  }, [audioLoaded]);
+  const playHoverSound = useCallback(() => playSound('hover'), [playSound]);
 
   useEffect(() => {
     const loadImages = async () => {

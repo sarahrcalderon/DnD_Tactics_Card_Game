@@ -5,6 +5,8 @@ import {
   Slider,
   SliderValue,
   Row,
+  Button,
+  OptionDescription,
   ToggleContainer,
   Toggle,
   ToggleLabel,
@@ -12,7 +14,7 @@ import {
 import { useAudio } from '../../contexts/AudioContext';
 
 export const AudioSection: React.FC = () => {
-  const { audioOptions, updateAudioOptions, isMuted, toggleMute } = useAudio();
+  const { audioOptions, updateAudioOptions, isMuted, toggleMute, playSound } = useAudio();
 
   const handleSliderChange =
     (key: keyof typeof audioOptions) =>
@@ -24,8 +26,8 @@ export const AudioSection: React.FC = () => {
   return (
     <>
       <OptionGroup>
-        <ToggleContainer onClick={toggleMute}>
-          <Toggle active={!isMuted} />
+        <ToggleContainer>
+          <Toggle aria-label="Ativar som" active={!isMuted} onClick={toggleMute} />
           <ToggleLabel>
             {isMuted ? ' Som Desativado' : ' Som Ativado'}
           </ToggleLabel>
@@ -38,6 +40,7 @@ export const AudioSection: React.FC = () => {
           <Slider
             min="0"
             max="100"
+            aria-label="Volume Geral"
             value={audioOptions.volumeMaster}
             onChange={handleSliderChange('volumeMaster')}
           />
@@ -51,6 +54,7 @@ export const AudioSection: React.FC = () => {
           <Slider
             min="0"
             max="100"
+            aria-label="Musica"
             value={audioOptions.volumeMusic}
             onChange={handleSliderChange('volumeMusic')}
           />
@@ -64,6 +68,7 @@ export const AudioSection: React.FC = () => {
           <Slider
             min="0"
             max="100"
+            aria-label="Efeitos Sonoros"
             value={audioOptions.volumeSFX}
             onChange={handleSliderChange('volumeSFX')}
           />
@@ -77,12 +82,18 @@ export const AudioSection: React.FC = () => {
           <Slider
             min="0"
             max="100"
+            aria-label="Interface"
             value={audioOptions.volumeInterface}
             onChange={handleSliderChange('volumeInterface')}
           />
           <SliderValue>{audioOptions.volumeInterface}%</SliderValue>
         </Row>
       </OptionGroup>
+      <OptionDescription>As alteracoes sao ouvidas imediatamente. Salve para manter ou cancele para desfazer.</OptionDescription>
+      <Row>
+        <Button onClick={() => playSound('click')}>Testar interface</Button>
+        <Button onClick={() => playSound('effect')}>Testar efeitos</Button>
+      </Row>
     </>
   );
 };

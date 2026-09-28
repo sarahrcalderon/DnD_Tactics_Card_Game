@@ -26,25 +26,17 @@ export const InterfaceSection: React.FC<InterfaceSectionProps> = ({
     <>
       <OptionGroup>
         <OptionLabel>Idioma</OptionLabel>
-        <Select
-          value={interfaceOptions.language || 'pt-BR'}
-          onChange={(e) => onUpdate({ language: e.target.value })}
-        >
+        <Select aria-label="Idioma" value="pt-BR" disabled>
           <option value="pt-BR">Portugues (Brasil)</option>
-          <option value="en-US">English (US)</option>
-          <option value="es-ES">Espanol</option>
-          <option value="fr-FR">Francais</option>
-          <option value="de-DE">Deutsch</option>
-          <option value="ja-JP">Japanese</option>
-          <option value="zh-CN">Chinese</option>
         </Select>
+        <OptionDescription>Outros idiomas ainda nao possuem traducao.</OptionDescription>
       </OptionGroup>
 
       <OptionGroup>
         <OptionLabel>Escala da UI</OptionLabel>
         <Row>
           <Slider
-            type="range"
+aria-label="Escala da UI"             type="range"
             min="50"
             max="150"
             value={interfaceOptions.uiScale}
@@ -58,7 +50,7 @@ export const InterfaceSection: React.FC<InterfaceSectionProps> = ({
         <OptionLabel>Tamanho da Fonte</OptionLabel>
         <Row>
           <Slider
-            type="range"
+aria-label="Tamanho da Fonte"             type="range"
             min="12"
             max="24"
             value={interfaceOptions.fontSize}
@@ -70,8 +62,7 @@ export const InterfaceSection: React.FC<InterfaceSectionProps> = ({
 
       <OptionGroup>
         <ToggleContainer>
-          <Toggle
-            active={interfaceOptions.showTips}
+          <Toggle aria-label="Mostrar Dicas"             active={interfaceOptions.showTips}
             onClick={() => onUpdate({ showTips: !interfaceOptions.showTips })}
           />
           <ToggleLabel>Mostrar Dicas</ToggleLabel>
@@ -81,8 +72,7 @@ export const InterfaceSection: React.FC<InterfaceSectionProps> = ({
 
       <OptionGroup>
         <ToggleContainer>
-          <Toggle
-            active={interfaceOptions.animations}
+          <Toggle aria-label="Animações"             active={interfaceOptions.animations}
             onClick={() =>
               onUpdate({ animations: !interfaceOptions.animations })
             }
@@ -98,7 +88,7 @@ export const InterfaceSection: React.FC<InterfaceSectionProps> = ({
         <OptionLabel>Velocidade das Animações</OptionLabel>
         <Row>
           <Slider
-            type="range"
+aria-label="Velocidade das Animações"             type="range"
             min="0.5"
             max="2"
             step="0.1"

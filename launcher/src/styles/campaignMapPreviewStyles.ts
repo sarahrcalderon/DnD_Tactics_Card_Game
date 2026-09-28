@@ -80,7 +80,7 @@ export const CampaignLocationName = styled.strong`
   text-shadow: 0 2px 8px rgba(0, 0, 0, 0.9);
 `;
 
-export const CampaignOpenHint = styled.span`
+export const CampaignOpenHint = styled.span.attrs<{ 'data-game-tip'?: boolean }>({ 'data-game-tip': true })`
   position: absolute;
   z-index: 2;
   right: 16px;

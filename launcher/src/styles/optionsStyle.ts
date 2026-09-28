@@ -249,7 +249,7 @@ export const ToggleContainer = styled.div`
   padding: 0.25rem 0;
 `;
 
-export const Toggle = styled.div<{ active: boolean }>`
+export const Toggle = styled.button.attrs<{ active: boolean }>(props => ({ type: 'button', role: 'switch', 'aria-checked': props.active }))<{ active: boolean }>`
   width: 48px;
   height: 26px;
   background: ${props => props.active ? '#ffd700' : 'rgba(255, 255, 255, 0.2)'};
@@ -299,7 +299,7 @@ export const ShortcutAction = styled.span`
   font-size: 0.9rem;
 `;
 
-export const ShortcutKey = styled.span`
+export const ShortcutKey = styled.button.attrs({ type: 'button' })`
   color: #fff;
   background: rgba(255, 215, 0, 0.2);
   padding: 0.25rem 0.75rem;

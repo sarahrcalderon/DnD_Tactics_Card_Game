@@ -1846,7 +1846,7 @@ export const LoadingText = styled.div`
 // SCROLL HINT
 // ============================================================
 
-export const ScrollHint = styled.div`
+export const ScrollHint = styled.div.attrs<{ 'data-game-tip'?: boolean }>({ 'data-game-tip': true })`
   margin: 5px 0 8px;
 
   color: #9b96a7;

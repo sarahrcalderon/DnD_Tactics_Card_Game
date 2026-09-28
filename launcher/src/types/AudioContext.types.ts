@@ -1,10 +1,5 @@
-
-export interface AudioOptions {
-  volumeMaster: number;
-  volumeMusic: number;
-  volumeSFX: number;
-  volumeInterface: number;
-}
+import type { AudioOptions } from './options.types';
+export type { AudioOptions } from './options.types';
 
 export interface AudioContextType {
   audioOptions: AudioOptions;

@@ -1,3 +1,5 @@
+import { OptionsProvider } from './contexts/OptionsContext';
+import { OptionsRuntime } from './components/options/OptionsRuntime';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { GlobalStyle } from './styles/global';
@@ -32,9 +34,11 @@ function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
+      <OptionsProvider>
       <AudioProvider>
         <CharacterCreationProvider>
           <GlobalStyle />
+          <OptionsRuntime />
           <Toaster
             position="top-right"
             toastOptions={{
@@ -76,6 +80,7 @@ function App() {
           </Routes>
         </CharacterCreationProvider>
       </AudioProvider>
+      </OptionsProvider>
       </AuthProvider>
     </BrowserRouter>
   );

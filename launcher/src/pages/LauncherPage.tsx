@@ -1,4 +1,7 @@
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { useAudio } from '../contexts/AudioContext';
+import { useOptions } from '../contexts/OptionsContext';
+import { matchesShortcut } from '../services/optionsService';
+import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import toast from 'react-hot-toast';
@@ -415,14 +418,10 @@ export const LauncherPage = () => {
   const { reset: resetCreation } = useCharacterCreation();
   const [selectedIndex, setSelectedIndex] = useState<number>(0);
   const [isPywebview, setIsPywebview] = useState<boolean>(false);
-  const [isMusicPlaying, setIsMusicPlaying] = useState<boolean>(false);
+  const { playSound } = useAudio();
+  const { options: preferences } = useOptions();
   const [showLoadModal, setShowLoadModal] = useState<boolean>(false);
   const [saves, setSaves] = useState<SavedGame[]>([]);
-
-  const musicRef = useRef<HTMLAudioElement | null>(null);
-  const hoverSoundRef = useRef<HTMLAudioElement | null>(null);
-  const musicLoadedRef = useRef<boolean>(false);
-  const hoverSoundLoadedRef = useRef<boolean>(false);
 
   const options: LauncherOption[] = [
     { id: 'online', label: 'Jogar online', icon: '' },
@@ -433,66 +432,8 @@ export const LauncherPage = () => {
     { id: 'sair', label: 'Sair', icon: '' },
   ];
 
-  useEffect(() => {
-    if (!musicLoadedRef.current) {
-      try {
-        musicRef.current = new Audio('/assets/sounds/menu_music.mp3');
-        musicRef.current.loop = true;
-        musicRef.current.volume = 0.25;
-        musicRef.current.preload = 'auto';
-        musicLoadedRef.current = true;
-      } catch (e) {}
-    }
-
-    if (!hoverSoundLoadedRef.current) {
-      try {
-        hoverSoundRef.current = new Audio('/assets/sounds/som_botao.mp3');
-        hoverSoundRef.current.volume = 0.15;
-        hoverSoundRef.current.preload = 'auto';
-        hoverSoundLoadedRef.current = true;
-      } catch (e) {}
-    }
-
-    const playMusicTimer = setTimeout(() => {
-      if (musicRef.current && !isMusicPlaying) {
-        musicRef.current
-          .play()
-          .then(() => {
-            setIsMusicPlaying(true);
-            console.log('🎵 Música iniciada!');
-          })
-          .catch(() => {
-            const playOnInteraction = () => {
-              if (musicRef.current && !isMusicPlaying) {
-                musicRef.current.play().catch(() => {});
-                document.removeEventListener('click', playOnInteraction);
-                document.removeEventListener('keydown', playOnInteraction);
-              }
-            };
-            document.addEventListener('click', playOnInteraction);
-            document.addEventListener('keydown', playOnInteraction);
-          });
-      }
-    }, 1000);
-
-    if (window.pywebview) {
-      setIsPywebview(true);
-    }
-
-    return () => {
-      clearTimeout(playMusicTimer);
-    };
-  }, []);
-
-  const playHoverSound = useCallback(() => {
-    if (hoverSoundRef.current) {
-      try {
-        const sound = hoverSoundRef.current;
-        sound.currentTime = 0;
-        sound.play().catch(() => {});
-      } catch (e) {}
-    }
-  }, []);
+  useEffect(() => setIsPywebview(Boolean(window.pywebview)), []);
+  const playHoverSound = useCallback(() => playSound('hover'), [playSound]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -500,24 +441,25 @@ export const LauncherPage = () => {
         if (e.key === 'Escape') setShowLoadModal(false);
         return;
       }
-      if (e.key === 'ArrowUp') {
+      if (matchesShortcut(e, preferences.controls.shortcuts, 'Mover para cima')) {
         e.preventDefault();
         setSelectedIndex(
           (prev) => (prev - 1 + options.length) % options.length,
         );
         playHoverSound();
-      } else if (e.key === 'ArrowDown') {
+      } else if (matchesShortcut(e, preferences.controls.shortcuts, 'Mover para baixo')) {
         e.preventDefault();
         setSelectedIndex((prev) => (prev + 1) % options.length);
         playHoverSound();
-      } else if (e.key === 'Enter') {
+      } else if (matchesShortcut(e, preferences.controls.shortcuts, 'Acao principal')) {
+        e.preventDefault();
         handleSelect(options[selectedIndex].id);
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [selectedIndex, options, playHoverSound, showLoadModal]);
+  }, [selectedIndex, options, playHoverSound, showLoadModal, preferences.controls.shortcuts]);
 
   const handleOpenLoadModal = useCallback(() => {
     const savesList = saveService.getAllSaves();

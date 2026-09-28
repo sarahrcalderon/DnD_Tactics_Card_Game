@@ -1,161 +1,91 @@
-import React, {
-  createContext,
-  useContext,
-  useRef,
-  useState,
-  useEffect,
-} from 'react';
-import { AudioOptions, AudioContextType } from '../types/AudioContext.types';
+import { createContext, useCallback, useContext, useEffect, useRef, type ReactNode } from 'react';
+import type { AudioContextType } from '../types/AudioContext.types';
+import { useOptions } from './OptionsContext';
 
-const defaultAudioOptions: AudioOptions = {
-  volumeMaster: 80,
-  volumeMusic: 70,
-  volumeSFX: 80,
-  volumeInterface: 60,
+const Context = createContext<AudioContextType | undefined>(undefined);
+const tracks: Record<string, { file: string; channel: 'volumeInterface' | 'volumeSFX' }> = {
+  hover: { file: 'som_botao.mp3', channel: 'volumeInterface' },
+  click: { file: 'som_botao.mp3', channel: 'volumeInterface' },
+  select: { file: 'som_botao.mp3', channel: 'volumeInterface' },
+  success: { file: 'som_botao.mp3', channel: 'volumeInterface' },
+  error: { file: 'som_botao.mp3', channel: 'volumeInterface' },
+  effect: { file: 'deck_choice.mp3', channel: 'volumeSFX' },
 };
 
-const AudioContext = createContext<AudioContextType | undefined>(undefined);
-
-export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({
-  children,
-}) => {
-  const [audioOptions, setAudioOptions] =
-    useState<AudioOptions>(defaultAudioOptions);
-  const [isMuted, setIsMuted] = useState(false);
-  const musicRef = useRef<HTMLAudioElement | null>(null);
-  const soundEffectsRef = useRef<{ [key: string]: HTMLAudioElement }>({});
-
-  useEffect(() => {
-    try {
-      const savedOptions = localStorage.getItem('gameOptions');
-      if (savedOptions) {
-        const parsed = JSON.parse(savedOptions);
-        if (parsed && parsed.audio) {
-          setAudioOptions(parsed.audio);
-        }
-      }
-    } catch (error) {
-      console.error('Erro ao carregar opções:', error);
-    }
+export function AudioProvider({ children }: { children: ReactNode }) {
+  const { options, preview } = useOptions();
+  const current = useRef(options.audio);
+  current.current = options.audio;
+  const music = useRef<HTMLAudioElement | null>(null);
+  const effects = useRef(new Map<HTMLAudioElement, 'volumeInterface' | 'volumeSFX'>());
+  const volume = useCallback((channel: 'volumeMusic' | 'volumeInterface' | 'volumeSFX') => {
+    const audio = current.current;
+    return audio.muted ? 0 : (audio.volumeMaster / 100) * (audio[channel] / 100);
   }, []);
 
   useEffect(() => {
-    try {
-      musicRef.current = new Audio('/assets/sounds/menu_music.mp3');
-      musicRef.current.loop = true;
-      musicRef.current.volume = 0.25;
-      musicRef.current.preload = 'auto';
-    } catch (error) {
-      console.error('Erro ao carregar música:', error);
-    }
-
-    return () => {
-      if (musicRef.current) {
-        musicRef.current.pause();
-        musicRef.current.src = '';
-        musicRef.current = null;
-      }
-      soundEffectsRef.current = {};
+    const track = new Audio('/assets/sounds/menu_music.mp3');
+    track.loop = true;
+    track.preload = 'auto';
+    track.volume = volume('volumeMusic');
+    music.current = track;
+    const resume = () => {
+      track.volume = volume('volumeMusic');
+      if (track.volume > 0 && track.paused) void track.play().catch(() => undefined);
     };
-  }, []);
-
-  const updateMusic = () => {
-    if (!musicRef.current) return;
-
-    const masterVolume = isMuted ? 0 : audioOptions.volumeMaster;
-    const musicVolume = isMuted ? 0 : audioOptions.volumeMusic;
-    const finalVolume = (masterVolume / 100) * (musicVolume / 100);
-
-    musicRef.current.volume = Math.min(Math.max(finalVolume, 0), 1);
-
-    if (finalVolume === 0) {
-      if (!musicRef.current.paused) {
-        musicRef.current.pause();
-      }
-    } else {
-      if (musicRef.current.paused) {
-        musicRef.current.play().catch(() => {
-          const playOnInteraction = () => {
-            if (musicRef.current && musicRef.current.paused) {
-              musicRef.current.play().catch(() => {});
-              document.removeEventListener('click', playOnInteraction);
-              document.removeEventListener('keydown', playOnInteraction);
-            }
-          };
-          document.addEventListener('click', playOnInteraction);
-          document.addEventListener('keydown', playOnInteraction);
-        });
-      }
-    }
-  };
+    resume();
+    document.addEventListener('pointerdown', resume);
+    document.addEventListener('keydown', resume);
+    return () => {
+      document.removeEventListener('pointerdown', resume);
+      document.removeEventListener('keydown', resume);
+      track.pause();
+      track.removeAttribute('src');
+      music.current = null;
+      effects.current.forEach((_, effect) => effect.pause());
+      effects.current.clear();
+    };
+  }, [volume]);
 
   useEffect(() => {
-    updateMusic();
-  }, [audioOptions.volumeMaster, audioOptions.volumeMusic, isMuted]);
-
-  const playSound = (soundName: string) => {
-    if (isMuted) return;
-
-    const masterVolume = audioOptions.volumeMaster;
-    const sfxVolume = audioOptions.volumeSFX;
-    const finalVolume = (masterVolume / 100) * (sfxVolume / 100);
-
-    if (finalVolume === 0) return;
-
-    if (soundName === 'hover') {
-      try {
-        const audio = new Audio('/assets/sounds/som_botao.mp3');
-        audio.volume = Math.min(Math.max(finalVolume, 0), 1);
-        audio.play().catch(() => {});
-      } catch (error) {}
+    const track = music.current;
+    if (track) {
+      track.volume = volume('volumeMusic');
+      if (track.volume === 0) track.pause();
+      else if (track.paused) void track.play().catch(() => undefined);
     }
-  };
-
-  const updateAudioOptions = (updates: Partial<AudioOptions>) => {
-    setAudioOptions((prev) => {
-      const newOptions = { ...prev, ...updates };
-      try {
-        const savedOptions = localStorage.getItem('gameOptions');
-        if (savedOptions) {
-          const parsed = JSON.parse(savedOptions);
-          parsed.audio = newOptions;
-          localStorage.setItem('gameOptions', JSON.stringify(parsed));
-        } else {
-          localStorage.setItem(
-            'gameOptions',
-            JSON.stringify({ audio: newOptions }),
-          );
-        }
-      } catch (error) {
-        console.error('Erro ao salvar opções:', error);
+    effects.current.forEach((channel, effect) => {
+      effect.volume = volume(channel);
+      if (effect.volume === 0) {
+        effect.pause();
+        effects.current.delete(effect);
       }
-      return newOptions;
     });
-  };
+  }, [options.audio, volume]);
 
-  const toggleMute = () => {
-    setIsMuted(!isMuted);
-  };
+  const playSound = useCallback((name: string) => {
+    const source = tracks[name];
+    if (!source || volume(source.channel) === 0) return;
+    const effect = new Audio(`/assets/sounds/${source.file}`);
+    effect.volume = volume(source.channel);
+    effects.current.set(effect, source.channel);
+    const release = () => effects.current.delete(effect);
+    effect.addEventListener('ended', release, { once: true });
+    effect.addEventListener('error', release, { once: true });
+    void effect.play().catch(release);
+  }, [volume]);
 
-  return (
-    <AudioContext.Provider
-      value={{
-        audioOptions,
-        updateAudioOptions,
-        playSound,
-        isMuted,
-        toggleMute,
-      }}
-    >
-      {children}
-    </AudioContext.Provider>
-  );
-};
+  return <Context.Provider value={{
+    audioOptions: options.audio,
+    updateAudioOptions: updates => preview({ ...options, audio: { ...options.audio, ...updates } }),
+    playSound,
+    isMuted: options.audio.muted,
+    toggleMute: () => preview({ ...options, audio: { ...options.audio, muted: !options.audio.muted } }),
+  }}>{children}</Context.Provider>;
+}
 
-export const useAudio = () => {
-  const context = useContext(AudioContext);
-  if (!context) {
-    throw new Error('useAudio must be used within an AudioProvider');
-  }
+export function useAudio() {
+  const context = useContext(Context);
+  if (!context) throw new Error('AudioProvider ausente');
   return context;
-};
+}

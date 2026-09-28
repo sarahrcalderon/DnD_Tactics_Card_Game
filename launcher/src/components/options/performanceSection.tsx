@@ -26,22 +26,15 @@ export const PerformanceSection: React.FC<PerformanceSectionProps> = ({
     <>
       <OptionGroup>
         <OptionLabel>Limite de FPS</OptionLabel>
-        <Select
-          value={performance.fpsLimit}
-          onChange={(e) => onUpdate({ fpsLimit: Number(e.target.value) })}
-        >
-          <option value="30">30 FPS</option>
-          <option value="60">60 FPS</option>
-          <option value="120">120 FPS</option>
-          <option value="144">144 FPS</option>
-          <option value="0">Ilimitado</option>
+        <Select aria-label="Limite de FPS" value="auto" disabled>
+          <option value="auto">Automatico (navegador)</option>
         </Select>
+        <OptionDescription>O navegador controla os quadros desta interface. Use baixo consumo para reduzir animacoes e efeitos.</OptionDescription>
       </OptionGroup>
 
       <OptionGroup>
         <ToggleContainer>
-          <Toggle
-            active={performance.lowPowerMode}
+          <Toggle aria-label="Modo de Baixo Consumo"             active={performance.lowPowerMode}
             onClick={() =>
               onUpdate({ lowPowerMode: !performance.lowPowerMode })
             }
@@ -56,20 +49,19 @@ export const PerformanceSection: React.FC<PerformanceSectionProps> = ({
       <OptionGroup>
         <OptionLabel>Qualidade dos Efeitos Visuais</OptionLabel>
         <Select
-          value={performance.visualEffects}
+aria-label="Qualidade dos Efeitos Visuais"           value={performance.visualEffects}
           onChange={(e) => onUpdate({ visualEffects: e.target.value })}
         >
           <option value="low">Baixa</option>
           <option value="medium">Media</option>
           <option value="high">Alta</option>
-          <option value="ultra">Ultra</option>
         </Select>
       </OptionGroup>
 
       <OptionGroup>
         <OptionLabel>Qualidade dos Efeitos</OptionLabel>
         <Select
-          value={performance.effectQuality}
+aria-label="Qualidade dos Efeitos"           value={performance.effectQuality}
           onChange={(e) => onUpdate({ effectQuality: e.target.value })}
         >
           <option value="low">Baixa</option>
@@ -80,8 +72,7 @@ export const PerformanceSection: React.FC<PerformanceSectionProps> = ({
 
       <OptionGroup>
         <ToggleContainer>
-          <Toggle
-            active={performance.reduceParticles}
+          <Toggle aria-label="Reduzir Efeitos/Particulas"             active={performance.reduceParticles}
             onClick={() =>
               onUpdate({ reduceParticles: !performance.reduceParticles })
             }
@@ -89,7 +80,7 @@ export const PerformanceSection: React.FC<PerformanceSectionProps> = ({
           <ToggleLabel>Reduzir Efeitos/Particulas</ToggleLabel>
         </ToggleContainer>
         <OptionDescription>
-          Reduz o numero de particulas e efeitos visuais
+          Oculta brilhos decorativos do mapa, preservando os indicadores de jogo
         </OptionDescription>
       </OptionGroup>
     </>

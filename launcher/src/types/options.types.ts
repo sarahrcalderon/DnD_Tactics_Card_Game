@@ -9,6 +9,7 @@ export interface OptionsData {
 }
 
 export interface AudioOptions {
+  muted: boolean;
   volumeMaster: number;
   volumeMusic: number;
   volumeSFX: number;

@@ -450,7 +450,7 @@ export const PlayerMarker = styled.div<{
     `}
 `;
 
-export const PlayerGlow = styled.div`
+export const PlayerGlow = styled.div.attrs<{ 'data-decorative'?: boolean }>({ 'data-decorative': true })`
   position: absolute;
   width: 34px;
   height: 34px;
