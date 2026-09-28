@@ -1,3 +1,4 @@
+import { saveService } from '../../services/saveService';
 import { useEffect, useRef, useState, type ChangeEvent } from 'react';
 import { Navigate, NavLink, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
@@ -59,14 +60,15 @@ export function OnlineLayout() {
     const controller = new AbortController();
     if (!auth.token || auth.loading) return () => controller.abort();
 
+    const hasLocalCharacter = saveService.getAllSaves().some(save => !save.userId || save.userId === auth.user?.id);
     setCheckingCharacter(true);
     loadoutService.hasCharacters(controller.signal)
-      .then((value) => !controller.signal.aborted && setHasCharacter(value))
-      .catch(() => !controller.signal.aborted && setHasCharacter(false))
+      .then((value) => !controller.signal.aborted && setHasCharacter(value || hasLocalCharacter))
+      .catch(() => !controller.signal.aborted && setHasCharacter(hasLocalCharacter))
       .finally(() => !controller.signal.aborted && setCheckingCharacter(false));
 
     return () => controller.abort();
-  }, [auth.token, auth.loading, location.pathname]);
+  }, [auth.token, auth.loading, auth.user?.id, location.pathname]);
 
   if (!auth.token) {
     return <Navigate to="/login" state={{ from: location.pathname }} replace />;

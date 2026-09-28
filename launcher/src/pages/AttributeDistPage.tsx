@@ -473,7 +473,10 @@ export const AttributeDistPage = () => {
     );
   }
 
-  if (!classId || !raceId || !deityId || !deckId || !selectedCharacterName) {
+  const isSavedSheet = routeSheet.isSaved || isCharacterSaved;
+  const missingCreationChoices = !raceId || !deityId || !deckId;
+
+  if (!classId || !selectedCharacterName || (!isSavedSheet && missingCreationChoices)) {
     return (
       <Container>
         <BackgroundImage />

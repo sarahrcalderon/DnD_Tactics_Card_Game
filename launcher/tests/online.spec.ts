@@ -398,10 +398,10 @@ test('login apresenta falhas e retorna à rota protegida solicitada', async ({
 });
 
 test('saved offline characters join the account library without playing online', async ({ browser, request }) => {
-  const identity = await account(request, 'Library');
+  const identity = await account(request, 'Library', false);
   const local = {
     id: `local-${randomUUID()}`, userId: identity.user.id,
-    characterName: 'Offline Champion', className: 'paladino', raceId: 'humano', raceName: 'Humano',
+    characterName: 'Offline Champion', className: 'paladino', raceName: 'Humano',
     level: 1, attributes: { str: 16, dex: 10, con: 14, int: 10, wis: 12, cha: 14 },
     deckId: 'paladino-protecao', deckName: 'Offline Deck',
     campaignName: 'Blackmoor', equipment: {}, progress: 0, location: 'Acampamento',
@@ -425,11 +425,39 @@ test('saved offline characters join the account library without playing online',
   await expect.poll(async () => {
     const response = await request.get(`${api}/loadouts/characters`, { headers: identity.headers });
     return (await response.json()).length;
-  }).toBe(3);
+  }).toBe(2);
   await page.getByText('Offline Champion', { exact: true }).locator('..').getByRole('link', { name: 'Abrir ficha' }).click();
   await expect(page).toHaveURL(/attribute-dist/);
   await expect(page.getByText('Offline Champion', { exact: true }).first()).toBeVisible();
   const records = await request.get(`${api}/loadouts/characters`, { headers: identity.headers });
   expect((await records.json()).filter((item: { name: string }) => item.name === local.characterName)).toHaveLength(1);
   await context.close();
+});
+
+
+test('online character sheet accepts legacy characters without optional creation choices', async ({ browser, request }) => {
+  const identity = await account(request, 'LegacySheet');
+  const { context, page } = await enter(browser, identity);
+  try {
+    await page.route(`${api}/loadouts/characters`, async route => {
+      const response = await route.fetch();
+      const characters = await response.json();
+      await route.fulfill({ response, json: characters.map((character: any) => ({
+        ...character,
+        name: 'Legacy Saved Hero',
+        character: { ...character.character, race_id: null },
+      })) });
+    });
+    for (const path of ['/online', '/online/characters']) {
+      await page.goto(path);
+      await page.getByRole('link', { name: /Abrir ficha/ }).click();
+      await expect(page).toHaveURL(/attribute-dist/);
+      await expect(page.getByText('Legacy Saved Hero', { exact: true }).first()).toBeVisible();
+      await expect(page.getByRole('heading', { name: 'Erro', exact: true })).toHaveCount(0);
+      await page.reload();
+      await expect(page.getByText('Legacy Saved Hero', { exact: true }).first()).toBeVisible();
+    }
+  } finally {
+    await context.close();
+  }
 });

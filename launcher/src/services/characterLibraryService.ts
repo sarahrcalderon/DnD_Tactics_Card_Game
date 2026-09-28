@@ -79,7 +79,13 @@ export function onlineCharacterSheet(character: OnlineCharacter, userId: string)
     save.userId === userId && save.onlineCharacterId === character.id
   );
 
-  if (local) return savedCharacterSheet(local, userId);
+  if (local) {
+    return {
+      ...savedCharacterSheet(local, userId),
+      raceId: local.raceId || character.character.race_id || undefined,
+      raceImage: local.raceImage || character.character.portrait_url || undefined,
+    };
+  }
 
   return {
     classId: character.character.class_id,

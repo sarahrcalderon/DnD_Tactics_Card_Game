@@ -1,3 +1,4 @@
+import { characterStorageService } from '../services/characterStorageService';
 import { saveService } from '../services/saveService';
 import { useAuth } from '../contexts/AuthContext';
 import { loadoutService } from '../services/loadoutService';
@@ -27,6 +28,7 @@ export function useLoadoutEditor() {
         for (const save of saveService.getAllSaves()) {
           if (save.userId === user?.id && save.onlineCharacterId === characterId) {
             saveService.deleteSave(save.id);
+            if (characterStorageService.load()?.saveId === save.id) characterStorageService.delete();
           }
         }
         await resource.refresh();
