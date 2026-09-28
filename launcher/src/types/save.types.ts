@@ -1,5 +1,8 @@
 export interface SavedGame {
   id: string;
+  userId?: string;
+  onlineCharacterId?: string;
+  onlineDeckId?: string;
   characterName: string;
   className: string;
   raceId?: string;
@@ -9,6 +12,7 @@ export interface SavedGame {
   deityId?: string;
   deityName?: string;
   level: number;
+  campaignName?: string;
   timestamp: string;
   date: string;
   time: string;

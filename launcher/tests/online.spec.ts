@@ -396,3 +396,40 @@ test('login apresenta falhas e retorna à rota protegida solicitada', async ({
     page.getByRole('heading', { name: 'Uma nova expedição' }),
   ).toBeVisible();
 });
+
+test('saved offline characters join the account library without playing online', async ({ browser, request }) => {
+  const identity = await account(request, 'Library');
+  const local = {
+    id: `local-${randomUUID()}`, userId: identity.user.id,
+    characterName: 'Offline Champion', className: 'paladino', raceId: 'humano', raceName: 'Humano',
+    level: 1, attributes: { str: 16, dex: 10, con: 14, int: 10, wis: 12, cha: 14 },
+    deckId: 'paladino-protecao', deckName: 'Offline Deck',
+    campaignName: 'Blackmoor', equipment: {}, progress: 0, location: 'Acampamento',
+  };
+  const context = await browser.newContext();
+  await context.addInitScript(({ token, saves }) => {
+    sessionStorage.setItem('dnd.online.token', token);
+    if (!localStorage.getItem('dnd_saves')) localStorage.setItem('dnd_saves', JSON.stringify(saves));
+  }, { token: identity.access_token, saves: [local,
+    { ...local, id: 'other-save', userId: 'another-account', characterName: 'Other Account' },
+    { ...local, id: 'legacy-save', userId: undefined, characterName: 'Legacy Champion' },
+  ] });
+  const page = await context.newPage();
+  await page.goto('/online');
+  await expect(page.getByText('Offline Champion', { exact: true })).toBeVisible();
+  await expect(page.getByText('Other Account', { exact: true })).toHaveCount(0);
+  await expect.poll(() => page.evaluate(() => JSON.parse(localStorage.getItem('dnd_saves')!)[0].onlineDeckId)).toBeTruthy();
+  await page.reload();
+  await expect(page.getByText('Offline Champion', { exact: true })).toHaveCount(1);
+  await page.getByRole('button', { name: 'Vincular' }).click();
+  await expect.poll(async () => {
+    const response = await request.get(`${api}/loadouts/characters`, { headers: identity.headers });
+    return (await response.json()).length;
+  }).toBe(3);
+  await page.getByText('Offline Champion', { exact: true }).locator('..').getByRole('link', { name: 'Abrir ficha' }).click();
+  await expect(page).toHaveURL(/attribute-dist/);
+  await expect(page.getByText('Offline Champion', { exact: true }).first()).toBeVisible();
+  const records = await request.get(`${api}/loadouts/characters`, { headers: identity.headers });
+  expect((await records.json()).filter((item: { name: string }) => item.name === local.characterName)).toHaveLength(1);
+  await context.close();
+});

@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import toast from 'react-hot-toast';
 import { saveService } from '../services/saveService';
 import { characterStorageService } from '../services/characterStorageService';
+import { useCharacterCreation } from '../contexts/CharacterCreationContext';
 import { SavedGame } from '../types/save.types';
 
 declare global {
@@ -259,6 +260,11 @@ const SaveGrid = styled.div`
 `;
 
 const SaveCard = styled.div`
+  gap: 14px;
+  @media (max-width: 560px) {
+    flex-direction: column;
+    align-items: stretch;
+  }
   background: rgba(5, 8, 13, 0.48);
   border-radius: 2px;
   padding: 16px 20px;
@@ -277,6 +283,8 @@ const SaveCard = styled.div`
 `;
 
 const SaveInfo = styled.div`
+  min-width: 0;
+  overflow-wrap: anywhere;
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -404,6 +412,7 @@ const restoreSavedCharacter = (save: SavedGame): SavedGame => {
 
 export const LauncherPage = () => {
   const navigate = useNavigate();
+  const { reset: resetCreation } = useCharacterCreation();
   const [selectedIndex, setSelectedIndex] = useState<number>(0);
   const [isPywebview, setIsPywebview] = useState<boolean>(false);
   const [isMusicPlaying, setIsMusicPlaying] = useState<boolean>(false);
@@ -487,6 +496,10 @@ export const LauncherPage = () => {
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      if (showLoadModal) {
+        if (e.key === 'Escape') setShowLoadModal(false);
+        return;
+      }
       if (e.key === 'ArrowUp') {
         e.preventDefault();
         setSelectedIndex(
@@ -504,7 +517,7 @@ export const LauncherPage = () => {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [selectedIndex, options, playHoverSound]);
+  }, [selectedIndex, options, playHoverSound, showLoadModal]);
 
   const handleOpenLoadModal = useCallback(() => {
     const savesList = saveService.getAllSaves();
@@ -519,6 +532,7 @@ export const LauncherPage = () => {
   const handleLoadSave = useCallback(
     (save: SavedGame) => {
       const restoredSave = restoreSavedCharacter(save);
+      resetCreation();
       setShowLoadModal(false);
       toast.loading('Carregando jogo...', { duration: 800 });
       setTimeout(() => {
@@ -538,11 +552,12 @@ export const LauncherPage = () => {
             deckName: restoredSave.deckName,
             saveId: restoredSave.id,
             isSaved: true,
+            pointsRemaining: 0,
           },
         });
       }, 600);
     },
-    [navigate],
+    [navigate, resetCreation],
   );
 
   const handleDeleteSave = useCallback((id: string, e: React.MouseEvent) => {
@@ -567,37 +582,7 @@ export const LauncherPage = () => {
           }, 600);
           break;
 
-        case 'continuar': {
-          const latestSave = saveService.getLatestSave();
-          if (latestSave) {
-            const restoredSave = restoreSavedCharacter(latestSave);
-            toast.loading('Carregando jogo...', { duration: 1000 });
-            setTimeout(() => {
-              navigate('/attribute-dist', {
-                state: {
-                  classId: restoredSave.className.toLowerCase(),
-                  raceId: restoredSave.raceId,
-                  raceName: restoredSave.raceName || '',
-                  raceImage: restoredSave.raceImage,
-                  raceIcon: restoredSave.raceIcon,
-                  deityId: restoredSave.deityId,
-                  deityName: restoredSave.deityName,
-                  characterName: restoredSave.characterName,
-                  attributes: restoredSave.attributes,
-                  derivedStats: restoredSave.derivedStats,
-                  deckId: restoredSave.deckId,
-                  deckName: restoredSave.deckName,
-                  saveId: restoredSave.id,
-                  isSaved: true,
-                },
-              });
-            }, 600);
-          } else {
-            toast.error('Nenhum jogo salvo encontrado!');
-          }
-          break;
-        }
-
+        case 'continuar':
         case 'carregar':
           handleOpenLoadModal();
           break;
@@ -678,7 +663,7 @@ export const LauncherPage = () => {
           <ModalContent onClick={(e) => e.stopPropagation()}>
             <ModalWrapper>
               <CloseButton onClick={handleCloseLoadModal}>✕</CloseButton>
-              <ModalTitle>Carregar Jogo</ModalTitle>
+              <ModalTitle>Continuar aventura</ModalTitle>
               <ModalSubtitle>
                 Selecione um jogo salvo para continuar
               </ModalSubtitle>
@@ -702,7 +687,10 @@ export const LauncherPage = () => {
                         <SaveName>{save.characterName}</SaveName>
                         <SaveDetails>
                           {save.className} • {save.raceName || 'Raça'} • Nv.{' '}
-                          {save.level}
+                          {save.level ?? 1}
+                        </SaveDetails>
+                        <SaveDetails>
+                          Campanha: {save.campaignName || 'Blackmoor'}
                         </SaveDetails>
                         <SaveMeta>
                           {save.date} às {save.time} •{' '}
@@ -710,7 +698,7 @@ export const LauncherPage = () => {
                         </SaveMeta>
                       </SaveInfo>
                       <SaveActions>
-                        <SaveButton variant="primary">Carregar</SaveButton>
+                        <SaveButton variant="primary" onClick={(event) => { event.stopPropagation(); handleLoadSave(save); }}>Continuar</SaveButton>
                         <SaveButton
                           variant="danger"
                           onClick={(e) => handleDeleteSave(save.id, e)}

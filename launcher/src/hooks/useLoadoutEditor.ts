@@ -1,3 +1,5 @@
+import { saveService } from '../services/saveService';
+import { useAuth } from '../contexts/AuthContext';
 import { loadoutService } from '../services/loadoutService';
 import type { MatchSide } from '../types/online.types';
 import { useLoadouts } from './useLoadouts';
@@ -5,6 +7,7 @@ import { useTask } from './useTask';
 
 export function useLoadoutEditor() {
   const resource = useLoadouts();
+  const { user } = useAuth();
   const task = useTask();
 
   return {
@@ -21,6 +24,11 @@ export function useLoadoutEditor() {
     deleteCharacter: (characterId: string) =>
       task.run(async () => {
         await loadoutService.deleteCharacter(characterId);
+        for (const save of saveService.getAllSaves()) {
+          if (save.userId === user?.id && save.onlineCharacterId === characterId) {
+            saveService.deleteSave(save.id);
+          }
+        }
         await resource.refresh();
       }),
     createDeck: (

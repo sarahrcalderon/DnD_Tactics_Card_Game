@@ -1,3 +1,4 @@
+import type { Attributes } from './character.types';
 export type MatchSide = 'ENEMY' | 'CHAMPION';
 export type MatchStatus =
   | 'WAITING'
@@ -45,6 +46,7 @@ export interface OnlineCharacter {
   id: string;
   name: string;
   character: {
+    attributes?: Attributes;
     class_id: string;
     race_id: string;
     hp: number;

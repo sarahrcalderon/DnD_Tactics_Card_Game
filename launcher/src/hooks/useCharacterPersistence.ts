@@ -5,6 +5,7 @@ import { characterStorageService } from '../services/characterStorageService';
 import { saveService } from '../services/saveService';
 import type { AttributeDistributionRouteState } from '../types/attributeDist.types';
 import type { Attributes, DerivedStats } from '../types/character.types';
+import { useAuth } from '../contexts/AuthContext';
 import { TOTAL_POINTS } from '../data/attributeDistData';
 
 interface UseCharacterPersistenceParams {
@@ -43,6 +44,7 @@ export const useCharacterPersistence = ({
   isCreationFlow = false,
 }: UseCharacterPersistenceParams) => {
   const location = useLocation();
+  const { user } = useAuth();
 
   // Estados internos
   const [characterName, setCharacterName] = useState(initialName);
@@ -123,7 +125,12 @@ export const useCharacterPersistence = ({
     const currentName = characterName || raceName || 'Herói';
     const currentDeckName = deckName || 'Seu Deck';
 
+    const previous = characterStorageService.load();
+    const saved = saveId ? saveService.getSaveById(saveId) : null;
+    const current = previous?.saveId === saveId ? previous : null;
     characterStorageService.save({
+      ...(previous?.saveId === saveId ? previous : {}),
+      userId: saved?.userId || (previous?.saveId === saveId ? previous?.userId : undefined) || user?.id,
       name: currentName,
       characterName: currentName,
       className,
@@ -134,10 +141,10 @@ export const useCharacterPersistence = ({
       raceIcon: raceIcon || '',
       deityId: deityId || '',
       deityName: deityName || '',
-      level: 1,
+      level: current?.level ?? saved?.level ?? 1,
       attributes,
       derivedStats,
-      equipment: {},
+      equipment: current?.equipment ?? saved?.equipment ?? {},
       deckId,
       deckName: currentDeckName,
       pointsRemaining,
@@ -145,8 +152,8 @@ export const useCharacterPersistence = ({
       isSaved: isCharacterSaved,
       isFinalized: isCharacterSaved,
       saveId,
-      progress: 0,
-      location: 'Acampamento Inicial',
+      progress: current?.progress ?? saved?.progress ?? 0,
+      location: current?.location ?? saved?.location ?? 'Acampamento Inicial',
       createdAt: new Date().toISOString(),
     } as any);
   }, [
@@ -166,6 +173,7 @@ export const useCharacterPersistence = ({
     pointsRemaining,
     isCharacterSaved,
     saveId,
+    user?.id,
   ]);
 
   // Finalizar e salvar personagem
@@ -183,6 +191,7 @@ export const useCharacterPersistence = ({
 
       const currentDeckName = deckName || 'Deck Inicial';
       const characterData = {
+        userId: user?.id,
         characterName: characterName || 'Herói',
         className,
         classId,
@@ -228,6 +237,7 @@ export const useCharacterPersistence = ({
       }, 800));
     },
     [
+      user?.id,
       pointsRemaining,
       characterName,
       className,

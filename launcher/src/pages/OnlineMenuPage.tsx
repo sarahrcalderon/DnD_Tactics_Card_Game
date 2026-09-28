@@ -1,3 +1,7 @@
+import { useState } from 'react';
+import { saveService } from '../services/saveService';
+import { onlineCharacterSheet, savedCharacterSheet } from '../services/characterLibraryService';
+import { useCharacterCreation } from '../contexts/CharacterCreationContext';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { matchService } from '../services/matchService';
@@ -17,7 +21,12 @@ import {
 
 export function OnlineMenuPage() {
   const { user } = useAuth();
+  const { reset } = useCharacterCreation();
+  const [, updateLocalSaves] = useState(0);
   const loadouts = useLoadoutEditor();
+  const localSaves = saveService.getAllSaves().filter(save =>
+    (!save.userId || save.userId === user?.id) &&
+    !loadouts.data?.characters.some(character => character.id === save.onlineCharacterId));
   const last = user ? matchService.last(user.id) : null;
 
   const removeCharacter = async (id: string, name: string) => {
@@ -88,9 +97,35 @@ export function OnlineMenuPage() {
 
         <Panel style={{ height: 430, overflowY: 'auto' }}>
           <h2>Seus personagens</h2>
-          {!loadouts.loading && !loadouts.data?.characters.length && (
+          {!loadouts.loading && !loadouts.data?.characters.length && !localSaves.length && (
             <Muted>Nenhum personagem salvo.</Muted>
           )}
+          {localSaves.map((save) => (
+            <div key={save.id} style={{ padding: '12px 0', borderBottom: '1px solid #3d3c36' }}>
+              <strong>{save.characterName}</strong>
+              <Row style={{ marginTop: 8 }}>
+                <Tag>{save.className}</Tag>
+                <Tag>Nv. {save.level}</Tag>
+                <Tag>{save.campaignName || 'Blackmoor'}</Tag>
+              </Row>
+              <Row style={{ marginTop: 12 }}>
+                <Button as={Link} to="/attribute-dist" state={savedCharacterSheet(save, user!.id)} onClick={reset} $tone="quiet">
+                  Abrir ficha
+                </Button>
+                {!save.userId && (
+                  <Button disabled={loadouts.loading} onClick={() => {
+                    if (!user) return;
+                    saveService.updateSave(save.id, { userId: user.id });
+                    updateLocalSaves(value => value + 1);
+                    void loadouts.refresh();
+                  }}>
+                    Vincular à minha conta
+                  </Button>
+                )}
+              </Row>
+              {!save.userId && <Muted>Save local ainda sem conta vinculada.</Muted>}
+            </div>
+          ))}
           {loadouts.data?.characters.map((character) => (
             <div
               key={character.id}
@@ -102,7 +137,7 @@ export function OnlineMenuPage() {
                 <Tag>Nv. {character.character.level}</Tag>
               </Row>
               <Row style={{ marginTop: 12 }}>
-                <Button as={Link} to="/attribute-dist" $tone="quiet">
+                <Button as={Link} to="/attribute-dist" state={onlineCharacterSheet(character, user!.id)} onClick={reset} $tone="quiet">
                   Abrir ficha
                 </Button>
                 <Button

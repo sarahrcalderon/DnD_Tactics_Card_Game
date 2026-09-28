@@ -106,6 +106,7 @@ import { useDeckGeneration } from '../hooks/useCharacterDeck';
 import { characterStorageService } from '../services/characterStorageService';
 import { useCharacterCreation } from '../contexts/CharacterCreationContext';
 import { useAuth } from '../contexts/AuthContext';
+import { saveService } from '../services/saveService';
 import { loadoutService } from '../services/loadoutService';
 import { apiError } from '../utils/apiError';
 
@@ -306,8 +307,12 @@ export const AttributeDistPage = () => {
       return;
     }
     if (!auth.token || !auth.user) {
-      toast.error('Entre na sua conta para finalizar o personagem online.');
-      navigate('/login', { state: { from: '/attribute-dist' } });
+      void saveCharacter().then(saved => {
+        if (saved) {
+          markCreated(characterStorageService.load()?.saveId || undefined);
+          navigate('/map');
+        }
+      });
       return;
     }
 
@@ -320,14 +325,19 @@ export const AttributeDistPage = () => {
           attributes,
           raceImage || undefined,
         );
-        await loadoutService.createSelectedDeck(
+        const onlineDeck = await loadoutService.createSelectedDeck(
           creation.deckName || deckName || 'Deck inicial',
           classId!,
           deckId!,
         );
         auth.retry();
         if (await saveCharacter()) {
-          characterStorageService.update({ userId: auth.user!.id });
+          const local = characterStorageService.update({ userId: auth.user!.id, onlineCharacterId: onlineCharacter.id });
+          if (local?.saveId) saveService.updateSave(local.saveId, {
+            userId: auth.user!.id,
+            onlineCharacterId: onlineCharacter.id,
+            onlineDeckId: onlineDeck.id,
+          });
           markCreated(onlineCharacter.id);
           reset();
           navigate('/online/characters', { replace: true });
@@ -340,7 +350,7 @@ export const AttributeDistPage = () => {
 
   const handleStartMatch = useCallback(() => {
     persistCurrentCharacter();
-    navigate('/online/characters');
+    navigate('/map');
   }, [navigate, persistCurrentCharacter]);
 
   const handleDeleteCharacter = useCallback(() => {

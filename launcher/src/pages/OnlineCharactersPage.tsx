@@ -1,3 +1,6 @@
+import { useAuth } from '../contexts/AuthContext';
+import { useCharacterCreation } from '../contexts/CharacterCreationContext';
+import { onlineCharacterSheet } from '../services/characterLibraryService';
 import { Link } from 'react-router-dom';
 import { useLoadoutEditor } from '../hooks/useLoadoutEditor';
 import { Feedback } from '../components/online/Feedback';
@@ -5,6 +8,8 @@ import { Grid, Muted, PageHeading, Panel, Row, Tag } from '../styles/onlineStyle
 
 export function OnlineCharactersPage() {
   const model = useLoadoutEditor();
+  const { user } = useAuth();
+  const { reset } = useCharacterCreation();
 
   return (
     <>
@@ -25,7 +30,7 @@ export function OnlineCharactersPage() {
             <br />
             <Muted>Nível {item.character.level} · {item.character.max_hp} PV · {item.character.mana} Mana</Muted>
             <br />
-            <Link to="/attribute-dist">Abrir ficha →</Link>
+            <Link to="/attribute-dist" state={onlineCharacterSheet(item, user!.id)} onClick={reset}>Abrir ficha →</Link>
           </Panel>
         ))}
       </Grid>

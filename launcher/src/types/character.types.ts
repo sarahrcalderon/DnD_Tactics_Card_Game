@@ -43,6 +43,7 @@ export interface DerivedStats {
 
 export interface Character {
   userId?: string;
+  onlineCharacterId?: string;
   name: string;
   classId: string;
   className: string;

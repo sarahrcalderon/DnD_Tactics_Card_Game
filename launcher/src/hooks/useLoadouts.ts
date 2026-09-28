@@ -1,10 +1,18 @@
-import { useEffect, useState } from 'react';
+import { useAuth } from '../contexts/AuthContext';
+import { syncSavedCharacters } from '../services/characterLibraryService';
+import { useCallback, useEffect, useState } from 'react';
 import { loadoutService } from '../services/loadoutService';
 import type { LoadoutSelection, MatchSide } from '../types/online.types';
 import { useAsyncResource } from './useAsyncResource';
 
 export function useLoadouts() {
-  return useAsyncResource(loadoutService.list);
+  const { user } = useAuth();
+  const loader = useCallback(async (signal: AbortSignal) => {
+    if (user) await syncSavedCharacters(user.id);
+    signal.throwIfAborted();
+    return loadoutService.list(signal);
+  }, [user?.id]);
+  return useAsyncResource(loader);
 }
 
 export function useLoadoutSelection(side: MatchSide) {

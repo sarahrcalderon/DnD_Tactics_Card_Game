@@ -25,6 +25,7 @@ export const saveService = {
     const now = new Date();
     const newSave: SavedGame = {
       ...gameData,
+      campaignName: gameData.campaignName || 'Blackmoor',
       id: `save_${Date.now()}`,
       timestamp: now.toISOString(),
       date: now.toLocaleDateString('pt-BR'),
