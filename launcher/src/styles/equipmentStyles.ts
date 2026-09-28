@@ -863,7 +863,7 @@ export const AttributeCard = styled.div`
 export const StatGroups = styled.div`
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  align-items: start;
+  align-items: stretch;
   gap: 10px;
   margin-top: 14px;
   padding-top: 14px;
@@ -872,22 +872,15 @@ export const StatGroups = styled.div`
   @media (max-width: 560px) { grid-template-columns: 1fr; }
 `;
 
-export const StatGroup = styled.section<{ $dense?: boolean }>`
+export const StatGroup = styled.section`
+  min-width: 0;
   padding: 11px 12px;
   background: rgba(5, 8, 13, 0.38);
   border: 1px solid rgba(211, 170, 94, 0.16);
 
-  ${({ $dense }) => $dense && `
-    grid-column: span 2;
-    @media (min-width: 561px) {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      column-gap: 18px;
-      align-items: start;
-
-      h4 { grid-column: 1 / -1; }
-    }
-  `}
+  > div + div:has(h4) {
+    margin-top: 10px;
+  }
 `;
 
 export const StatGroupTitle = styled.h4`

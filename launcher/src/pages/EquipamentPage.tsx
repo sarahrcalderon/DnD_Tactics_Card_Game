@@ -62,7 +62,7 @@ import { EquipmentPreview } from '../components/Equipment/EquipmentPreview';
 import { calculateCharacter } from '../utils/characterCalculator';
 import { DerivedStats, Attributes } from '../types/character.types';
 import { getGold } from '../utils/goldUtils';
-import { getModifierDisplay } from '../utils/characterStats';
+import { getAttributeModifier, getModifierDisplay } from '../utils/characterStats';
 import { formatStatValue } from '../utils/statFormat';
 
 const getSlotType = (slot: EquipmentSlot): string => {
@@ -528,7 +528,9 @@ export const EquipmentPage = () => {
                   <AttributeCard key={key}>
                     <span>{label}</span>
                     <strong>{displayAttributes?.[key] || 0}</strong>
-                    <small>{getModifierDisplay(displayAttributes?.[key] || 0)} modificador</small>
+                    {displayAttributes?.[key] != null && getAttributeModifier(displayAttributes[key]) !== 0 && (
+                      <small>{getModifierDisplay(displayAttributes[key])} modificador</small>
+                    )}
                   </AttributeCard>
                 ))}
               </AttributeGrid>
@@ -582,142 +584,29 @@ export const EquipmentPage = () => {
                 </StatBarRow>
               </StatBarContainer>
 
-              <div
-                style={{
-                  display: 'none',
-                  gridTemplateColumns: '1fr 1fr',
-                  gap: '4px 12px',
-                  marginTop: '12px',
-                }}
-              >
-                <div
-                  style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    color: '#858594',
-                    fontSize: '0.7rem',
-                  }}
-                >
-                  <span>Defesa</span>
-                  <span style={{ color: '#ffd700' }}>
-                    {formatStatValue(displayStats?.defense)}
-                  </span>
-                </div>
-                <div
-                  style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    color: '#858594',
-                    fontSize: '0.7rem',
-                  }}
-                >
-                  <span>Ataque</span>
-                  <span style={{ color: '#ffd700' }}>{formatStatValue(equipmentAttack, 'decimal')}</span>
-                </div>
-                <div
-                  style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    color: '#858594',
-                    fontSize: '0.7rem',
-                  }}
-                >
-                  <span>Awareness</span>
-                  <span style={{ color: '#ffd700' }}>
-                    {formatStatValue(displayStats?.awareness)}
-                  </span>
-                </div>
-                <div
-                  style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    color: '#858594',
-                    fontSize: '0.7rem',
-                  }}
-                >
-                  <span>Crítico</span>
-                  <span style={{ color: '#ffd700' }}>
-                    {formatStatValue(displayStats?.critical, 'percentage')}
-                  </span>
-                </div>
-                <div
-                  style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    color: '#858594',
-                    fontSize: '0.7rem',
-                  }}
-                >
-                  <span>Avoidance</span>
-                  <span style={{ color: '#ffd700' }}>
-                    {formatStatValue(displayStats?.avoidance, 'percentage')}
-                  </span>
-                </div>
-                <div
-                  style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    color: '#858594',
-                    fontSize: '0.7rem',
-                  }}
-                >
-                  <span>Deflect</span>
-                  <span style={{ color: '#ffd700' }}>
-                    {formatStatValue(displayStats?.deflect, 'percentage')}
-                  </span>
-                </div>
-                <div
-                  style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    color: '#858594',
-                    fontSize: '0.7rem',
-                  }}
-                >
-                  <span>Potência Mágica</span>
-                  <span style={{ color: '#ffd700' }}>
-                    {formatStatValue(displayStats?.manaPower, 'decimal')}
-                  </span>
-                </div>
-                <div
-                  style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    color: '#858594',
-                    fontSize: '0.7rem',
-                  }}
-                >
-                  <span>Iniciativa</span>
-                  <span style={{ color: '#ffd700' }}>
-                    {formatStatValue(displayStats?.initiative)}
-                  </span>
-                </div>
-                <div
-                  style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    color: '#858594',
-                    fontSize: '0.7rem',
-                  }}
-                >
-                  <span>Velocidade</span>
-                  <span style={{ color: '#ffd700' }}>
-                    {formatStatValue(displayStats?.speed, 'distance')}
-                  </span>
-                </div>
-              </div>
               <StatGroups>
-                {statGroups.map((group) => (
-                  <StatGroup key={group.title} $dense={group.title === 'Combate'}>
-                    <StatGroupTitle>{group.title}</StatGroupTitle>
-                    {group.stats.map(([label, value]) => (
-                      <StatMetric key={label}>
-                        <span>{label}</span>
-                        <strong>{value}</strong>
-                      </StatMetric>
-                    ))}
-                  </StatGroup>
-                ))}
+                <StatGroup>
+                  <StatGroupTitle>{statGroups[0].title}</StatGroupTitle>
+                  {statGroups[0].stats.map(([label, value]) => (
+                    <StatMetric key={label}>
+                      <span>{label}</span>
+                      <strong>{value}</strong>
+                    </StatMetric>
+                  ))}
+                </StatGroup>
+                <StatGroup>
+                  {statGroups.slice(1).map((group) => (
+                    <div key={group.title}>
+                      <StatGroupTitle>{group.title}</StatGroupTitle>
+                      {group.stats.map(([label, value]) => (
+                        <StatMetric key={label}>
+                          <span>{label}</span>
+                          <strong>{value}</strong>
+                        </StatMetric>
+                      ))}
+                    </div>
+                  ))}
+                </StatGroup>
               </StatGroups>
             </CharacterStatsPanel>
 

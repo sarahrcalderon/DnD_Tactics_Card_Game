@@ -803,16 +803,15 @@ export const StatsGrid = styled.div`
 export const StatItem = styled.div`
   position: relative;
 
+  min-width: 0;
   min-height: 94px;
-
-  overflow: hidden;
-
-  padding: 12px 10px;
+  box-sizing: border-box;
+  padding: 12px;
 
   display: grid;
-  grid-template-columns: 28px minmax(0, 1fr) max-content;
-  align-items: center;
-  column-gap: 8px;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: 1fr auto;
+  gap: 10px;
   color: ${colors.text.secondary};
   font-size: 0.68rem;
   font-weight: 700;
@@ -901,10 +900,15 @@ export const StatIcon = styled.img`
 `;
 
 export const StatLabel = styled.div`
-  display: contents;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
 
   img {
-    grid-column: 1;
+    flex: 0 0 26px;
     width: 26px !important;
     height: 26px !important;
     margin: 0 !important;
@@ -924,8 +928,12 @@ export const StatLabel = styled.div`
 `;
 
 export const StatValue = styled.span`
-  grid-column: 3;
+  display: block;
   margin: 0;
+  padding-top: 8px;
+  border-top: 1px solid rgba(213, 177, 102, 0.16);
+  text-align: right;
+  white-space: nowrap;
 
   color: #ffd700;
 
